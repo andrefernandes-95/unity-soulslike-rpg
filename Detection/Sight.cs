@@ -1,17 +1,17 @@
-
-using System.Collections.Generic;
-using System.Linq;
-using AF.Characters;
-using AF.Combat;
-using UnityEngine;
-using UnityEngine.Events;
-using Vector3 = UnityEngine.Vector3;
-
 namespace AF.Detection
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using AF.Characters;
+    using AF.Combat;
+    using UnityEngine;
+    using UnityEngine.Events;
+    using Vector3 = UnityEngine.Vector3;
+
     public class Sight : MonoBehaviour
     {
         public float viewDistance = 10f;
+        public float sphereRadius = 5f; // Radius for the sphere cast
         public LayerMask targetLayer;
 
         [Header("Components")]
@@ -37,34 +37,53 @@ namespace AF.Detection
         public Transform IsTargetInSight()
         {
             Vector3 originPosition = origin.transform.position;
-
-            Vector3 direction = origin.transform.forward * viewDistance;
+            Vector3 direction = origin.transform.forward;
 
             // Perform the raycast
             if (Physics.Raycast(originPosition, direction, out RaycastHit hit, viewDistance, targetLayer))
             {
                 if (debug) Debug.DrawLine(originPosition, hit.point, Color.red); // Draw a red line for the raycast
-
                 return hit.transform;
             }
 
             // Draw a green debug line if no target is hit
-            if (debug) Debug.DrawRay(originPosition, direction, Color.green);
+            if (debug) Debug.DrawRay(originPosition, direction * viewDistance, Color.green);
             return null;
         }
+
+        public Transform IsTargetInSphereSight()
+        {
+            Vector3 originPosition = origin.transform.position;
+            Vector3 direction = origin.transform.forward;
+
+            // Perform the sphere cast
+            if (Physics.SphereCast(originPosition, sphereRadius, direction, out RaycastHit hit, viewDistance, targetLayer))
+            {
+                if (debug) Debug.DrawLine(originPosition, hit.point, Color.blue); // Draw a blue line for the sphere cast
+                return hit.transform;
+            }
+
+            // Draw a yellow debug sphere if no target is hit
+            if (debug) Debug.DrawRay(originPosition, direction * viewDistance, Color.yellow);
+            return null;
+        }
+
         public void CastSight()
         {
-            if (canSight == false)
+            if (!canSight)
             {
                 return;
             }
 
-            Transform hit = IsTargetInSight();
+            Transform hit = IsTargetInSight(); // Check raycast first
+            if (hit == null)
+            {
+                hit = IsTargetInSphereSight(); // Fallback to sphere cast if raycast fails
+            }
 
             if (hit != null)
             {
                 // Check if the hit object's tag is in the list of tags to detect
-
                 if (tagsToDetect.Count > 0)
                 {
                     isSighted = tagsToDetect.Contains(hit.transform.gameObject.tag);
@@ -72,7 +91,7 @@ namespace AF.Detection
 
                 if (isSighted && hit.TryGetComponent(out CharacterBaseManager target))
                 {
-                    if (factionsToIgnore == null || factionsToIgnore.Count == 0 || !target.characterFactions.Any(faction => factionsToIgnore.Contains(faction)))
+                    if (factionsToIgnore == null || factionsToIgnore.Count == 0 || !target.combatant.characterFactions.Any(faction => factionsToIgnore.Contains(faction)))
                     {
                         targetManager.SetTarget(target, () =>
                         {

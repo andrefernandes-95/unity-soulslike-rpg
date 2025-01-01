@@ -87,6 +87,20 @@ namespace AF
             ).SetEase(Ease.OutElastic);
         }
 
+        public static void PlayInfinitePopAnimation(VisualElement button, Vector3 startingScale, float duration)
+        {
+            button.transform.scale = startingScale;
+
+            DOTween.To(
+                () => startingScale,
+                scale => button.transform.scale = scale,
+                Vector3.one,
+                duration
+            )
+            .SetEase(Ease.InOutSine)
+            .SetLoops(-1, LoopType.Yoyo); // Infinite loop with a Yoyo effect
+        }
+
         public static void ScrollToLastPosition(int currentIndex, ScrollView scrollView, UnityAction onFinish)
         {
             VisualElement lastElement = null;

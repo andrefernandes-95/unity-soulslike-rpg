@@ -1,14 +1,11 @@
-using System.Collections;
-using System.Linq;
-using AF.Characters;
-using AF.Combat;
-using AF.Health;
-using AF.StatusEffects;
-using UnityEngine;
-using UnityEngine.AI;
-
 namespace AF
 {
+    using System.Linq;
+    using AF.Health;
+    using AF.StatusEffects;
+    using UnityEngine;
+    using UnityEngine.AI;
+
     public abstract class CharacterBaseManager : MonoBehaviour
     {
         public Combatant combatant;
@@ -20,9 +17,6 @@ namespace AF
 
         [Header("Audio Sources")]
         public AudioSource combatAudioSource;
-
-        [Header("Faction")]
-        public CharacterFaction[] characterFactions;
 
         [Header("Flags")]
         public bool isBusy = false;
@@ -100,13 +94,12 @@ namespace AF
 
         public bool IsFromSameFaction(CharacterBaseManager target)
         {
-            return target != null && characterFactions != null
-                && characterFactions.Length > 0
-                && characterFactions.Any(thisCharactersFaction =>
-                    target.characterFactions != null && target.characterFactions.Length > 0 && target.characterFactions.Contains(thisCharactersFaction));
+            return target != null && combatant.characterFactions != null
+                && combatant.characterFactions.Length > 0
+                && combatant.characterFactions.Any(thisCharactersFaction =>
+                    target.combatant.characterFactions != null && target.combatant.characterFactions.Length > 0 && target.combatant.characterFactions.Contains(thisCharactersFaction));
 
         }
-
 
         public void SetIsConfused(bool value)
         {

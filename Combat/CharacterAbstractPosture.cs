@@ -152,6 +152,11 @@ namespace AF
                 return incomingDamage;
             }
 
+            if (receiver is PlayerManager playerManager && playerManager.playerBlockController.isBlocking && playerManager.playerBlockController.CanParry(incomingDamage))
+            {
+                return incomingDamage;
+            }
+
             bool isPostureBroken = TakePostureDamage(incomingDamage.postureDamage);
 
             if (isPostureBroken)

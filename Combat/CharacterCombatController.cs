@@ -1,25 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using AF.Animations;
-using AF.Events;
-using AF.Health;
-using TigerForge;
-using UnityEngine;
-using UnityEngine.Events;
-
-namespace AF.Combat
+namespace AF
 {
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using AF.Animations;
+    using AF.Events;
+    using AF.Health;
+    using TigerForge;
+    using UnityEngine;
+    using UnityEngine.Events;
+
     public class CharacterCombatController : MonoBehaviour
     {
         [Header("Components")]
         public CharacterManager characterManager;
 
         [Header("Combat Actions")]
-        public List<CombatAction> reactionsToTarget = new();
-        public List<CombatAction> combatActions = new();
-        public List<CombatAction> chaseActions = new();
+        public Transform reactionActionsContainer;
+        public readonly List<CombatAction> reactionsToTarget = new();
+        public Transform combatActionsContainer;
+        public readonly List<CombatAction> combatActions = new();
+        public Transform chaseActionsContainer;
+        public readonly List<CombatAction> chaseActions = new();
 
         [Header("Directional")]
         public CombatAction reactionToTargetBehindBack;
@@ -58,10 +60,29 @@ namespace AF.Combat
         {
             characterManager.animator.SetFloat(AttackSpeedHash, 1f);
 
-
             if (characterManager.characterCombatController.listenForDodgeInput)
             {
                 EventManager.StartListening(EventMessages.ON_PLAYER_DODGING_FINISHED, OnPlayerDodgeFinished);
+            }
+
+            PopulateCombatActions();
+        }
+
+        void PopulateCombatActions()
+        {
+            PopulateActions(reactionActionsContainer, reactionsToTarget);
+            PopulateActions(combatActionsContainer, combatActions);
+            PopulateActions(chaseActionsContainer, chaseActions);
+        }
+
+        void PopulateActions(Transform container, List<CombatAction> actionList)
+        {
+            foreach (Transform child in container)
+            {
+                if (child.gameObject.activeSelf && child.TryGetComponent(out CombatAction combatActionToAdd))
+                {
+                    actionList.Add(combatActionToAdd);
+                }
             }
         }
 

@@ -66,7 +66,8 @@ namespace AF
                 VisualElement row = currentTutorial.GetRenderedObjective(
                     tutorialStep,
                     Array.IndexOf(currentTutorial.tutorialSteps, tutorialManager.currentStep),
-                    starterAssetsInputs
+                    starterAssetsInputs,
+                    Array.IndexOf(currentTutorial.tutorialSteps, tutorialManager.currentStep) == currentIndex
                 );
 
                 stepsContent.Add(row);

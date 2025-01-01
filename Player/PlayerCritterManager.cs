@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using AF.Characters;
-using UnityEngine;
-using System.Linq;
-
 namespace AF
 {
+    using System.Collections;
+    using AF.Characters;
+    using UnityEngine;
+    using System.Linq;
     public class PlayerCritterManager : MonoBehaviour
     {
         public CharacterFaction playerFaction;
@@ -16,7 +14,7 @@ namespace AF
         public void SpawnCritter(CharacterManager character)
         {
             CharacterManager instance = Instantiate(character, playerManager.transform.position + playerManager.transform.forward, Quaternion.identity);
-            instance.characterFactions = new CharacterFaction[] { playerFaction };
+            instance.combatant.characterFactions = new CharacterFaction[] { playerFaction };
 
             LockOnRef lockOnRef = instance.GetComponentInChildren<LockOnRef>();
             if (lockOnRef != null)
@@ -34,7 +32,7 @@ namespace AF
                 var enemyCharacters = allCharacters.Where(character => character.CompareTag("Enemy"));
 
                 // Exclude the character that is the same as this character
-                var filteredCharacters = enemyCharacters.Where(_character => !_character.characterFactions.Contains(playerFaction));
+                var filteredCharacters = enemyCharacters.Where(_character => !_character.combatant.characterFactions.Contains(playerFaction));
 
                 // Sort characters by distance to the player
                 var closestCharacter = filteredCharacters.OrderBy(

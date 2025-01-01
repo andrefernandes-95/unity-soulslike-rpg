@@ -1,9 +1,8 @@
-using AF.Health;
-using UnityEngine;
-using UnityEngine.Events;
-
-namespace AF.Combat
+namespace AF
 {
+    using AF.Health;
+    using UnityEngine;
+    using UnityEngine.Events;
 
     public class CombatAction : MonoBehaviour
     {

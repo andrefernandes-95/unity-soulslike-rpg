@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Linq;
-using AF.Characters;
-using UnityEngine;
-
 namespace AF
 {
+    using System.Collections;
+    using System.Linq;
+    using AF.Characters;
+    using UnityEngine;
 
     public class EV_TurnFactionAgressiveTowardsPlayer : EventBase
     {
@@ -21,9 +20,9 @@ namespace AF
                     if (
                         characterInScene is CharacterManager aiCharacter
                         && aiCharacter.targetManager != null
-                        && aiCharacter.characterFactions != null
-                        && aiCharacter.characterFactions.Length > 0
-                        && aiCharacter.characterFactions.Contains(faction))
+                        && aiCharacter.combatant.characterFactions != null
+                        && aiCharacter.combatant.characterFactions.Length > 0
+                        && aiCharacter.combatant.characterFactions.Contains(faction))
                     {
                         aiCharacter.targetManager.SetPlayerAsTarget();
                     }

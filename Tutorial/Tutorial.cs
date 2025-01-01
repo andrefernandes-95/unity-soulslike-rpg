@@ -36,9 +36,10 @@ namespace AF
         public LocalizedString description;
         public TutorialStep[] tutorialSteps;
 
-        public VisualElement GetRenderedObjective(TutorialStep tutorialStep, int currentStep, StarterAssetsInputs starterAssetsInputs)
+        public VisualElement GetRenderedObjective(TutorialStep tutorialStep, int currentStep, StarterAssetsInputs starterAssetsInputs, bool isCurrentStep)
         {
             bool isComplete = currentStep == -1 || currentStep > Array.IndexOf(tutorialSteps, tutorialStep);
+
 
             VisualElement row = new VisualElement();
             row.style.flexDirection = FlexDirection.Row;
@@ -80,6 +81,11 @@ namespace AF
 
                     row.Add(label);
                 }
+            }
+
+            if (isCurrentStep)
+            {
+                UIUtils.PlayInfinitePopAnimation(row, new(0.9f, 0.9f, 0.9f), 1f);
             }
 
             return row;

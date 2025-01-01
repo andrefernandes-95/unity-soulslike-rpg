@@ -1,6 +1,6 @@
-
 namespace AF
 {
+    using AF.Characters;
     using AF.Inventory;
     using AYellowpaper.SerializedCollections;
     using UnityEngine;
@@ -43,5 +43,8 @@ namespace AF
             OVERRIDE,
             MERGE,
         }
+
+        [Header("Faction")]
+        public CharacterFaction[] characterFactions;
     }
 }

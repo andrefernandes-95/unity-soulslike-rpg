@@ -54,6 +54,11 @@ namespace AF.Combat
 
         public void SetTarget(CharacterBaseManager target, UnityAction onTargetSetCallback, bool ignorePostureBroken)
         {
+            if (target == null)
+            {
+                return;
+            }
+
             if (!CanSetTarget(ignorePostureBroken))
             {
                 return;
