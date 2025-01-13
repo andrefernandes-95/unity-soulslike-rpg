@@ -17,5 +17,7 @@
         [Header("Requirements")]
         [Tooltip("Minimum ingredients to produce the effects")] public int minimumAmount = 2;
 
+        public int effectDuration = 0;
+
     }
 }

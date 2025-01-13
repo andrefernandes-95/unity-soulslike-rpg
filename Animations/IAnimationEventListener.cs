@@ -13,6 +13,8 @@ namespace AF.Animations
         public void ShowShield();
 
         // Combat
+        public void OpenHeadWeaponHitbox();
+        public void CloseHeadWeaponHitbox();
         public void OpenLeftWeaponHitbox();
         public void CloseLeftWeaponHitbox();
         public void OpenRightWeaponHitbox();
@@ -41,8 +43,6 @@ namespace AF.Animations
 
         // FX
         public void OnBlood();
-
-        public void OpenCombo();
 
         public void OnShakeCamera();
 

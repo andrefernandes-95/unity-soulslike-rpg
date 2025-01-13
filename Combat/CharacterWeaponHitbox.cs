@@ -3,6 +3,8 @@
     using System.Collections.Generic;
     using System.Linq;
     using AF.Combat;
+    using AF.Health;
+    using Unity.Cinemachine;
     using UnityEngine;
     using UnityEngine.Events;
 
@@ -39,6 +41,9 @@
         public CharacterTwoHandRef characterTwoHandRef;
         public CharacterWeaponBuffs characterWeaponBuffs;
 
+        [Header("Enemy")]
+        public Damage enemyWeaponDamage;
+
         // Scene References
         Soundbank soundbank;
         WeaponCollisionFXManager weaponCollisionFXManager;
@@ -50,6 +55,10 @@
 
         // Useful for throwable weapon situation
         [HideInInspector] public bool shouldDisableHitboxOnStart = true;
+
+        public CinemachineImpulseSource cinemachineImpulseSource;
+
+        public float impactForce = 0.1f;
 
         private void Awake()
         {
@@ -145,9 +154,15 @@
 
             if (other.TryGetComponent(out IDamageable damageable) && !damageReceiversHit.Contains(damageable))
             {
+                if (cinemachineImpulseSource != null)
+                {
+                    cinemachineImpulseSource.GenerateImpulse(impactForce);
+                }
+
                 damageReceiversHit.Add(damageable);
                 damageable.OnDamage(character, () =>
                 {
+
                     onDamageInflicted?.Invoke();
 
                     if (hitSfx != null && canPlayHitSfx && character != null)

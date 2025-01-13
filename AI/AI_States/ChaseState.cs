@@ -111,6 +111,7 @@ namespace AF
                     if (characterManager.characterCombatController != null)
                     {
                         characterManager.characterCombatController.UseChaseAction();
+
                         return this;
                     }
                 }

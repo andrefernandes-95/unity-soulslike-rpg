@@ -69,7 +69,7 @@ namespace AF
             if (closestTeleport == null) return null;
 
             var teleportMatch = FindObjectsByType<EV_Teleport>(FindObjectsInactive.Include, FindObjectsSortMode.None)
-                .FirstOrDefault(evTeleport => evTeleport.destinationSceneName == closestTeleport.name);
+                .FirstOrDefault(evTeleport => evTeleport.targetLocation?.name == closestTeleport.name);
 
             return teleportMatch?.gameObject;
         }

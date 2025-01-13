@@ -25,7 +25,6 @@ namespace AF.Inventory
         {
             // No need to populate the list; it's serialized directly
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-
         }
 
         private void OnPlayModeStateChanged(PlayModeStateChange state)
@@ -39,21 +38,27 @@ namespace AF.Inventory
 #endif
         public void Clear() => ownedItems.Clear();
 
-        public void SetDefaultItems()
+        public void SetDefaultItems(EquipmentGraphicsHandler equipmentGraphicsHandler)
         {
             ownedItems.Clear();
 
-            foreach (var defaultItem in defaultItems)
+            foreach (var addedItem in defaultItems)
             {
-                ItemInstance addedItem = AddItem(defaultItem);
 
-                if (addedItem is ArmorInstance armorInstance)
+                if (addedItem is Armor)
                 {
-                    equipmentDatabase.EquipArmor(armorInstance);
+                    ArmorInstance armorInstance = AddItem(addedItem) as ArmorInstance;
+                    equipmentGraphicsHandler.EquipArmor(armorInstance);
                 }
-                else if (addedItem is LegwearInstance legwearInstance)
+                else if (addedItem is Gauntlet)
                 {
-                    equipmentDatabase.EquipLegwear(legwearInstance);
+                    GauntletInstance gauntletInstance = AddItem(addedItem) as GauntletInstance;
+                    equipmentGraphicsHandler.EquipGauntlet(gauntletInstance);
+                }
+                else if (addedItem is Legwear)
+                {
+                    LegwearInstance legwearInstance = AddItem(addedItem) as LegwearInstance;
+                    equipmentGraphicsHandler.EquipLegwear(legwearInstance);
                 }
             }
         }

@@ -4,6 +4,7 @@ namespace AF
     using System.Collections;
     using System.Linq;
     using AF.Dialogue;
+    using AF.UI;
     using UnityEngine;
     using UnityEngine.Localization.Settings;
 
@@ -23,6 +24,9 @@ namespace AF
         [Header("Responses")]
         public Response[] responses;
 
+        [Header("Action Button")]
+        public ActionButton actionButton;
+
         [HideInInspector] public MonoBehaviourID monoBehaviourID => GetComponent<MonoBehaviourID>();
 
         // Scene Refs
@@ -34,7 +38,11 @@ namespace AF
             Response[] filteredResponses = responses.Where(response => response.gameObject.activeInHierarchy).ToArray();
 
             yield return GetUIDocumentDialogueWindow().DisplayMessage(
-                character, LocalizationSettings.StringDatabase.GetLocalizedString("Dialogues", monoBehaviourID.ID), filteredResponses);
+                character,
+                LocalizationSettings.StringDatabase.GetLocalizedString("Dialogues", monoBehaviourID.ID),
+                filteredResponses,
+                actionButton
+                );
         }
 
         private void OnDisable()

@@ -1,14 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-
-namespace AF
+﻿namespace AF
 {
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using UnityEngine;
+
     public class EV_Teleport : EventBase
     {
         public SceneTeleport currentSceneTeleports;
-        public string destinationSceneName;
+        public Location targetLocation;
 
         // Scene Refs
         TeleportManager teleportManager;
@@ -23,13 +23,13 @@ namespace AF
         {
             // Find the first match where the key's name is the destination scene
             var match = currentSceneTeleports.teleports
-                .FirstOrDefault(entry => entry.Key.name == destinationSceneName);
+                .FirstOrDefault(entry => entry.Key.name == targetLocation.name);
 
             // Check if match is valid and match.Value is not null
             if (!match.Equals(default(KeyValuePair<Location, string>)) && match.Value != null)
             {
                 // Use TeleportManager to teleport to the destination scene
-                GetTeleportManager().Teleport(destinationSceneName, match.Value);
+                GetTeleportManager().Teleport(targetLocation.name, match.Value);
             }
         }
 

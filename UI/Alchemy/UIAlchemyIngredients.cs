@@ -68,6 +68,9 @@ namespace AF
         void DrawIngredientsList(ScrollView scrollView)
         {
             int i = 0;
+
+            Dictionary<CraftingMaterial, int> visitedItems = new();
+
             foreach (var craftingMaterialInstance in inventoryDatabase.FilterByType<CraftingMaterialInstance>())
             {
                 CraftingMaterial ingredient = craftingMaterialInstance.GetItem();
@@ -107,7 +110,15 @@ namespace AF
                 false,
                 soundbank);
 
-                scrollView.Add(scrollItem);
+                if (visitedItems.ContainsKey(ingredient))
+                {
+                    visitedItems[ingredient]++;
+                }
+                else
+                {
+                    scrollView.Add(scrollItem);
+                    visitedItems.Add(ingredient, 1);
+                }
 
                 i++;
             }

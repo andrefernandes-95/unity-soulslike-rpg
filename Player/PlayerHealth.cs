@@ -27,6 +27,7 @@ namespace AF
         [Header("Options")]
         public bool isTutorialScene = false;
 
+        public int bonusMaximumHealth = 0;
 
         private void Awake()
         {
@@ -43,7 +44,7 @@ namespace AF
         public override int GetMaxHealth()
         {
             int baseValue = Formulas.CalculateStatForLevel(
-                playerManager.combatant.health + playerStatsBonusController.healthBonus,
+                playerManager.combatant.health + playerStatsBonusController.healthBonus + bonusMaximumHealth,
                 playerStatsBonusController.GetCurrentVitality(),
                 playerStatsDatabase.levelMultiplierForHealth);
 
@@ -210,6 +211,12 @@ namespace AF
             }
 
             return damage;
+        }
+
+        public void SetBonusMaximumHealth(int bonusAmount)
+        {
+            this.bonusMaximumHealth = bonusAmount;
+            onHealthChanged?.Invoke();
         }
     }
 }

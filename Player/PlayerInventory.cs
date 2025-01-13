@@ -134,7 +134,7 @@ namespace AF
 
         bool CanConsumeItem(Consumable consumable)
         {
-            if (isConsumingItem)
+            if (isConsumingItem || consumable == null)
             {
                 return false;
             }

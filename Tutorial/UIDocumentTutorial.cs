@@ -59,7 +59,10 @@ namespace AF
             titleContainer.Q<VisualElement>("UncompleteCheck").style.display = isComplete ? DisplayStyle.None : DisplayStyle.Flex;
             titleContainer.Q<VisualElement>("CompleteCheck").style.display = isComplete ? DisplayStyle.Flex : DisplayStyle.None;
 
-            root.Q<VisualElement>("Description").Q<Label>().text = currentTutorial.description.GetLocalizedString();
+            string description = currentTutorial.description.IsEmpty ? "" : currentTutorial.description.GetLocalizedString();
+
+            root.Q<VisualElement>("Description").style.display = description.Length <= 0 ? DisplayStyle.None : DisplayStyle.Flex;
+            root.Q<VisualElement>("Description").Q<Label>().text = description;
 
             foreach (var tutorialStep in currentTutorial.tutorialSteps)
             {

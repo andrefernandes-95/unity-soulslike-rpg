@@ -54,6 +54,11 @@ namespace AF.Events
 
             foreach (Transform childTransform in transform)
             {
+                if (!childTransform.gameObject.activeSelf)
+                {
+                    continue;
+                }
+
                 foreach (EventBase eventBase in childTransform.GetComponents<EventBase>())
                 {
                     events.Add(eventBase);

@@ -38,12 +38,14 @@ namespace AF
         public UnityEvent onDisableEvent;
 
         // Internal
-        Label actorNameLabel, actorTitleLabel, messageTextLabel, pressToContinueLabel;
+        Label actorNameLabel, actorTitleLabel, messageTextLabel;
+        VisualElement actorContainer;
         VisualElement actorSprite;
         VisualElement actorInfoContainer;
 
         [Header("Input")]
         VisualElement actionButtonContainer;
+        VisualElement continueActionButtonContainer;
         public StarterAssetsInputs starterAssetsInputs;
         public ActionButton continueButton;
 
@@ -59,13 +61,16 @@ namespace AF
             this.actorNameLabel = this.root.Q<Label>("ActorName");
             this.actorTitleLabel = this.root.Q<Label>("ActorTitle");
             this.messageTextLabel = this.root.Q<Label>("MessageText");
+            this.actorContainer = this.root.Q<VisualElement>("ActorContainer");
             this.actorSprite = this.root.Q<VisualElement>("ActorSprite");
-            this.pressToContinueLabel = this.root.Q<Label>("PressToContinue");
             this.actorInfoContainer = this.root.Q<VisualElement>("ActorInfoContainer");
-            actionButtonContainer = this.root.Q<VisualElement>("ContinueButtonContainer");
+            actionButtonContainer = this.root.Q<VisualElement>("ActionButtonContainer");
             actionButtonContainer.Clear();
 
-            actionButtonContainer.Add(continueButton.GetKey(starterAssetsInputs));
+            continueActionButtonContainer = this.root.Q<VisualElement>("ContinueButtonContainer");
+            continueActionButtonContainer.Clear();
+
+            continueActionButtonContainer.Add(continueButton.GetKey(starterAssetsInputs));
 
             onEnableEvent?.Invoke();
 
@@ -81,12 +86,13 @@ namespace AF
         public IEnumerator DisplayMessage(
                     Character character,
                     string message,
-                    Response[] responses
+                    Response[] responses,
+                    ActionButton actionButton
                 )
         {
             gameObject.SetActive(true);
 
-            ShowMessage(character, message);
+            ShowMessage(character, message, actionButton);
 
             // Create a new copy to prevent mutation
             Response[] clonedResponses = responses.ToArray();
@@ -117,7 +123,7 @@ namespace AF
 
         }
 
-        private void ShowMessage(Character character, string message)
+        private void ShowMessage(Character character, string message, ActionButton actionButton)
         {
             hasFinishedTypewriter = false;
 
@@ -166,13 +172,25 @@ namespace AF
 
             if (character != null && character.avatar != null)
             {
+                actorContainer.style.display = DisplayStyle.Flex;
                 actorSprite.style.backgroundImage = new StyleBackground(
                                    character.isPlayer ? playerManager.playerAppearance.GetPlayerPortrait() : character.avatar);
                 actorSprite.style.display = DisplayStyle.Flex;
             }
             else
             {
+                actorContainer.style.display = DisplayStyle.None;
                 actorSprite.style.display = DisplayStyle.None;
+            }
+
+            actionButtonContainer.style.display = actionButton != null ? DisplayStyle.Flex : DisplayStyle.None;
+            actionButtonContainer.Clear();
+
+            if (actionButton != null)
+            {
+                VisualElement actionButtonElement = actionButton.GetKey(starterAssetsInputs);
+                actionButtonElement.Q<Label>("Description").style.display = DisplayStyle.None;
+                actionButtonContainer.Add(actionButtonElement);
             }
 
             StartCoroutine(Typewrite(message, messageTextLabel));
@@ -256,7 +274,7 @@ namespace AF
             }
             else if (string.IsNullOrEmpty(selectedResponse.reply) == false)
             {
-                yield return DisplayMessage(selectedResponse.replier, selectedResponse.reply, new Response[] { });
+                yield return DisplayMessage(selectedResponse.replier, selectedResponse.reply, new Response[] { }, null);
             }
 
             selectedResponse.onResponseFinished?.Invoke();

@@ -1,15 +1,15 @@
-using System.Linq;
-using UnityEngine;
-
 namespace AF.Equipment
 {
+    using UnityEngine;
+
     public class CharacterWeaponsManager : MonoBehaviour
     {
-
-        public CharacterWeaponHitbox[] weapons;
+        public CharacterWeaponHitbox leftHandWeapon, rightHandWeapon, headWeapon, leftFootWeapon, rightFootWeapon;
         public GameObject bow;
         public GameObject shield;
         public bool shouldHideShield = true;
+
+        [HideInInspector] public CharacterWeaponHitbox currentAttackingWeapon;
 
         public void ResetStates()
         {
@@ -32,23 +32,14 @@ namespace AF.Equipment
 
         public void ShowWeapon()
         {
-            if (weapons.Length > 0)
-            {
-                foreach (var weapon in weapons)
-                {
-                    weapon.gameObject.SetActive(true);
-                }
-            }
+            rightHandWeapon?.gameObject.SetActive(true);
+            leftHandWeapon?.gameObject.SetActive(true);
         }
+
         public void HideWeapon()
         {
-            if (weapons.Length > 0)
-            {
-                foreach (var weapon in weapons)
-                {
-                    weapon.gameObject.SetActive(false);
-                }
-            }
+            rightHandWeapon?.gameObject.SetActive(false);
+            leftHandWeapon?.gameObject.SetActive(false);
         }
 
         public void ShowShield()
@@ -82,38 +73,39 @@ namespace AF.Equipment
             }
         }
 
-        public void OpenCharacterWeaponHitbox()
+        public void OpenLeftHandWeaponHitbox()
         {
-            if (weapons.Length > 0)
-            {
-                OpenCharacterWeaponHitbox(weapons[0]);
-            }
+            leftHandWeapon?.EnableHitbox();
+            this.currentAttackingWeapon = leftHandWeapon;
         }
-
-        public void CloseCharacterWeaponHitbox()
+        public void OpenRightHandWeaponHitbox()
         {
-            if (weapons.Length > 0)
-            {
-                CloseCharacterWeaponHitbox(weapons[0]);
-            }
+            rightHandWeapon?.EnableHitbox();
+            this.currentAttackingWeapon = rightHandWeapon;
         }
-
-        public void OpenCharacterWeaponHitbox(CharacterWeaponHitbox characterWeaponHitbox)
+        public void OpenLeftFootWeaponHitbox()
         {
-            characterWeaponHitbox?.EnableHitbox();
+            leftFootWeapon?.EnableHitbox();
+            this.currentAttackingWeapon = leftFootWeapon;
         }
-
-        public void CloseCharacterWeaponHitbox(CharacterWeaponHitbox characterWeaponHitbox)
+        public void OpenRightFootWeaponHitbox()
         {
-            characterWeaponHitbox?.DisableHitbox();
+            rightFootWeapon?.EnableHitbox();
+            this.currentAttackingWeapon = rightFootWeapon;
+        }
+        public void OpenHeadWeaponHitbox()
+        {
+            headWeapon?.EnableHitbox();
+            this.currentAttackingWeapon = headWeapon;
         }
 
         public void CloseAllWeaponHitboxes()
         {
-            foreach (CharacterWeaponHitbox characterWeaponHitbox in weapons)
-            {
-                characterWeaponHitbox?.DisableHitbox();
-            }
+            leftHandWeapon?.DisableHitbox();
+            rightHandWeapon?.DisableHitbox();
+            leftFootWeapon?.DisableHitbox();
+            rightFootWeapon?.DisableHitbox();
+            headWeapon?.DisableHitbox();
         }
     }
 }

@@ -1,9 +1,9 @@
-using UnityEngine;
-using NUnit.Framework;
-using AF.Animations;
-
 namespace AF.Tests
 {
+    using UnityEngine;
+    using NUnit.Framework;
+    using AF.Animations;
+
     public class CharacterAnimationEventListener_Tests : MonoBehaviour
     {
         CharacterAnimationEventListener characterAnimationEventListener;
@@ -33,46 +33,6 @@ namespace AF.Tests
             bool wasCalled = false;
             characterAnimationEventListener.onRightFootstep.AddListener(() => { wasCalled = true; });
             characterAnimationEventListener.OnRightFootstep();
-            Assert.IsTrue(wasCalled);
-        }
-
-        [Test]
-        public void ShouldCallOpenRightWeaponHitbox()
-        {
-            characterAnimationEventListener.onRightWeaponHitboxOpen = new UnityEngine.Events.UnityEvent();
-            bool wasCalled = false;
-            characterAnimationEventListener.onRightWeaponHitboxOpen.AddListener(() => { wasCalled = true; });
-            characterAnimationEventListener.OpenRightWeaponHitbox();
-            Assert.IsTrue(wasCalled);
-        }
-
-        [Test]
-        public void ShouldCallOpenLeftWeaponHitbox()
-        {
-            characterAnimationEventListener.onLeftWeaponHitboxOpen = new UnityEngine.Events.UnityEvent();
-            bool wasCalled = false;
-            characterAnimationEventListener.onLeftWeaponHitboxOpen.AddListener(() => { wasCalled = true; });
-            characterAnimationEventListener.OpenLeftWeaponHitbox();
-            Assert.IsTrue(wasCalled);
-        }
-
-        [Test]
-        public void ShouldCallOpenLeftFootHitbox()
-        {
-            characterAnimationEventListener.onLeftFootHitboxOpen = new UnityEngine.Events.UnityEvent();
-            bool wasCalled = false;
-            characterAnimationEventListener.onLeftFootHitboxOpen.AddListener(() => { wasCalled = true; });
-            characterAnimationEventListener.OpenLeftFootHitbox();
-            Assert.IsTrue(wasCalled);
-        }
-
-        [Test]
-        public void ShouldCallOpenRightFootHitbox()
-        {
-            characterAnimationEventListener.onRightFootHitboxOpen = new UnityEngine.Events.UnityEvent();
-            bool wasCalled = false;
-            characterAnimationEventListener.onRightFootHitboxOpen.AddListener(() => { wasCalled = true; });
-            characterAnimationEventListener.OpenRightFootHitbox();
             Assert.IsTrue(wasCalled);
         }
 

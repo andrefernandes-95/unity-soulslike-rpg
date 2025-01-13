@@ -12,7 +12,7 @@ namespace AF
         public StatusEffect[] positiveEffects;
         public StatusEffect[] negativeEffects;
         public int value = 0;
-
+        public int effectsDuration = 0;
 
         public Consumable GenerateItem()
         {
@@ -25,6 +25,7 @@ namespace AF
             statusEffectsWhenConsumed.AddRange(positiveEffects);
             statusEffectsWhenConsumed.AddRange(negativeEffects);
             consumable.statusEffectsWhenConsumed = statusEffectsWhenConsumed.ToArray();
+            consumable.effectsDurationInSeconds = effectsDuration;
 
             return consumable;
         }

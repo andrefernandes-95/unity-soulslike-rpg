@@ -183,7 +183,7 @@ namespace AF
                 return;
             }
 
-            shields[slotIndex] = shieldInstanceToEquip;
+            shields[slotIndex] = shieldInstanceToEquip.Clone();
             secondaryWeapons[slotIndex].Clear();
             EventManager.EmitEvent(EventMessages.ON_EQUIPMENT_CHANGED);
             EventManager.EmitEvent(EventMessages.ON_SHIELD_EQUIPMENT_CHANGED);
@@ -210,7 +210,7 @@ namespace AF
                 return;
             }
 
-            arrows[slotIndex] = arrowInstanceToEquip;
+            arrows[slotIndex] = arrowInstanceToEquip.Clone();
             EventManager.EmitEvent(EventMessages.ON_EQUIPMENT_CHANGED);
         }
         public void UnequipArrow(int slotIndex)
@@ -234,7 +234,7 @@ namespace AF
                 return;
             }
 
-            spells[slotIndex] = spellInstanceToEquip;
+            spells[slotIndex] = spellInstanceToEquip.Clone();
 
             EventManager.EmitEvent(EventMessages.ON_EQUIPMENT_CHANGED);
         }
@@ -258,7 +258,7 @@ namespace AF
                 return;
             }
 
-            consumables[slotIndex] = consumableInstanceToEquip;
+            consumables[slotIndex] = consumableInstanceToEquip.Clone();
 
             EventManager.EmitEvent(EventMessages.ON_EQUIPMENT_CHANGED);
         }
@@ -297,7 +297,7 @@ namespace AF
                 return;
             }
 
-            helmet = helmetInstanceToEquip;
+            helmet = helmetInstanceToEquip.Clone();
             EventManager.EmitEvent(EventMessages.ON_EQUIPMENT_CHANGED);
         }
         public void UnequipHelmet()
@@ -315,7 +315,7 @@ namespace AF
                 return;
             }
 
-            armor = armorInstanceToEquip;
+            armor = armorInstanceToEquip.Clone();
             EventManager.EmitEvent(EventMessages.ON_EQUIPMENT_CHANGED);
         }
 
@@ -333,7 +333,7 @@ namespace AF
                 return;
             }
 
-            gauntlet = gauntletInstanceToEquip;
+            gauntlet = gauntletInstanceToEquip.Clone();
             EventManager.EmitEvent(EventMessages.ON_EQUIPMENT_CHANGED);
         }
 
@@ -351,7 +351,7 @@ namespace AF
                 return;
             }
 
-            legwear = legwearInstanceToEquip;
+            legwear = legwearInstanceToEquip.Clone();
             EventManager.EmitEvent(EventMessages.ON_EQUIPMENT_CHANGED);
         }
 
@@ -369,7 +369,7 @@ namespace AF
                 return;
             }
 
-            accessories[slotIndex] = accessoryInstanceToEquip;
+            accessories[slotIndex] = accessoryInstanceToEquip.Clone();
             EventManager.EmitEvent(EventMessages.ON_EQUIPMENT_CHANGED);
         }
 

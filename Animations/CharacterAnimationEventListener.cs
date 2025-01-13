@@ -1,11 +1,9 @@
-using AF.Events;
-using AYellowpaper.SerializedCollections;
-using TigerForge;
-using UnityEngine;
-using UnityEngine.Events;
-
 namespace AF.Animations
 {
+    using AYellowpaper.SerializedCollections;
+    using UnityEngine;
+    using UnityEngine.Events;
+
     public class CharacterAnimationEventListener : MonoBehaviour, IAnimationEventListener
     {
 
@@ -24,18 +22,9 @@ namespace AF.Animations
         [Header("Unity Events")]
         public UnityEvent onLeftFootstep;
         public UnityEvent onRightFootstep;
-        public UnityEvent onLeftWeaponHitboxOpen;
-        public UnityEvent onLeftWeaponHitboxClose;
-        public UnityEvent onRightWeaponHitboxOpen;
-        public UnityEvent onRightWeaponHitboxClose;
-        public UnityEvent onLeftFootHitboxOpen;
-        public UnityEvent onLeftFootHitboxClose;
-        public UnityEvent onRightFootHitboxOpen;
-        public UnityEvent onRightFootHitboxClose;
         public UnityEvent onBuff;
         public UnityEvent onCloth;
         public UnityEvent onImpact;
-        public UnityEvent onOpenCombo;
         public UnityEvent onBlood;
 
         float defaultAnimatorSpeed;
@@ -97,44 +86,59 @@ namespace AF.Animations
             onRightFootstep?.Invoke();
         }
 
+        public void OpenHeadWeaponHitbox()
+        {
+            characterManager.characterWeaponsManager.OpenHeadWeaponHitbox();
+            characterManager.characterCombatController.OnAttack_HitboxOpen();
+        }
+
+        public void CloseHeadWeaponHitbox()
+        {
+            characterManager.characterWeaponsManager.CloseAllWeaponHitboxes();
+        }
+
         public void OpenLeftWeaponHitbox()
         {
-            onLeftWeaponHitboxOpen?.Invoke();
+            characterManager.characterWeaponsManager.OpenLeftHandWeaponHitbox();
+            characterManager.characterCombatController.OnAttack_HitboxOpen();
         }
 
         public void CloseLeftWeaponHitbox()
         {
-            onLeftWeaponHitboxClose?.Invoke();
+            characterManager.characterWeaponsManager.CloseAllWeaponHitboxes();
         }
 
         public void OpenRightWeaponHitbox()
         {
-            onRightWeaponHitboxOpen?.Invoke();
+            characterManager.characterWeaponsManager.OpenRightHandWeaponHitbox();
+            characterManager.characterCombatController.OnAttack_HitboxOpen();
         }
 
         public void CloseRightWeaponHitbox()
         {
-            onRightWeaponHitboxClose?.Invoke();
+            characterManager.characterWeaponsManager.CloseAllWeaponHitboxes();
         }
 
         public void OpenLeftFootHitbox()
         {
-            onLeftFootHitboxOpen?.Invoke();
+            characterManager.characterWeaponsManager.OpenLeftFootWeaponHitbox();
+            characterManager.characterCombatController.OnAttack_HitboxOpen();
         }
 
         public void CloseLeftFootHitbox()
         {
-            onLeftFootHitboxClose?.Invoke();
+            characterManager.characterWeaponsManager.CloseAllWeaponHitboxes();
         }
 
         public void OpenRightFootHitbox()
         {
-            onRightFootHitboxOpen?.Invoke();
+            characterManager.characterWeaponsManager.OpenRightFootWeaponHitbox();
+            characterManager.characterCombatController.OnAttack_HitboxOpen();
         }
 
         public void CloseRightFootHitbox()
         {
-            onRightFootHitboxClose?.Invoke();
+            characterManager.characterWeaponsManager.CloseAllWeaponHitboxes();
         }
 
         public void EnableRotation()
@@ -188,11 +192,6 @@ namespace AF.Animations
         public void OnBuff()
         {
             onBuff?.Invoke();
-        }
-
-        public void OpenCombo()
-        {
-            onOpenCombo?.Invoke();
         }
 
         public void OnThrow()

@@ -341,7 +341,7 @@ namespace AF
         {
             characterController.enabled = activate;
 
-            if (characterLockOnRef.TryGetComponent<SphereCollider>(out var sphereCollider))
+            if (characterLockOnRef != null && characterLockOnRef.TryGetComponent<SphereCollider>(out var sphereCollider))
             {
                 sphereCollider.enabled = activate;
             }

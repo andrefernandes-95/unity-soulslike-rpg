@@ -33,6 +33,7 @@ namespace AF
                 positiveEffects = positiveEffects,
                 negativeEffects = negativeEffects,
                 value = value,
+                effectsDuration = GetItemDuration(ingredients, playerIntelligence)
             };
         }
 
@@ -130,6 +131,13 @@ namespace AF
         static int GetItemValue(CraftingMaterial[] ingredients, int playerIntelligence)
         {
             int baseValue = ingredients.Sum(ing => (int)ing.value * ingredients.Length);
+            return (int)(baseValue + baseValue * (1 - (10 / (10 + (float)playerIntelligence))));
+        }
+
+        static int GetItemDuration(CraftingMaterial[] ingredients, int playerIntelligence)
+        {
+            int baseValue = ingredients.Sum(ing => (int)ing.effectDuration);
+
             return (int)(baseValue + baseValue * (1 - (10 / (10 + (float)playerIntelligence))));
         }
     }

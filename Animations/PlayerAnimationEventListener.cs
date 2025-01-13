@@ -1,10 +1,9 @@
-using AF.Animations;
-using UnityEngine;
-using UnityEngine.Events;
-using Unity.Cinemachine;
-
 namespace AF.Animations
 {
+    using UnityEngine;
+    using UnityEngine.Events;
+    using Unity.Cinemachine;
+
     public class PlayerAnimationEventListener : MonoBehaviour, IAnimationEventListener
     {
         public PlayerManager playerManager;
@@ -26,6 +25,14 @@ namespace AF.Animations
         {
             playerManager.animator.speed = animatorSpeed;
             defaultAnimatorSpeed = animatorSpeed;
+        }
+
+        public void OpenHeadWeaponHitbox()
+        {
+        }
+
+        public void CloseHeadWeaponHitbox()
+        {
         }
 
         public void OpenLeftWeaponHitbox()
@@ -52,7 +59,6 @@ namespace AF.Animations
             {
                 playerManager.playerWeaponsManager.leftHandHitbox.DisableHitbox();
             }
-
         }
 
         public void OpenRightWeaponHitbox()
@@ -75,11 +81,11 @@ namespace AF.Animations
             {
                 playerManager.playerWeaponsManager.currentWeaponInstance.DisableHitbox();
             }
+
             if (playerManager.playerWeaponsManager.rightHandHitbox != null)
             {
                 playerManager.playerWeaponsManager.rightHandHitbox.DisableHitbox();
             }
-
         }
 
         public void OpenLeftFootHitbox()
@@ -98,7 +104,6 @@ namespace AF.Animations
             {
                 playerManager.playerWeaponsManager.leftFootHitbox.DisableHitbox();
             }
-
         }
 
         public void OpenRightFootHitbox()
@@ -117,7 +122,6 @@ namespace AF.Animations
             {
                 playerManager.playerWeaponsManager.rightFootHitbox.DisableHitbox();
             }
-
         }
         public void EnableRotation()
         {
@@ -141,7 +145,6 @@ namespace AF.Animations
 
         public void FaceTarget()
         {
-
         }
 
         public void SetAnimatorBool_True(string parameterName)
@@ -199,12 +202,6 @@ namespace AF.Animations
 
         public void OnBuff()
         {
-
-        }
-
-        public void OpenCombo()
-        {
-
         }
 
         public void OnThrow()
@@ -214,7 +211,6 @@ namespace AF.Animations
 
         public void OnBlood()
         {
-            throw new System.NotImplementedException();
         }
 
         public void RestoreDefaultAnimatorSpeed()
@@ -281,7 +277,6 @@ namespace AF.Animations
         public void ResumeAnimation()
         {
         }
-
 
         public void StopIframes()
         {

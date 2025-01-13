@@ -76,6 +76,7 @@ namespace AF
 
 		[Header("Tutorial Events")]
 		public UIDocumentTutorial uIDocumentTutorial;
+		public TutorialEventMessage moveAroundEventMessage;
 		public TutorialEventMessage jumpEventMessage;
 
 		private void Awake()
@@ -88,6 +89,8 @@ namespace AF
 			move = value.Get<Vector2>();
 
 			onMoveInput?.Invoke();
+
+			uIDocumentTutorial?.OnStepComplete(moveAroundEventMessage);
 		}
 
 		public void OnLook(InputValue value)

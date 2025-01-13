@@ -12,6 +12,8 @@ namespace AF
 
     public class CharacterCombatController : MonoBehaviour
     {
+        public float crossFade = 0.2f;
+
         [Header("Components")]
         public CharacterManager characterManager;
 
@@ -25,7 +27,6 @@ namespace AF
 
         [Header("Directional")]
         public CombatAction reactionToTargetBehindBack;
-        public CombatAction currentCombatAction = null;
 
         [Header("Combat Options")]
         [Range(0, 100f)] public float chanceToReact = 90f;
@@ -55,6 +56,10 @@ namespace AF
         CharacterAnimationEventListener characterAnimationEventListener;
         public CombatAction combatActionToRespondToDodgeInput;
         public float chanceToReactToDodgeInput = 0.75f;
+
+        [Header("Current Combat")]
+        public CombatAction currentCombatAction = null;
+        public string currentAnimationToPlay = "";
 
         private void Awake()
         {
@@ -162,7 +167,7 @@ namespace AF
             return null;
         }
 
-        public void UseCombatAction()
+        public void ChooseNextCombatAction()
         {
             CombatAction newCombatAction = GetCombatAction();
             if (newCombatAction == null)
@@ -170,8 +175,19 @@ namespace AF
                 return;
             }
 
-            this.currentCombatAction = newCombatAction;
-            ExecuteCurrentCombatAction(0f);
+            SetCombatAction(newCombatAction);
+        }
+
+        public void UseCombatAction()
+        {
+            if (currentCombatAction != null && string.IsNullOrEmpty(currentAnimationToPlay) == false)
+            {
+                this.usedCombatActions.Add(currentCombatAction);
+                characterManager.PlayCrossFadeBusyAnimationWithRootMotion(currentAnimationToPlay, crossFade);
+                OnAttackStart();
+
+                StartCoroutine(ClearCombatActionFromCooldownList(currentCombatAction));
+            }
         }
 
         public void UseChaseAction()
@@ -208,99 +224,12 @@ namespace AF
 
             if (newCombatAction != null)
             {
-                this.currentCombatAction = newCombatAction;
-                ExecuteCurrentCombatAction(0f);
+                SetCombatAction(newCombatAction);
+
+                UseCombatAction();
             }
         }
 
-        public void ExecuteCurrentCombatAction(float crossFade)
-        {
-            if (currentCombatAction != reactionToTargetBehindBack)
-            {
-                characterManager.FaceTarget();
-            }
-
-            if (currentCombatAction.hasHyperArmor)
-            {
-                (characterManager.characterPoise as CharacterPoise).hasHyperArmor = true;
-            }
-
-            if (currentCombatAction.attackAnimationClip != null)
-            {
-                if (currentCombatAction.comboClip != null)
-                {
-                    if (currentCombatAction.comboClip2 != null)
-                    {
-                        if (currentCombatAction.comboClip3 != null)
-                        {
-                            characterManager.UpdateAnimatorOverrideControllerClips(PRE_PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip);
-                            characterManager.UpdateAnimatorOverrideControllerClips(PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip);
-                            characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip2);
-                            characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip3);
-                        }
-                        else
-                        {
-                            characterManager.UpdateAnimatorOverrideControllerClips(PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip);
-                            characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip);
-                            characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip2);
-                        }
-                    }
-                    else
-                    {
-                        characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip);
-                        characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip);
-                    }
-                }
-                else
-                {
-                    characterManager.UpdateAnimatorOverrideControllerClips(ANIMATION_CLIP_TO_OVERRIDE_NAME, currentCombatAction.attackAnimationClip);
-                }
-
-                characterManager.animator.ForceStateNormalizedTime(0f);
-
-                if (currentCombatAction.animationSpeed != 1f)
-                {
-                    characterManager.animator.SetFloat(AttackSpeedHash, currentCombatAction.animationSpeed);
-                }
-
-                if (currentCombatAction.comboClip != null)
-                {
-                    if (currentCombatAction.comboClip2 != null)
-                    {
-                        if (currentCombatAction.comboClip3 != null)
-                        {
-                            characterManager.PlayBusyAnimationWithRootMotion(hashPrePreComboAttack);
-                        }
-                        else
-                        {
-                            characterManager.PlayBusyAnimationWithRootMotion(hashPreComboAttack);
-                        }
-                    }
-                    else
-                    {
-                        characterManager.PlayBusyAnimationWithRootMotion(hashComboAttack);
-                    }
-                }
-                else if (crossFade > 0)
-                {
-                    characterManager.PlayAnimationWithCrossFade(hashLightAttack1, true, true, crossFade);
-                }
-                else
-                {
-                    characterManager.PlayBusyAnimationWithRootMotion(hashLightAttack1);
-                }
-            }
-            else if (!string.IsNullOrEmpty(currentCombatAction.attackAnimationName))
-            {
-                characterManager.PlayBusyAnimationWithRootMotion(currentCombatAction.attackAnimationName);
-            }
-
-            StartCoroutine(ClearCombatActionFromCooldownList(currentCombatAction));
-
-            this.usedCombatActions.Add(currentCombatAction);
-
-            OnAttackStart();
-        }
 
         void OnPlayerDodgeFinished()
         {
@@ -323,7 +252,7 @@ namespace AF
             characterAnimationEventListener.RestoreDefaultAnimatorSpeed();
 
             this.currentCombatAction = combatActionToRespondToDodgeInput;
-            ExecuteCurrentCombatAction(0.15f);
+            SetCombatAction(currentCombatAction);
         }
 
         IEnumerator ClearCombatActionFromCooldownList(CombatAction combatActionToClear)
@@ -356,6 +285,7 @@ namespace AF
             {
                 currentCombatAction.onAttack_End?.Invoke();
                 currentCombatAction = null;
+                currentAnimationToPlay = "";
             }
         }
 
@@ -368,10 +298,75 @@ namespace AF
         public void SetCombatAction(CombatAction combatAction)
         {
             this.currentCombatAction = combatAction;
+            SetupCombatAction();
         }
+
+        public void SetupCombatAction()
+        {
+            if (currentCombatAction != reactionToTargetBehindBack)
+            {
+                characterManager.FaceTarget();
+            }
+
+            if (currentCombatAction.hasHyperArmor)
+            {
+                (characterManager.characterPoise as CharacterPoise).hasHyperArmor = true;
+            }
+
+            if (currentCombatAction.animationSpeed != 1f)
+            {
+                characterManager.animator.SetFloat(AttackSpeedHash, currentCombatAction.animationSpeed);
+            }
+
+            string animationToPlay = "";
+
+            if (currentCombatAction.attackAnimationClip != null)
+            {
+                if (currentCombatAction.comboClip3 != null)
+                {
+                    characterManager.UpdateAnimatorOverrideControllerClips(PRE_PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip);
+                    characterManager.UpdateAnimatorOverrideControllerClips(PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip);
+                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip2);
+                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip3);
+                    animationToPlay = hashPrePreComboAttack;
+                }
+                else if (currentCombatAction.comboClip2 != null)
+                {
+                    characterManager.UpdateAnimatorOverrideControllerClips(PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip);
+                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip);
+                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip2);
+                    animationToPlay = hashPreComboAttack;
+                }
+                else if (currentCombatAction.comboClip != null)
+                {
+                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip);
+                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip);
+                    animationToPlay = hashComboAttack;
+                }
+                else
+                {
+                    characterManager.UpdateAnimatorOverrideControllerClips(ANIMATION_CLIP_TO_OVERRIDE_NAME, currentCombatAction.attackAnimationClip);
+                    animationToPlay = hashLightAttack1;
+                }
+            }
+            else if (!string.IsNullOrEmpty(currentCombatAction.attackAnimationName))
+            {
+                animationToPlay = currentCombatAction.attackAnimationName;
+            }
+
+            this.currentAnimationToPlay = animationToPlay;
+        }
+
 
         public Damage GetCurrentDamage()
         {
+            if (characterManager.characterWeaponsManager.currentAttackingWeapon != null)
+            {
+                Damage attackingWeaponDamage = characterManager.characterWeaponsManager.currentAttackingWeapon.enemyWeaponDamage.Clone();
+
+                return attackingWeaponDamage.Combine(currentCombatAction?.damage);
+            }
+
             return currentCombatAction?.damage?.Copy();
         }
     }

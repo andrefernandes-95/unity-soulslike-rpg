@@ -1,11 +1,11 @@
-using AF.Journals;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
-
 namespace AF
 {
+    using AF.Journals;
+    using AF.UI;
+    using UnityEngine;
+    using UnityEngine.Events;
+    using UnityEngine.UIElements;
+
     public class UIDocumentBook : MonoBehaviour
     {
         VisualElement root;
@@ -26,9 +26,30 @@ namespace AF
         public Soundbank soundbank;
         public CursorManager cursorManager;
 
+        [Header("Footer")]
+        public MenuFooter menuFooter;
+        public ActionButton confirmButton, cancelButton, nextPageButton, previousPageButton;
+        public StarterAssetsInputs starterAssetsInputs;
+
         private void Awake()
         {
             this.gameObject.SetActive(false);
+
+            starterAssetsInputs.onMenuEvent.AddListener(() =>
+            {
+                if (this.isActiveAndEnabled)
+                {
+                    OnClose();
+                }
+            });
+
+            starterAssetsInputs.onInteract.AddListener(() =>
+            {
+                if (this.isActiveAndEnabled)
+                {
+                    OnClose();
+                }
+            });
         }
 
         void SetupRefs()
@@ -51,6 +72,9 @@ namespace AF
             rightPage = this.root.Q<VisualElement>("RightPage");
             rightPageTitle = rightPage.Q<Label>("ChapterTitle");
             rightPageText = rightPage.Q<Label>("PageText");
+
+            menuFooter.SetupReferences();
+            SetupFooterActions();
         }
 
         /// <summary>
@@ -105,6 +129,7 @@ namespace AF
         public void BeginRead(Journal journal)
         {
             this.currentJournal = journal;
+
             this.gameObject.SetActive(true);
 
             if (journal.isNote)
@@ -163,6 +188,8 @@ namespace AF
             bookPage.style.display = DisplayStyle.None;
             bookBack.style.display = DisplayStyle.None;
             notePage.style.display = DisplayStyle.Flex;
+
+            UIUtils.PlayFadeInAnimation(notePage, .5f);
 
             notePageTitle.text = currentJournal.pages[currentPage].pageTitle;
             notePageText.text = currentJournal.pages[currentPage].pageText;
@@ -303,6 +330,14 @@ namespace AF
         string FormatText(string text)
         {
             return text.Replace("\r", "");
+        }
+
+        void SetupFooterActions()
+        {
+            menuFooter.GetFooterActionsContainer().Add(confirmButton.GetKey(starterAssetsInputs));
+            menuFooter.GetFooterActionsContainer().Add(cancelButton.GetKey(starterAssetsInputs));
+            menuFooter.GetFooterActionsContainer().Add(nextPageButton.GetKey(starterAssetsInputs));
+            menuFooter.GetFooterActionsContainer().Add(previousPageButton.GetKey(starterAssetsInputs));
         }
     }
 }

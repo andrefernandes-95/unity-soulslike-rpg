@@ -1,5 +1,7 @@
 namespace AF
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using UnityEngine;
 
     [RequireComponent(typeof(ParticleSystem))]
@@ -7,12 +9,20 @@ namespace AF
     public class DamageEffect : MonoBehaviour
     {
         new ParticleSystem particleSystem => GetComponent<ParticleSystem>();
-        AudioSource audioSource => GetComponent<AudioSource>();
+        List<AudioSource> audioSources = new();
+
+        private void Awake()
+        {
+            audioSources = GetComponents<AudioSource>().ToList();
+        }
 
         public void Play()
         {
             particleSystem.Play();
-            audioSource.Play();
+            foreach (var audioSource in audioSources)
+            {
+                audioSource.Play();
+            }
         }
     }
 }

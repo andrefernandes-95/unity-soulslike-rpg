@@ -26,6 +26,8 @@ namespace AF
         {
             onStateEnter?.Invoke();
 
+            characterManager.characterCombatController.ChooseNextCombatAction();
+
             if (characterManager.targetManager.currentTarget != null)
             {
                 RotateTowardsTarget(characterManager.targetManager.currentTarget.transform);
@@ -75,6 +77,13 @@ namespace AF
 
             if (distanceToTarget <= characterManager.agent.stoppingDistance)
             {
+                if (characterManager.characterCombatController.currentCombatAction == null)
+                {
+                    characterManager.characterCombatController.ChooseNextCombatAction();
+                    return this;
+                }
+
+                characterManager.characterCombatController.UseCombatAction();
                 onAttack?.Invoke();
                 return this;
             }

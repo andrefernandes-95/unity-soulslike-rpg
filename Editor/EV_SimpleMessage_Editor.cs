@@ -26,7 +26,7 @@ namespace AF
             VisualTree.CloneTree(root);
             root.Q<PropertyField>("CharacterField").RegisterValueChangeCallback(ev =>
             {
-                root.Q<IMGUIContainer>("CharacterAvatar").style.backgroundImage = new StyleBackground(eV_SimpleMessage.character.avatar ?? null);
+                root.Q<IMGUIContainer>("CharacterAvatar").style.backgroundImage = new StyleBackground(eV_SimpleMessage.character?.avatar ?? null);
             });
             root.Q<PropertyField>("EnglishMessage").RegisterCallback<FocusOutEvent>(ev =>
             {
