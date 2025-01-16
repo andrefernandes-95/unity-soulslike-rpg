@@ -1,14 +1,12 @@
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using GameAnalyticsSDK;
-using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.UIElements;
-
 namespace AF
 {
+    using System;
+    using System.Collections.Generic;
+    using GameAnalyticsSDK;
+    using UnityEngine;
+    using UnityEngine.Networking;
+    using UnityEngine.UIElements;
+
     [RequireComponent(typeof(UIDocument))]
     public class ErrorHandler : MonoBehaviour
     {
@@ -23,11 +21,11 @@ namespace AF
 
         public Dictionary<string, string> errors = new();
 
-        private List<string> errorMessagesToIgnore = new()
+        private readonly List<string> errorMessagesToIgnore = new()
         {
             "has no receiver! Are you missing a component?",
             "AnimationEvent has no function name specified!",
-            "PhysX does not support concave Mesh Colliders with dynamic Rigidbody GameObjects.",
+            "Concave Mesh Colliders are not supported when used with dynamic Rigidbody GameObjects.",
             "The variable fadeMaterial of",
             "can only be called on an active agent that has been placed on a NavMesh.",
             "The variable transformRef of FootstepReceiver has not been assigned",

@@ -1,18 +1,12 @@
-﻿
-namespace AF
+﻿namespace AF
 {
     using AYellowpaper.SerializedCollections;
     using UnityEngine;
     using UnityEngine.Localization;
 
     [CreateAssetMenu(menuName = "Items / Item / New Item")]
-    public class Item : IdentifiableScriptableObject
+    public class Item : ScriptableObject
     {
-        public string englishName;
-        public string portugueseName;
-        [TextAreaAttribute(minLines: 2, maxLines: 10)] public string englishDescription;
-        [TextAreaAttribute(minLines: 2, maxLines: 10)] public string portugueseDescription;
-
 
         [Header("Localization")]
         public LocalizedString nameLocalized;
@@ -26,7 +20,6 @@ namespace AF
         [Tooltip("If we want to buy this item on a shop, this will override their value when trading with an NPC. E.g. Buying a boss weapon by trading a boss soul")]
         public SerializedDictionary<Item, int> tradingItemRequirements = new();
 
-
         public string GetName()
         {
             if (nameLocalized != null && nameLocalized.IsEmpty == false)
@@ -36,7 +29,6 @@ namespace AF
 
             return name;
         }
-
 
         public string GetDescription()
         {

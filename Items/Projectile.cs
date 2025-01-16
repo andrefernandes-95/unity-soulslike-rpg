@@ -1,11 +1,11 @@
-﻿using System.Collections;
-using AF.Health;
-using AF.Shooting;
-using UnityEngine;
-using UnityEngine.Events;
-
-namespace AF
+﻿namespace AF
 {
+    using System.Collections;
+    using AF.Health;
+    using AF.Shooting;
+    using UnityEngine;
+    using UnityEngine.Events;
+
     public class Projectile : MonoBehaviour, IProjectile
     {
         [Header("Lifespan")]
@@ -34,6 +34,7 @@ namespace AF
         bool hasCollided = false;
 
         CharacterBaseManager shooter;
+        Vector3 previousPosition;
 
 
         [Header("Collision Options")]
@@ -45,6 +46,22 @@ namespace AF
             onFired?.Invoke();
 
             StartCoroutine(HandleOnFiredAfter_Coroutine());
+        }
+
+        private void Update()
+        {
+            // Get the direction of movement by comparing the current position to the previous position
+            Vector3 direction = (transform.position - previousPosition).normalized;
+
+            // Only update the rotation if there's movement
+            if (direction != Vector3.zero)
+            {
+                // Rotate the arrow to face the direction of movement
+                transform.rotation = Quaternion.LookRotation(direction);
+            }
+
+            // Update the previous position for the next frame
+            previousPosition = transform.position;
         }
 
         private void OnDisable()

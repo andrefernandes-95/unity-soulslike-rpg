@@ -11,7 +11,7 @@ namespace AF
     [CreateAssetMenu(fileName = "Gemstones Database", menuName = "System/New Gemstone Database", order = 0)]
     public class GemstonesDatabase : ScriptableObject
     {
-        public SerializedDictionary<string, List<Gemstone>> weaponsWithGemstones = new();
+        public SerializedDictionary<string, List<GemstoneInstance>> weaponsWithGemstones = new();
 
         public InventoryDatabase inventoryDatabase;
 
@@ -37,12 +37,12 @@ namespace AF
             weaponsWithGemstones.Clear();
         }
 
-        public void AttachGemstoneToWeapon(WeaponInstance weaponInstance, Gemstone gemstone)
+        public void AttachGemstoneToWeapon(WeaponInstance weaponInstance, GemstoneInstance gemstoneInstance)
         {
             if (weaponsWithGemstones.ContainsKey(weaponInstance.GetId()))
             {
 
-                int gemstoneIndex = weaponsWithGemstones[weaponInstance.GetId()].FindIndex(x => x.Id == gemstone.Id);
+                int gemstoneIndex = weaponsWithGemstones[weaponInstance.GetId()].FindIndex(x => x.GetId() == gemstoneInstance.GetId());
 
                 if (gemstoneIndex != -1)
                 {
@@ -50,25 +50,35 @@ namespace AF
                     return;
                 }
 
-                weaponsWithGemstones[weaponInstance.GetId()].Add(gemstone);
+                weaponsWithGemstones[weaponInstance.GetId()].Add(gemstoneInstance);
             }
             else
             {
-                weaponsWithGemstones.Add(weaponInstance.GetId(), new() { gemstone });
+                weaponsWithGemstones.Add(weaponInstance.GetId(), new() { gemstoneInstance });
             }
         }
 
-        public void DettachGemstoneFromWeapon(WeaponInstance weaponInstanceToAttach, Gemstone gemstone)
+        public void DettachGemstoneFromWeapon(WeaponInstance weaponInstanceToAttach, GemstoneInstance gemstoneInstance)
         {
             if (weaponsWithGemstones.ContainsKey(weaponInstanceToAttach.GetId()))
             {
-                int gemstoneIndex = weaponsWithGemstones[weaponInstanceToAttach.GetId()].FindIndex(x => x.Id == gemstone.Id);
+                int gemstoneIndex = weaponsWithGemstones[weaponInstanceToAttach.GetId()].FindIndex(x => x.GetId() == gemstoneInstance.GetId());
 
                 if (gemstoneIndex != -1)
                 {
                     weaponsWithGemstones[weaponInstanceToAttach.GetId()].RemoveAt(gemstoneIndex);
                 }
             }
+        }
+
+        public GemstoneInstance[] GetAttachedGemstoneInstancesFromWeapon(WeaponInstance weaponInstance)
+        {
+            if (!weaponsWithGemstones.ContainsKey(weaponInstance.GetId()))
+            {
+                return new List<GemstoneInstance>().ToArray();
+            }
+
+            return weaponsWithGemstones[weaponInstance.GetId()].ToArray();
         }
 
         public Gemstone[] GetAttachedGemstonesFromWeapon(WeaponInstance weaponInstance)
@@ -78,17 +88,17 @@ namespace AF
                 return new List<Gemstone>().ToArray();
             }
 
-            return weaponsWithGemstones[weaponInstance.GetId()].ToArray();
+            return weaponsWithGemstones[weaponInstance.GetId()].Select(gemstoneInstance => gemstoneInstance.GetItem()).ToArray();
         }
 
-        public string GetWeaponIdByAttachedGemstone(Gemstone gemstone)
+        public string GetWeaponIdByAttachedGemstone(GemstoneInstance gemstoneInstance)
         {
             if (weaponsWithGemstones.Count <= 0)
             {
                 return null;
             }
 
-            var match = weaponsWithGemstones.FirstOrDefault(x => x.Value.Find(xGemstone => xGemstone.Id == gemstone.Id));
+            var match = weaponsWithGemstones.FirstOrDefault(x => x.Value.Where(xGemstone => xGemstone.GetId() == gemstoneInstance.GetId()) != null);
 
             return match.Key;
         }

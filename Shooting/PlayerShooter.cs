@@ -41,7 +41,7 @@ namespace AF.Shooting
 
         [Header("Refs")]
         public Transform playerFeetRef;
-
+        public GameObject arrowPlaceholder;
 
         [Header("Flags")]
         public bool isAiming = false;
@@ -55,7 +55,7 @@ namespace AF.Shooting
         public UnityEvent onBowAim_Begin;
 
         [Header("Cinemachine")]
-        Cinemachine3rdPersonFollow cinemachine3RdPersonFollow;
+        Cinemachine3rdPersonFollow cinemachineThirdPersonFollow;
 
         public CinemachineImpulseSource cinemachineImpulseSource;
 
@@ -64,22 +64,41 @@ namespace AF.Shooting
         public GameObject queuedProjectile;
         public Spell queuedSpell;
 
+        private void Awake()
+        {
+            HideArrowPlaceholder();
+        }
+
+        void ShowArrowPlaceholder()
+        {
+            if (isAiming && equipmentDatabase.IsBowEquipped() && equipmentDatabase.HasEnoughCurrentArrows())
+            {
+                arrowPlaceholder.SetActive(true);
+            }
+        }
+
+        void HideArrowPlaceholder()
+        {
+            arrowPlaceholder.SetActive(false);
+        }
+
         public void ResetStates()
         {
             isShooting = false;
-
             queuedProjectile = null;
             queuedSpell = null;
+
+            ShowArrowPlaceholder();
         }
 
         void SetupCinemachine3rdPersonFollowReference()
         {
-            if (cinemachine3RdPersonFollow != null)
+            if (cinemachineThirdPersonFollow != null)
             {
                 return;
             }
 
-            cinemachine3RdPersonFollow = aimingCamera.GetComponent<CinemachineVirtualCamera>().GetCinemachineComponent<Cinemachine3rdPersonFollow>();
+            cinemachineThirdPersonFollow = aimingCamera.GetComponent<CinemachineVirtualCamera>().GetCinemachineComponent<Cinemachine3rdPersonFollow>();
         }
 
         bool IsRangeWeaponIncompatibleWithProjectile()
@@ -193,18 +212,20 @@ namespace AF.Shooting
             {
                 GetPlayerManager().animator.SetBool(hashIsAiming, true);
 
-                cinemachine3RdPersonFollow.CameraDistance = (equipmentDatabase.GetCurrentWeapon().Exists() && equipmentDatabase.GetCurrentWeapon().GetItem().isCrossbow)
+                cinemachineThirdPersonFollow.CameraDistance = (equipmentDatabase.GetCurrentWeapon().Exists() && equipmentDatabase.GetCurrentWeapon().GetItem().isCrossbow)
                     ? crossbowAimCameraDistance : bowAimCameraDistance;
 
                 onBowAim_Begin?.Invoke();
             }
             else if (equipmentDatabase.IsStaffEquipped())
             {
-                cinemachine3RdPersonFollow.CameraDistance = spellAimCameraDistance;
+                cinemachineThirdPersonFollow.CameraDistance = spellAimCameraDistance;
                 onSpellAim_Begin?.Invoke();
             }
 
             GetPlayerManager().thirdPersonController.virtualCamera.gameObject.SetActive(false);
+
+            ShowArrowPlaceholder();
         }
 
         public void Aim_End()
@@ -220,6 +241,8 @@ namespace AF.Shooting
             GetPlayerManager().thirdPersonController.rotateWithCamera = false;
             GetPlayerManager().animator.SetBool(hashIsAiming, false);
             GetPlayerManager().thirdPersonController.virtualCamera.gameObject.SetActive(true);
+
+            HideArrowPlaceholder();
         }
 
         private void Update()
@@ -244,6 +267,8 @@ namespace AF.Shooting
             GetPlayerManager().staminaStatManager.DecreaseStamina(minimumStaminaToShoot);
 
             FireProjectile(consumableProjectile.projectile.gameObject, lockOnTarget, null);
+
+            HideArrowPlaceholder();
         }
 
 
@@ -304,12 +329,6 @@ namespace AF.Shooting
         public void ShootWithoutClearingProjectilesAndSpells(bool ignoreSpawnFromCamera)
         {
             Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
-            Vector3 lookPosition = ray.direction;
-
-            if (lookPosition.y > 0)
-            {
-                lookPosition.y *= -1f;
-            }
 
             cinemachineImpulseSource.GenerateImpulse();
             isShooting = true;
@@ -328,7 +347,6 @@ namespace AF.Shooting
             HandleProjectile(
                 queuedProjectile,
                 distanceFromCamera,
-                Quaternion.LookRotation(lookPosition),
                 ray,
                 0f,
                 queuedSpell,
@@ -345,9 +363,10 @@ namespace AF.Shooting
             queuedSpell = null;
         }
 
-        void HandleProjectile(GameObject projectile, float originDistanceFromCamera, Quaternion lookPosition, Ray ray, float delay, Spell spell, bool ignoreSpawnFromCamera)
+        void HandleProjectile(GameObject projectile, float originDistanceFromCamera, Ray ray, float delay, Spell spell, bool ignoreSpawnFromCamera)
         {
             Vector3 origin = ray.GetPoint(originDistanceFromCamera);
+            Quaternion lookPosition = Quaternion.identity;
 
             // If shooting spell but not locked on, use player transform forward to direct the spell
             if (lockOnManager.isLockedOn == false && isAiming == false || spell != null && spell.ignoreSpawnFromCamera || ignoreSpawnFromCamera)
@@ -574,7 +593,6 @@ namespace AF.Shooting
         /// <param name="projectile"></param>
         public void ShootProjectile(GameObject projectile)
         {
-
             if (lockOnManager.nearestLockOnTarget?.transform != null && lockOnManager.isLockedOn)
             {
                 var rotation = lockOnManager.nearestLockOnTarget.transform.transform.position - characterBaseManager.transform.position;
@@ -588,7 +606,5 @@ namespace AF.Shooting
             queuedProjectile = null;
             queuedSpell = null;
         }
-
     }
-
 }

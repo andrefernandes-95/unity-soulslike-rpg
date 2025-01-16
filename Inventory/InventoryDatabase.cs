@@ -16,6 +16,17 @@ namespace AF.Inventory
 
         public List<Item> defaultItems = new();
 
+        public Armor defaultArmor;
+        public Legwear defaultLegwear;
+        public Gauntlet defaultGauntlets;
+        public Weapon defaultWeapon;
+        public Shield defaultShield;
+        public Weapon defaultBowWeapon;
+        public Weapon defaultStaffWeapon;
+        public Arrow defaultArrows;
+        public int defaultAmountOfArrows = 15;
+
+
         [Header("Databases")]
         public EquipmentDatabase equipmentDatabase;
 
@@ -38,28 +49,53 @@ namespace AF.Inventory
 #endif
         public void Clear() => ownedItems.Clear();
 
-        public void SetDefaultItems(EquipmentGraphicsHandler equipmentGraphicsHandler)
+        public void SetDefaultItems()
         {
             ownedItems.Clear();
 
-            foreach (var addedItem in defaultItems)
+            if (defaultWeapon != null)
             {
+                WeaponInstance weaponInstance = AddItem(defaultWeapon) as WeaponInstance;
+                equipmentDatabase.EquipWeapon(weaponInstance, 0);
+            }
+            if (defaultBowWeapon != null)
+            {
+                WeaponInstance weaponInstance = AddItem(defaultBowWeapon) as WeaponInstance;
+                equipmentDatabase.EquipWeapon(weaponInstance, 1);
+            }
+            if (defaultStaffWeapon != null)
+            {
+                WeaponInstance weaponInstance = AddItem(defaultStaffWeapon) as WeaponInstance;
+                equipmentDatabase.EquipWeapon(weaponInstance, 2);
+            }
+            if (defaultShield != null)
+            {
+                ShieldInstance shieldInstance = AddItem(defaultShield) as ShieldInstance;
+                equipmentDatabase.EquipShield(shieldInstance, 0);
+            }
+            if (defaultArrows != null)
+            {
+                for (int i = 0; i < defaultAmountOfArrows; i++)
+                {
+                    ArrowInstance arrowInstance = AddItem(defaultArrows) as ArrowInstance;
 
-                if (addedItem is Armor)
-                {
-                    ArmorInstance armorInstance = AddItem(addedItem) as ArmorInstance;
-                    equipmentGraphicsHandler.EquipArmor(armorInstance);
+                    if (i == 0) equipmentDatabase.EquipArrow(arrowInstance, 0);
                 }
-                else if (addedItem is Gauntlet)
-                {
-                    GauntletInstance gauntletInstance = AddItem(addedItem) as GauntletInstance;
-                    equipmentGraphicsHandler.EquipGauntlet(gauntletInstance);
-                }
-                else if (addedItem is Legwear)
-                {
-                    LegwearInstance legwearInstance = AddItem(addedItem) as LegwearInstance;
-                    equipmentGraphicsHandler.EquipLegwear(legwearInstance);
-                }
+            }
+            if (defaultArmor != null)
+            {
+                ArmorInstance armorInstance = AddItem(defaultArmor) as ArmorInstance;
+                equipmentDatabase.EquipArmor(armorInstance);
+            }
+            if (defaultGauntlets != null)
+            {
+                GauntletInstance gauntletInstance = AddItem(defaultGauntlets) as GauntletInstance;
+                equipmentDatabase.EquipGauntlet(gauntletInstance);
+            }
+            if (defaultLegwear != null)
+            {
+                LegwearInstance legwearInstance = AddItem(defaultLegwear) as LegwearInstance;
+                equipmentDatabase.EquipLegwear(legwearInstance);
             }
         }
 
@@ -151,8 +187,14 @@ namespace AF.Inventory
                 return;
             }
 
-            UnequipItemToRemove(itemInstance);
             ownedItems.Remove(itemInstance);
+
+            if (itemInstance is ArrowInstance arrowInstance && GetItemAmount(arrowInstance.GetItem()) > 0)
+            {
+                return;
+            }
+
+            UnequipItemToRemove(itemInstance);
         }
 
         void UnequipItemToRemove(ItemInstance item) => equipmentDatabase.UnequipItem(item);

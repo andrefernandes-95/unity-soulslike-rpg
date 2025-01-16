@@ -19,6 +19,9 @@ namespace AF
         [Header("Flags")]
         public bool canTakeDamage = true;
 
+        [Header("Events")]
+        public UnityEvent onDamage;
+
         // Damage Event
         public Func<CharacterBaseManager, CharacterBaseManager, Damage, Damage> onDamageEvent;
 
@@ -73,9 +76,9 @@ namespace AF
                 return false;
             }
 
-            character.health.TakeDamage(damage.GetTotalDamage());
+            character?.health.TakeDamage(damage.GetTotalDamage());
 
-            if (character.statusController != null && damage.statusEffects != null && damage.statusEffects.Length > 0)
+            if (character?.statusController != null && damage.statusEffects != null && damage.statusEffects.Length > 0)
             {
                 foreach (var statusEffectToApply in damage.statusEffects)
                 {
@@ -85,6 +88,8 @@ namespace AF
 
             HandleDamageEffect(damage);
 
+            onDamage?.Invoke();
+
             return true;
         }
 
@@ -92,7 +97,7 @@ namespace AF
         {
             if (damage.physical > 0)
             {
-                physicalDamageEffect.Play();
+                physicalDamageEffect?.Play();
             }
         }
 

@@ -1,4 +1,3 @@
-
 namespace AF
 {
     using System.Collections;
@@ -6,28 +5,19 @@ namespace AF
     using AF.Dialogue;
     using AF.UI;
     using UnityEngine;
-    using UnityEngine.Localization.Settings;
 
-    [RequireComponent(typeof(MonoBehaviourID))]
     public class EV_SimpleMessage : EventBase
     {
         public Character character;
 
         [TextAreaAttribute(minLines: 10, maxLines: 20)]
-        [HideInInspector] public string message;
-        [TextAreaAttribute(minLines: 10, maxLines: 20)]
-        public string englishMessage;
-
-        [TextAreaAttribute(minLines: 10, maxLines: 20)]
-        public string portugueseMessage;
+        public string message;
 
         [Header("Responses")]
         public Response[] responses;
 
         [Header("Action Button")]
         public ActionButton actionButton;
-
-        [HideInInspector] public MonoBehaviourID monoBehaviourID => GetComponent<MonoBehaviourID>();
 
         // Scene Refs
         UIDocumentDialogueWindow uIDocumentDialogueWindow;
@@ -39,7 +29,7 @@ namespace AF
 
             yield return GetUIDocumentDialogueWindow().DisplayMessage(
                 character,
-                LocalizationSettings.StringDatabase.GetLocalizedString("Dialogues", monoBehaviourID.ID),
+                message,
                 filteredResponses,
                 actionButton
                 );

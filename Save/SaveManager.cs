@@ -75,7 +75,7 @@
         {
             playerStatsDatabase.Clear(isFromGameOver);
             equipmentDatabase.Clear();
-            inventoryDatabase.SetDefaultItems(playerManager.equipmentGraphicsHandler);
+            inventoryDatabase.SetDefaultItems();
             pickupDatabase.Clear();
             questsDatabase.Clear();
             companionsDatabase.Clear();

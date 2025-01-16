@@ -28,7 +28,7 @@ namespace AF
 
         // Last scroll position
         int lastScrollElementIndex = -1;
-        Gemstone selectedGemstone;
+        GemstoneInstance selectedGemstone;
 
         public void ClearPreviews(VisualElement root)
         {
@@ -123,7 +123,7 @@ namespace AF
 
                 WeaponInstance selectedWeaponInstance = uIDocumentCraftScreen.uIBlacksmithWeaponsList?.selectedWeaponInstance;
 
-                string weaponIdThatThisGemstoneIsAttachedTo = gemstonesDatabase.GetWeaponIdByAttachedGemstone(gemstone);
+                string weaponIdThatThisGemstoneIsAttachedTo = gemstonesDatabase.GetWeaponIdByAttachedGemstone(gemstoneInstance);
 
                 bool isEquipped = weaponIdThatThisGemstoneIsAttachedTo == selectedWeaponInstance.GetId();
 
@@ -145,7 +145,7 @@ namespace AF
                     lastScrollElementIndex = currentIndex;
                     PreviewGemstone(gemstone, root, isEquipped);
 
-                    SelectGemstone(gemstone);
+                    SelectGemstone(gemstoneInstance);
 
                     DrawUI(root, onClose);
                 },
@@ -167,15 +167,15 @@ namespace AF
             }
         }
 
-        void SelectGemstone(Gemstone gemstone)
+        void SelectGemstone(GemstoneInstance gemstoneInstance)
         {
-            selectedGemstone = gemstone;
+            selectedGemstone = gemstoneInstance;
 
             WeaponInstance weaponInstanceToAttach = uIDocumentCraftScreen.uIBlacksmithWeaponsList.selectedWeaponInstance;
 
             if (weaponInstanceToAttach != null)
             {
-                if (gemstonesDatabase.GetWeaponIdByAttachedGemstone(gemstone) == weaponInstanceToAttach.GetId())
+                if (gemstonesDatabase.GetWeaponIdByAttachedGemstone(gemstoneInstance) == weaponInstanceToAttach.GetId())
                 {
                     gemstonesDatabase.DettachGemstoneFromWeapon(weaponInstanceToAttach, selectedGemstone);
                 }
@@ -203,14 +203,14 @@ namespace AF
 
             Weapon weapon = selectedWeaponInstance.GetItem();
 
+            Gemstone[] equippedGemstones = gemstonesDatabase.GetAttachedGemstonesFromWeapon(selectedWeaponInstance);
+
             Damage currentWeaponDamage = weapon.weaponDamage.GetCurrentDamage(playerManager,
                 playerManager.statsBonusController.GetCurrentStrength(),
                 playerManager.statsBonusController.GetCurrentDexterity(),
                 playerManager.statsBonusController.GetCurrentIntelligence(),
                 selectedWeaponInstance,
-                playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(selectedWeaponInstance));
-
-            Gemstone[] equippedGemstones = gemstonesDatabase.GetAttachedGemstonesFromWeapon(selectedWeaponInstance);
+                equippedGemstones);
 
             string gemstoneNames = string.Join(", ", equippedGemstones.Select(gemstone => gemstone.GetName()));
 
@@ -234,12 +234,15 @@ namespace AF
 
             Weapon weapon = selectedWeaponInstance.GetItem();
 
+            Gemstone[] attachedGemstones = playerManager.gemstonesDatabase
+                .GetAttachedGemstonesFromWeapon(selectedWeaponInstance);
+
             Damage currentWeaponDamage = weapon.weaponDamage.GetCurrentDamage(playerManager,
                 playerManager.statsBonusController.GetCurrentStrength(),
                 playerManager.statsBonusController.GetCurrentDexterity(),
                 playerManager.statsBonusController.GetCurrentIntelligence(),
                 selectedWeaponInstance,
-                playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(selectedWeaponInstance));
+                attachedGemstones);
 
             if (gemstone != null)
             {
@@ -252,7 +255,9 @@ namespace AF
                         playerManager.statsBonusController.GetCurrentDexterity(),
                         playerManager.statsBonusController.GetCurrentIntelligence(),
                         selectedWeaponInstance,
-                        playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(selectedWeaponInstance).Where(gem => gem.Id != gemstone.Id).ToArray());
+                        playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(selectedWeaponInstance)
+                            .Where(gem => gem != gemstone)
+                            .ToArray());
 
                 uIWeaponStatsContainer.PreviewWeaponDamageDifference(
                     weapon.GetName() + " + " + gemstone.GetName(),

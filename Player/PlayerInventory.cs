@@ -289,7 +289,7 @@ namespace AF
                 }
                 else
                 {
-                    playerManager.playerInventory.RemoveItem(currentConsumedItem);
+                    RemoveItem(currentConsumedItem);
                 }
             }
 
