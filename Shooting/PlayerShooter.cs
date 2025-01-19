@@ -64,6 +64,10 @@ namespace AF.Shooting
         public GameObject queuedProjectile;
         public Spell queuedSpell;
 
+        [Header("SFX")]
+        public AudioSource combatAudioSource;
+        public AudioClip bowDrawSfx;
+
         private void Awake()
         {
             HideArrowPlaceholder();
@@ -224,6 +228,12 @@ namespace AF.Shooting
             }
 
             GetPlayerManager().thirdPersonController.virtualCamera.gameObject.SetActive(false);
+
+
+            if (bowDrawSfx != null && combatAudioSource != null)
+            {
+                combatAudioSource.PlayOneShot(bowDrawSfx);
+            }
 
             ShowArrowPlaceholder();
         }

@@ -25,6 +25,7 @@ namespace AF.Inventory
         public Weapon defaultStaffWeapon;
         public Arrow defaultArrows;
         public int defaultAmountOfArrows = 15;
+        public Spell defaultSpell;
 
 
         [Header("Databases")]
@@ -96,6 +97,11 @@ namespace AF.Inventory
             {
                 LegwearInstance legwearInstance = AddItem(defaultLegwear) as LegwearInstance;
                 equipmentDatabase.EquipLegwear(legwearInstance);
+            }
+            if (defaultSpell != null)
+            {
+                SpellInstance spellInstance = AddItem(defaultSpell) as SpellInstance;
+                equipmentDatabase.EquipSpell(spellInstance, 0);
             }
         }
 

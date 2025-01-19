@@ -3,14 +3,22 @@ namespace AF
     using System.Collections;
     using System.Linq;
     using AF.Dialogue;
+    using AF.UI;
     using UnityEngine;
 
-    public class EV_SimpleMessage : EventBase
+    [System.Serializable]
+    public class TutorialMessage
+    {
+        [TextAreaAttribute(minLines: 10, maxLines: 20)]
+        public string message;
+        public ActionButton actionButton;
+    }
+
+    public class EV_TutorialMessage : EventBase
     {
         public Character character;
 
-        [TextAreaAttribute(minLines: 10, maxLines: 20)]
-        public string message;
+        public TutorialMessage[] tutorialMessages;
 
         [Header("Responses")]
         public Response[] responses;
@@ -23,9 +31,9 @@ namespace AF
             // Only consider responses that are active - we hide responses based on composition of nested objects
             Response[] filteredResponses = responses.Where(response => response.gameObject.activeInHierarchy).ToArray();
 
-            yield return GetUIDocumentDialogueWindow().DisplayMessage(
+            yield return GetUIDocumentDialogueWindow().DisplayTutorialMessage(
                 character,
-                message,
+                tutorialMessages,
                 filteredResponses
                 );
         }

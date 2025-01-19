@@ -127,6 +127,17 @@ namespace AF
 
         public bool IsHolyWeapon(PlayerManager playerManager, WeaponInstance weaponInstance) => weaponDamage.HasHolyDamage(weaponInstance, playerManager);
 
+        public bool IsRangeWeapon()
+        {
+            return weaponDamage.weaponUpgradeLevels.Length > 0
+                && weaponDamage.weaponUpgradeLevels[0].damage.weaponAttackType == WeaponAttackType.Range;
+        }
+        public bool IsStaffWeapon()
+        {
+            return weaponDamage.weaponUpgradeLevels.Length > 0
+                && weaponDamage.weaponUpgradeLevels[0].damage.weaponAttackType == WeaponAttackType.Staff;
+        }
+
     }
 
 }

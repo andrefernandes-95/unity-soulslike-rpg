@@ -275,8 +275,13 @@ namespace AF
             var query = inventoryDatabase.ownedItems
                 .Where(item =>
                 {
-                    if (isShieldSlot && item is WeaponInstance)
+                    if (isShieldSlot && item is WeaponInstance weaponInstance)
                     {
+                        if (weaponInstance.GetItem().IsRangeWeapon() || weaponInstance.GetItem().IsStaffWeapon())
+                        {
+                            return false;
+                        }
+
                         return true;
                     }
 

@@ -11,6 +11,10 @@ namespace AF
 
         State defaultState;
 
+        [Header("State References")]
+        public ChaseState chaseState;
+        public AmbushState ambushState;
+
         private void Awake()
         {
             this.defaultState = currentState;
@@ -59,6 +63,11 @@ namespace AF
             currentState = null;
             scheduledState = null;
             ScheduleState(defaultState);
+        }
+
+        public bool IsInAmbushState()
+        {
+            return currentState == ambushState;
         }
 
     }

@@ -20,7 +20,6 @@ namespace AF
 
         void Start()
         {
-            playerManager.health.onHealthChanged.AddListener(UpdateUI);
             UpdateUI();
         }
 
@@ -39,7 +38,7 @@ namespace AF
             isSetup = true;
         }
 
-        void UpdateUI()
+        public void UpdateUI()
         {
             if (!isSetup)
             {

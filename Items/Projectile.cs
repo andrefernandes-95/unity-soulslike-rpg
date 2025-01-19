@@ -1,6 +1,7 @@
 ﻿namespace AF
 {
     using System.Collections;
+    using System.Collections.Generic;
     using AF.Health;
     using AF.Shooting;
     using UnityEngine;
@@ -30,8 +31,7 @@
         public UnityEvent onCollision;
         public float onFired_AfterDelay = 0.1f;
 
-        // Flags
-        bool hasCollided = false;
+        readonly List<Collider> hitColliders = new();
 
         CharacterBaseManager shooter;
         Vector3 previousPosition;
@@ -41,11 +41,22 @@
         public bool collideWithAnything = false;
         public UnityEvent onAnyCollision;
 
+        [Header("SFX")]
+        public AudioSource audioSource => GetComponent<AudioSource>();
+        public AudioClip releaseSfx;
+        public AudioClip onCollisionSfx;
+        bool hasPlayedCollisionSfx = false;
+
         private void OnEnable()
         {
             onFired?.Invoke();
 
             StartCoroutine(HandleOnFiredAfter_Coroutine());
+
+            if (releaseSfx != null && audioSource != null)
+            {
+                audioSource.PlayOneShot(releaseSfx);
+            }
         }
 
         private void Update()
@@ -97,10 +108,12 @@
 
         void OnTriggerEnter(Collider other)
         {
-            if (hasCollided)
+            if (hitColliders.Contains(other))
             {
                 return;
             }
+
+            hitColliders.Add(other);
 
             other.TryGetComponent(out DamageReceiver damageReceiver);
 
@@ -114,7 +127,11 @@
                 return;
             }
 
-            hasCollided = true;
+            if (onCollisionSfx != null && audioSource != null && !hasPlayedCollisionSfx)
+            {
+                hasPlayedCollisionSfx = true;
+                audioSource.PlayOneShot(onCollisionSfx);
+            }
 
             if (collideWithAnything)
             {

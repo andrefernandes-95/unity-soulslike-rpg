@@ -1,9 +1,8 @@
-using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.AI;
-
 namespace AF.Tests
 {
+    using NUnit.Framework;
+    using UnityEngine;
+    using UnityEngine.AI;
 
     public class AmbushStateTests
     {
@@ -38,20 +37,20 @@ namespace AF.Tests
         public void Tick_ShouldReturnIdleStateWhenShouldAwakeIsTrue()
         {
             // Arrange
-            _state.shouldAwake = true;
+            _state.ambushHasFinished = true;
 
             // Act
             var nextState = _state.Tick(_mockStateManager);
 
             // Assert
-            Assert.That(nextState, Is.SameAs(_state.idleState));
+            Assert.That(nextState, Is.SameAs(_state.chaseState));
         }
 
         [Test]
         public void Tick_ShouldReturnThisWhenShouldAwakeIsFalse()
         {
             // Arrange
-            _state.shouldAwake = false;
+            _state.ambushHasFinished = false;
 
             // Act
             var nextState = _state.Tick(_mockStateManager);

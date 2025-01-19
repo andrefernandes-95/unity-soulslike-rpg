@@ -17,6 +17,7 @@ namespace AF.Detection
         [Header("Components")]
         public Transform origin;
         public TargetManager targetManager;
+        public CharacterManager characterManager;
 
         [Header("Tags")]
         public List<string> tagsToDetect = new();
@@ -95,11 +96,16 @@ namespace AF.Detection
                     {
                         targetManager.SetTarget(target, () =>
                         {
-                            OnTargetSighted?.Invoke();
+                            HandleTargetSighted();
                         }, false);
                     }
                 }
             }
+        }
+
+        void HandleTargetSighted()
+        {
+            OnTargetSighted?.Invoke();
         }
 
         public void SetDetectionLayer(string layerName)

@@ -652,9 +652,18 @@
                 }
             }
 
+            string saveDirectory = Path.Combine(Application.persistentDataPath, SaveUtils.SAVE_FILES_FOLDER);
+
+            // Ensure the directory exists
+            if (!Directory.Exists(saveDirectory))
+            {
+                Directory.CreateDirectory(saveDirectory);
+            }
+
             if (finalScreenshot != null)
             {
-                File.WriteAllBytes(Path.Combine(Application.persistentDataPath + "/" + SaveUtils.SAVE_FILES_FOLDER, saveFileName + ".jpg"), finalScreenshot.EncodeToJPG());
+                string filePath = Path.Combine(saveDirectory, saveFileName + ".jpg");
+                File.WriteAllBytes(filePath, finalScreenshot.EncodeToJPG());
             }
 
             notificationManager.ShowNotification(LocalizationSettings.StringDatabase.GetLocalizedString("Glossary", "Game saved"), notificationManager.systemSuccess);

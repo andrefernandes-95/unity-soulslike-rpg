@@ -189,6 +189,11 @@ namespace AF
             if (element == WeaponElementType.Darkness) elementAttack = currentDamage.darkness;
             if (element == WeaponElementType.Water) elementAttack = currentDamage.water;
 
+            if (elementAttack <= 0)
+            {
+                return 0;
+            }
+
             return (int)(
                 (elementAttack
                     + GetScalingBonus(playerStrength, playerDexterity, playerIntelligence, currentWeapon)

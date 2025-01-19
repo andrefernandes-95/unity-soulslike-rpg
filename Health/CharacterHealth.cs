@@ -68,7 +68,7 @@ namespace AF.Health
 
         private void UpdateBonusHealthFromCompanions()
         {
-            if (!characterManager.IsCompanion() && companionsDatabase.TryGetCompanionCount(out int companionCount) && companionCount > 0)
+            if (!characterManager.IsCompanion() && companionsDatabase.TryGetCompanionCount(out int companionCount) && companionCount > 1)
             {
                 bonusHealthFromCompanions = HealthUtils.GetExtraHealthBasedOnCompanionsInParty(companionCount);
             }

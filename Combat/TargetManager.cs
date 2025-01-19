@@ -3,6 +3,7 @@ using System.Linq;
 using AF.Characters;
 using AF.Companions;
 using AF.Events;
+using AF.Health;
 using TigerForge;
 using UnityEngine;
 using UnityEngine.Events;
@@ -26,9 +27,6 @@ namespace AF.Combat
         [Header("Faction Settings")]
         public UnityAction<bool> onAgressiveTowardsPlayer;
 
-        [Header("Combat Start Settings")]
-        bool hasBeenInCombat = false;
-        public float delayWhenBeginningCombatForFirstTime = 1f;
 
         // Scene Reference
         PlayerManager playerManager;
@@ -36,10 +34,6 @@ namespace AF.Combat
 
         private void Awake()
         {
-            EventManager.StartListening(EventMessages.ON_LEAVING_BONFIRE, () =>
-            {
-                hasBeenInCombat = false;
-            });
         }
 
         public void SetTarget(CharacterBaseManager target)
@@ -74,31 +68,13 @@ namespace AF.Combat
                 return;
             }
 
-            if (!hasBeenInCombat)
-            {
-                hasBeenInCombat = true;
-
-                IEnumerator PrepareCombat_Coroutine()
-                {
-                    yield return new WaitForSeconds(delayWhenBeginningCombatForFirstTime);
-
-                    HandleSetTarget(target);
-
-                    onTargetSetCallback?.Invoke();
-                }
-
-                StartCoroutine(PrepareCombat_Coroutine());
-            }
-            else
-            {
-                HandleSetTarget(target);
-            }
+            HandleSetTarget(target);
+            onTargetSetCallback?.Invoke();
         }
 
         void HandleSetTarget(CharacterBaseManager target)
         {
             currentTarget = target;
-
             onTargetSet_Event?.Invoke();
 
             if (characterManager != null && characterManager.partners != null && characterManager.partners.Length > 0)
@@ -122,6 +98,15 @@ namespace AF.Combat
                     onAgressiveTowardsPlayer(true);
                 }
                 onAgressiveTowardsPlayer_Event?.Invoke();
+            }
+
+            if (characterManager.stateManager.IsInAmbushState())
+            {
+                characterManager.stateManager.ambushState.WakeUpFromAmbush();
+            }
+            else
+            {
+                characterManager.stateManager.ScheduleState(characterManager.stateManager.chaseState);
             }
         }
 

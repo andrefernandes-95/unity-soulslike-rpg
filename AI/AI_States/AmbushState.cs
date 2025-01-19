@@ -1,13 +1,15 @@
-using System.Collections;
-using AF.Events;
-using TigerForge;
-using UnityEngine;
-using UnityEngine.Events;
-
 namespace AF
 {
+    using AF.Events;
+    using TigerForge;
+    using UnityEngine;
+    using UnityEngine.Events;
+
     public class AmbushState : State
     {
+
+        public readonly int ambushIdle = Animator.StringToHash("Ambush");
+        public readonly int exitAmbush = Animator.StringToHash("Exiting Ambush");
 
         [Header("Components")]
         public CharacterManager characterManager;
@@ -17,29 +19,38 @@ namespace AF
         public UnityEvent onStateUpdate;
         public UnityEvent onStateExit;
         public UnityEvent onAmbushBegin;
-
         public UnityEvent onAmbushFinish;
 
         [Header("Transitions")]
-        public State idleState;
+        public ChaseState chaseState;
 
-        bool ambushHasBegun = false;
-        public bool shouldAwake = false;
+        public bool isInAmbushState = false;
+        public bool ambushHasFinished = false;
 
-        Coroutine ambushCoroutine;
 
-        private void Awake()
+        public void WakeUpFromAmbush()
         {
-            EventManager.StartListening(EventMessages.ON_LEAVING_BONFIRE, () =>
+            if (!isInAmbushState)
             {
-                ambushHasBegun = false;
-                shouldAwake = false;
-            });
+                return;
+            }
+
+            onAmbushBegin?.Invoke();
+
+            characterManager.animator.CrossFade(exitAmbush, 0.1f);
+        }
+
+        public void ExitAmbushState()
+        {
+            ambushHasFinished = true;
         }
 
         public override void OnStateEnter(StateManager stateManager)
         {
             onStateEnter?.Invoke();
+
+            isInAmbushState = true;
+            ambushHasFinished = false;
 
             if (characterManager.agent.isOnNavMesh)
             {
@@ -47,52 +58,28 @@ namespace AF
             }
 
             characterManager.agent.speed = 0f;
+
+            characterManager.animator.Play(ambushIdle);
         }
 
         public override void OnStateExit(StateManager stateManager)
         {
-            if (ambushCoroutine != null)
-            {
-                StopCoroutine(ambushCoroutine);
-            }
-
+            isInAmbushState = false;
             onStateExit?.Invoke();
         }
+
         public override State Tick(StateManager stateManager)
         {
             onStateUpdate?.Invoke();
 
-            if (shouldAwake)
+            if (ambushHasFinished)
             {
-                return idleState;
+                onAmbushFinish?.Invoke();
+
+                return chaseState;
             }
 
             return this;
-        }
-
-        public void BeginAmbush(float animationDuration)
-        {
-            if (ambushHasBegun)
-            {
-                return;
-            }
-
-            ambushHasBegun = true;
-
-            if (ambushCoroutine != null)
-            {
-                StopCoroutine(ambushCoroutine);
-            }
-
-            ambushCoroutine = StartCoroutine(Ambush_Coroutine(animationDuration));
-        }
-
-        IEnumerator Ambush_Coroutine(float duration)
-        {
-            onAmbushBegin?.Invoke();
-            yield return new WaitForSeconds(duration);
-            onAmbushFinish?.Invoke();
-            shouldAwake = true;
         }
     }
 }
