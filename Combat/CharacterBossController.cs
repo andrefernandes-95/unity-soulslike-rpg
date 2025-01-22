@@ -1,23 +1,22 @@
-using System.Linq;
-using AF.Combat;
-using AF.Events;
-using AF.Flags;
-using AF.Health;
-using AF.Music;
-using GameAnalyticsSDK;
-using TigerForge;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.UIElements;
-
 namespace AF
 {
+    using System.Linq;
+    using AF.Events;
+    using AF.Flags;
+    using AF.Music;
+    using GameAnalyticsSDK;
+    using TigerForge;
+    using UnityEngine;
+    using UnityEngine.Events;
+    using UnityEngine.UIElements;
+
     public class CharacterBossController : MonoBehaviour
     {
         public bool isBoss = false;
 
         [Header("Settings")]
         public string bossName;
+        public GameObject fogwall;
         public AudioClip bossMusic;
 
         public UIDocument bossHud;
@@ -40,8 +39,14 @@ namespace AF
         private BGMManager bgmManager;
         private SceneSettings sceneSettings;
 
+
         public void Start()
         {
+            if (fogwall != null)
+            {
+                fogwall.SetActive(false);
+            }
+
             HideBossHud();
         }
 
@@ -57,14 +62,13 @@ namespace AF
                     return;
                 }
 
+                bossFillBar ??= bossHud.rootVisualElement.Q<IMGUIContainer>("hp-bar");
+                bossFillBar.style.width = new Length(characterManager.health.GetCurrentHealth() * 100 / characterManager.health.GetMaxHealth(), LengthUnit.Percent);
+
                 if (characterManager.health.GetCurrentHealth() <= 0)
                 {
                     HideBossHud();
-                    return;
                 }
-
-                bossFillBar ??= bossHud.rootVisualElement.Q<IMGUIContainer>("hp-bar");
-                bossFillBar.style.width = new Length(characterManager.health.GetCurrentHealth() * 100 / characterManager.health.GetMaxHealth(), LengthUnit.Percent);
             }
         }
 
@@ -77,7 +81,9 @@ namespace AF
 
             bossHud.enabled = true;
             bossHud.rootVisualElement.Q<Label>("boss-name").text = bossName;
-            bossHud.rootVisualElement.style.display = DisplayStyle.Flex;
+
+            UIUtils.PlayFadeInAnimation(bossHud.rootVisualElement, .5f);
+
             bossHud.rootVisualElement.Q<VisualElement>("container").style.marginBottom = characterManager.partnerOrder == 0 ? 0 : 60 * characterManager.partnerOrder;
         }
 
@@ -88,7 +94,7 @@ namespace AF
                 return;
             }
 
-            bossHud.rootVisualElement.style.display = DisplayStyle.None;
+            UIUtils.PlayFadeOutAnimation(bossHud.rootVisualElement, 2f);
         }
 
         public bool IsBossHUDEnabled()
@@ -117,6 +123,7 @@ namespace AF
                 if (GetBGMManager().IsPlayingMusicClip(bossMusic.name) == false)
                 {
                     GetBGMManager().PlayMusic(bossMusic);
+                    sceneSettings.StopPlaylist();
                     GetBGMManager().isPlayingBossMusic = true;
                 }
             }
@@ -136,6 +143,11 @@ namespace AF
             onBattleBegin?.Invoke();
 
             EventManager.EmitEvent(EventMessages.ON_BOSS_BATTLE_BEGINS);
+
+            if (fogwall != null)
+            {
+                fogwall.SetActive(true);
+            }
         }
 
         /// <summary>
@@ -155,6 +167,11 @@ namespace AF
 
             if (characterManager.partners?.Length > 0 ? allPartnersAreDead : isDead)
             {
+                if (fogwall != null)
+                {
+                    fogwall.SetActive(false);
+                }
+
                 if (GetBGMManager() != null)
                 {
                     GetBGMManager().isPlayingBossMusic = false;

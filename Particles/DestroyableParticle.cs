@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using UnityEngine;
-
-namespace AF
+﻿namespace AF
 {
+    using System.Collections;
+    using UnityEngine;
+
     public class DestroyableParticle : MonoBehaviour
     {
         public float destroyAfter = 5f;

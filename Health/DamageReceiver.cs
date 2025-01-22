@@ -126,7 +126,6 @@ namespace AF
 
         bool CanTakeDamage(CharacterBaseManager attacker)
         {
-
             if (!canTakeDamage)
             {
                 return false;

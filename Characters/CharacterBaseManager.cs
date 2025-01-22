@@ -94,11 +94,12 @@ namespace AF
 
         public bool IsFromSameFaction(CharacterBaseManager target)
         {
-            return target != null && combatant.characterFactions != null
-                && combatant.characterFactions.Length > 0
-                && combatant.characterFactions.Any(thisCharactersFaction =>
-                    target.combatant.characterFactions != null && target.combatant.characterFactions.Length > 0 && target.combatant.characterFactions.Contains(thisCharactersFaction));
+            if (target == null)
+            {
+                return false;
+            }
 
+            return combatant.IsFriendsWith(target.combatant);
         }
 
         public void SetIsConfused(bool value)

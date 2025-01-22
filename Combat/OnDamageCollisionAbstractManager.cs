@@ -1,11 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using AF.Health;
-using UnityEngine;
-using UnityEngine.Events;
-
 namespace AF
 {
+    using System.Collections;
+    using System.Collections.Generic;
+    using AF.Health;
+    using UnityEngine;
+    using UnityEngine.Events;
+
     public class OnDamageCollisionAbstractManager : MonoBehaviour
     {
         [Header("Projectile Settings")]

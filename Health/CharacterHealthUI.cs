@@ -18,11 +18,23 @@ namespace AF
             }
         }
 
+        void HideRegularHUD()
+        {
+            characterHealth.characterManager.characterHUD.characterName.gameObject.SetActive(false);
+            healthSlider.gameObject.SetActive(false);
+        }
+
+        void UpdateBossHUD()
+        {
+            characterHealth.characterManager.characterBossController.UpdateUI();
+        }
+
         public void InitializeHUD()
         {
             if (characterHealth.characterManager.characterBossController.IsBoss())
             {
-                healthSlider.gameObject.SetActive(false);
+                UpdateBossHUD();
+                HideRegularHUD();
                 return;
             }
 
@@ -37,7 +49,8 @@ namespace AF
         {
             if (characterHealth.characterManager.characterBossController.IsBoss())
             {
-                healthSlider.gameObject.SetActive(false);
+                UpdateBossHUD();
+                HideRegularHUD();
                 return;
             }
 
@@ -49,6 +62,13 @@ namespace AF
 
         void UpdateUIDueToSettings()
         {
+            if (characterHealth.characterManager.characterBossController.IsBoss())
+            {
+                UpdateBossHUD();
+                HideRegularHUD();
+                return;
+            }
+
             healthSlider.value = characterHealth.GetCurrentHealth() * 0.01f;
             healthSlider.maxValue = characterHealth.GetMaxHealth() * 0.01f;
         }

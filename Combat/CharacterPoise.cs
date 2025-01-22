@@ -23,11 +23,6 @@ namespace AF
                 return false;
             }
 
-            if (ignorePoiseDamage)
-            {
-                return false;
-            }
-
             return true;
         }
 
@@ -38,10 +33,20 @@ namespace AF
 
         public override bool TakePoiseDamage(int poiseDamage)
         {
-            bool result = base.TakePoiseDamage(poiseDamage);
+            bool result = ignorePoiseDamage == false && base.TakePoiseDamage(poiseDamage);
 
             if (result)
             {
+                currentPoiseHitCount = 0;
+
+                if (CanCallPoiseDamagedEvent())
+                {
+                    onPoiseDamagedEvent?.Invoke();
+                    characterManager.PlayBusyAnimationWithRootMotion(takingDamageAnimationClip);
+                }
+
+                characterManager.health.PlayPostureHit();
+
                 ignorePoiseDamage = true;
 
                 if (ResetIgnorePoiseDamageCoroutine != null)

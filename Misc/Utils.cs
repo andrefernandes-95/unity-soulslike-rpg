@@ -160,7 +160,7 @@
         }
 
 
-        public static CharacterManager GetClosestEnemy(PlayerManager playerManager, CharacterFaction playerFaction)
+        public static CharacterManager GetClosestEnemy(PlayerManager playerManager, Combatant playerCombatant)
         {
             CharacterManager target = playerManager.lockOnManager.nearestLockOnTarget?.characterManager;
             if (target == null)
@@ -172,7 +172,7 @@
                 var enemyCharacters = allCharacters.Where(character => character.CompareTag("Enemy"));
 
                 // Exclude the character that is the same as this character
-                var filteredCharacters = enemyCharacters.Where(_character => !_character.combatant.characterFactions.Contains(playerFaction) && _character.health.GetCurrentHealth() > 0);
+                var filteredCharacters = enemyCharacters.Where(_character => !_character.combatant.friendlies.Contains(playerCombatant) && _character.health.GetCurrentHealth() > 0);
 
                 // Sort characters by distance to the player
                 var closestCharacter = filteredCharacters.OrderBy(

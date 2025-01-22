@@ -169,7 +169,7 @@ namespace AF.Animations
 
         public void OnFireMultipleArrows()
         {
-            playerManager.playerShootingManager.ShootWithoutClearingProjectilesAndSpells(false);
+            playerManager.playerShootingManager.HandleProjectileShot(false);
         }
 
         public void OnLeftFootstep()

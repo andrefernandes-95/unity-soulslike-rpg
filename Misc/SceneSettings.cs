@@ -161,6 +161,11 @@ namespace AF
             EvaluateAmbience();
         }
 
+        public void StopPlaylist()
+        {
+            isPlayingMusicFromThePlaylist = false;
+        }
+
         void EvaluatePlaylist()
         {
             if (isPlayingMusicFromThePlaylist)

@@ -1,15 +1,12 @@
 namespace AF
 {
-    using AF.Events;
-    using TigerForge;
     using UnityEngine;
     using UnityEngine.Events;
 
     public class AmbushState : State
     {
-
-        public readonly int ambushIdle = Animator.StringToHash("Ambush");
-        public readonly int exitAmbush = Animator.StringToHash("Exiting Ambush");
+        public string ambushIdle = "Ambush";
+        public string exitAmbush = "Exiting Ambush";
 
         [Header("Components")]
         public CharacterManager characterManager;
@@ -27,12 +24,20 @@ namespace AF
         public bool isInAmbushState = false;
         public bool ambushHasFinished = false;
 
+        [Header("SFX")]
+        public AudioClip wakeUpSfx;
+
 
         public void WakeUpFromAmbush()
         {
             if (!isInAmbushState)
             {
                 return;
+            }
+
+            if (wakeUpSfx != null)
+            {
+                characterManager.combatAudioSource.PlayOneShot(wakeUpSfx);
             }
 
             onAmbushBegin?.Invoke();

@@ -5,6 +5,7 @@ namespace AF
     using AF.Dialogue;
     using AF.UI;
     using UnityEngine;
+    using UnityEngine.Localization;
 
     [System.Serializable]
     public class TutorialMessage
@@ -16,12 +17,13 @@ namespace AF
 
     public class EV_TutorialMessage : EventBase
     {
-        public Character character;
+        [HideInInspector] public Character character;
 
+        public LocalizedString tutorialName;
         public TutorialMessage[] tutorialMessages;
 
         [Header("Responses")]
-        public Response[] responses;
+        [HideInInspector] public Response[] responses;
 
         // Scene Refs
         UIDocumentDialogueWindow uIDocumentDialogueWindow;
@@ -33,6 +35,7 @@ namespace AF
 
             yield return GetUIDocumentDialogueWindow().DisplayTutorialMessage(
                 character,
+                tutorialName,
                 tutorialMessages,
                 filteredResponses
                 );

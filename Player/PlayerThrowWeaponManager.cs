@@ -1,9 +1,7 @@
-using AF.Health;
-using UnityEngine;
-using UnityEngine.Events;
-
 namespace AF
 {
+    using UnityEngine;
+
     public class PlayerThrowWeaponManager : MonoBehaviour
     {
         public PlayerManager playerManager;

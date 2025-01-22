@@ -26,6 +26,8 @@ namespace AF.Combat
 
         [Header("Faction Settings")]
         public UnityAction<bool> onAgressiveTowardsPlayer;
+        public float radiusToSearchForFriendlies = 5f;
+        public LayerMask friendliesLayer;
 
 
         // Scene Reference
@@ -98,6 +100,20 @@ namespace AF.Combat
                     onAgressiveTowardsPlayer(true);
                 }
                 onAgressiveTowardsPlayer_Event?.Invoke();
+
+
+                if (characterManager.characterBossController.isBoss)
+                {
+                    characterManager.characterBossController.BeginBossBattle();
+                }
+                else
+                {
+                    characterManager.characterHUD.ShowHealthbar();
+                }
+            }
+            else
+            {
+                NotifyClosestCombatPartner();
             }
 
             if (characterManager.stateManager.IsInAmbushState())
@@ -107,6 +123,25 @@ namespace AF.Combat
             else
             {
                 characterManager.stateManager.ScheduleState(characterManager.stateManager.chaseState);
+            }
+        }
+
+        void NotifyClosestCombatPartner()
+        {
+            Combatant currentTargetCombant = currentTarget.combatant;
+
+            // Perform the sphere cast
+            RaycastHit[] hits = Physics.SphereCastAll(transform.position, radiusToSearchForFriendlies, transform.forward, radiusToSearchForFriendlies, friendliesLayer);
+
+            foreach (var hit in hits)
+            {
+                if (hit.transform.TryGetComponent<CharacterManager>(out var possibleFriendly))
+                {
+                    if (possibleFriendly?.combatant && currentTargetCombant.IsFriendsWith(possibleFriendly.combatant))
+                    {
+                        possibleFriendly.targetManager.SetTarget(currentTarget);
+                    }
+                }
             }
         }
 

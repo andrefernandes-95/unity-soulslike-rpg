@@ -7,6 +7,9 @@ namespace AF
 
     public abstract class CharacterAbstractPoise : MonoBehaviour
     {
+        [Header("Animations")]
+        public string takingDamageAnimationClip = "Taking Damage";
+
         public int currentPoiseHitCount = 0;
 
         [Header("Components")]
@@ -53,6 +56,7 @@ namespace AF
                 if (CanCallPoiseDamagedEvent())
                 {
                     onPoiseDamagedEvent?.Invoke();
+                    characterManager.PlayBusyAnimationWithRootMotion(takingDamageAnimationClip);
                 }
 
                 characterManager.health.PlayPostureHit();

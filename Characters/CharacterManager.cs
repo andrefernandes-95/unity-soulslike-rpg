@@ -346,5 +346,16 @@ namespace AF
                 sphereCollider.enabled = activate;
             }
         }
+
+        public void ForceCombatWithPlayer()
+        {
+            targetManager.SetPlayerAsTarget();
+            stateManager.ScheduleState(stateManager.chaseState);
+
+            if (characterBossController.isBoss)
+            {
+                characterBossController.BeginBossBattle();
+            }
+        }
     }
 }

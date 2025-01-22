@@ -183,7 +183,11 @@ namespace AF
             if (currentCombatAction != null && string.IsNullOrEmpty(currentAnimationToPlay) == false)
             {
                 this.usedCombatActions.Add(currentCombatAction);
+
+                characterManager.PlayBusyAnimationWithRootMotion("Idle");
+
                 characterManager.PlayCrossFadeBusyAnimationWithRootMotion(currentAnimationToPlay, crossFade);
+
                 OnAttackStart();
 
                 StartCoroutine(ClearCombatActionFromCooldownList(currentCombatAction));
@@ -270,6 +274,7 @@ namespace AF
             if (currentCombatAction != null)
             {
                 currentCombatAction.onAttack_Start?.Invoke();
+                currentCombatAction.PlayGruntSfx();
             }
         }
         public void OnAttack_HitboxOpen()

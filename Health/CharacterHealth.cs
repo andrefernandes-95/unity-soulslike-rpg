@@ -116,6 +116,11 @@ namespace AF.Health
             CheckIfHasBeenKilledWithRightWeapon();
             EventManager.EmitEvent(EventMessages.ON_CHARACTER_KILLED);
             onDeath?.Invoke();
+
+            if (characterManager.characterBossController.isBoss)
+            {
+                characterManager.characterBossController.OnAllBossesDead();
+            }
         }
 
         public override int GetMaxHealth()

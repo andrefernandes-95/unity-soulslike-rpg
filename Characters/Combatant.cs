@@ -1,5 +1,6 @@
 namespace AF
 {
+    using System.Linq;
     using AF.Characters;
     using AF.Inventory;
     using AYellowpaper.SerializedCollections;
@@ -44,7 +45,22 @@ namespace AF
             MERGE,
         }
 
-        [Header("Faction")]
-        public CharacterFaction[] characterFactions;
+        [Header("Factions")]
+        public Combatant[] friendlies;
+
+        public bool IsFriendsWith(Combatant possibleFriendly)
+        {
+            if (possibleFriendly == this)
+            {
+                return true;
+            }
+
+            if (friendlies == null || friendlies.Length <= 0)
+            {
+                return false;
+            }
+
+            return friendlies.Any(friend => friend == possibleFriendly);
+        }
     }
 }

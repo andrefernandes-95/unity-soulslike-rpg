@@ -186,11 +186,19 @@ namespace AF.Inventory
             {
                 return;
             }
-
-            if ((itemInstance.GetItem()?.isRenewable ?? false) && itemInstance is ConsumableInstance consumableInstance)
+            if (itemInstance is ConsumableInstance consumableInstance)
             {
-                consumableInstance.wasUsed = true;
-                return;
+                if (consumableInstance.GetItem().isRenewable)
+                {
+                    consumableInstance.wasUsed = true;
+                    return;
+                }
+
+                if (GetItemAmount(itemInstance.GetItem()) > 0)
+                {
+                    ownedItems.Remove(itemInstance);
+                    return;
+                }
             }
 
             ownedItems.Remove(itemInstance);

@@ -142,8 +142,7 @@ namespace AF.Bonfires
             GetPlayerManager().playerComponentManager.transform.rotation = Quaternion.LookRotation(rot);
 
             GetUIDocumentBonfireMenu().SetCurrentBonfire(this);
-            GetUIDocumentBonfireMenu().SetCurrentBonfire(this);
-            GetUIDocumentBonfireMenu().gameObject.SetActive(true);
+            GetUIDocumentBonfireMenu().ActivateBonfire();
 
             EventManager.EmitEvent(EventMessages.ON_LEAVING_BONFIRE);
         }

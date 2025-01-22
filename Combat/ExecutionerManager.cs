@@ -13,7 +13,7 @@ namespace AF
         private AnimationClip currentExecutedClip;
         private Transform executedTransformRef;
 
-        public CharacterFaction playerFaction;
+        public Combatant playerCombatant;
 
         public float maximumRange = 3f;
 
@@ -77,7 +77,7 @@ namespace AF
                 var enemyCharacters = allCharacters.Where(character => character.CompareTag("Enemy"));
 
                 // Exclude the character that is the same as this character
-                var filteredCharacters = enemyCharacters.Where(_character => !_character.combatant.characterFactions.Contains(playerFaction));
+                var filteredCharacters = enemyCharacters.Where(_character => !_character.combatant.friendlies.Contains(playerCombatant));
 
                 // Sort characters by distance to the player
                 var closestCharacter = filteredCharacters.OrderBy(

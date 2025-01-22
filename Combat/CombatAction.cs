@@ -47,6 +47,9 @@ namespace AF
         [Header("Components")]
         public CharacterManager characterManager;
 
+        [Header("SFX")]
+        public AudioClip gruntSfx;
+
         void Awake()
         {
             // Scale enemy damage according to new game plus
@@ -91,6 +94,14 @@ namespace AF
             }
 
             return true;
+        }
+
+        public void PlayGruntSfx()
+        {
+            if (gruntSfx != null)
+            {
+                characterManager.combatAudioSource.PlayOneShot(gruntSfx);
+            }
         }
 
     }

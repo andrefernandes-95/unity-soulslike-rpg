@@ -303,5 +303,40 @@ namespace AF.Health
             return newDamage;
         }
 
+        public Damage ApplyMultiplier(float multiplier)
+        {
+            // Clone and modify the status effects with the multiplier
+            List<StatusEffectEntry> statusEffectsCombined = new List<StatusEffectEntry>();
+
+            foreach (StatusEffectEntry statusEffectEntry in this.statusEffects)
+            {
+                statusEffectEntry.amountPerHit = (int)(statusEffectEntry.amountPerHit * multiplier);
+
+                statusEffectsCombined.Add(statusEffectEntry);
+            }
+
+            // Create the new Damage object with all values scaled by the multiplier
+            Damage newDamage = new()
+            {
+                physical = (int)(this.physical * multiplier),
+                fire = (int)(this.fire * multiplier),
+                frost = (int)(this.frost * multiplier),
+                lightning = (int)(this.lightning * multiplier),
+                magic = (int)(this.magic * multiplier),
+                darkness = (int)(this.darkness * multiplier),
+                water = (int)(this.water * multiplier),
+                canNotBeParried = this.canNotBeParried,
+                damageType = this.damageType,
+                ignoreBlocking = this.ignoreBlocking,
+                poiseDamage = (int)(this.poiseDamage * multiplier),
+                postureDamage = (int)(this.postureDamage * multiplier),
+                pushForce = (int)(this.pushForce * multiplier),
+                weaponAttackType = this.weaponAttackType,
+                statusEffects = statusEffectsCombined.ToArray(),
+            };
+
+            return newDamage;
+        }
+
     }
 }

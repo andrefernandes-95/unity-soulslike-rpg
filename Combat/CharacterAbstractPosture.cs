@@ -11,10 +11,16 @@ namespace AF
         public float currentPostureDamage;
         public readonly float POSTURE_BREAK_BONUS_MULTIPLIER = 2.5f;
 
+        [Header("Damage")]
+        public float damageMultiplierWhenStunned = 3f;
+
         [Header("Unity Events")]
         public UnityEvent onPostureBreakDamage;
         public UnityEvent onDamageWhileStunned;
 
+        [Header("Animations")]
+        public string postureBreakAnimationClip = "Posture Break";
+        public string postureBreakExitAnimationClip = "Posture Break Exit";
 
         [Header("Components")]
         public CharacterBaseHealth health;
@@ -114,6 +120,8 @@ namespace AF
             if (CanPlayPostureDamagedEvent())
             {
                 onPostureBreakDamage?.Invoke();
+
+                characterBaseManager.PlayBusyAnimationWithRootMotion(postureBreakAnimationClip);
             }
 
             HandlePostureBreak();
@@ -135,6 +143,7 @@ namespace AF
 
             isStunned = false;
             onDamageWhileStunned?.Invoke();
+            characterBaseManager.PlayCrossFadeBusyAnimationWithRootMotion(postureBreakExitAnimationClip, .5f);
         }
 
         public abstract float GetPostureDecreateRate();
@@ -144,7 +153,9 @@ namespace AF
             if (isStunned)
             {
                 RecoverFromStunned();
-                return incomingDamage;
+
+                // Apply stunned bonus damage
+                return incomingDamage.ApplyMultiplier(damageMultiplierWhenStunned);
             }
 
             if (incomingDamage == null)

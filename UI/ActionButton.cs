@@ -69,7 +69,7 @@ namespace AF.UI
         // Creates the root container element
         private VisualElement CreateContainer()
         {
-            VisualElement container = new VisualElement();
+            VisualElement container = new();
             container.style.flexDirection = FlexDirection.Row;
             container.style.alignItems = Align.Center;
             container.style.flexShrink = 0;
@@ -80,7 +80,7 @@ namespace AF.UI
         // Creates the button element container
         private VisualElement CreateButtonElement()
         {
-            VisualElement buttonElement = new VisualElement();
+            VisualElement buttonElement = new();
             buttonElement.style.flexDirection = FlexDirection.Row;
             buttonElement.style.alignItems = Align.Center;
             buttonElement.style.flexShrink = 0;
@@ -92,20 +92,31 @@ namespace AF.UI
         {
             VisualElement background = new VisualElement();
             background.style.backgroundImage = new StyleBackground(keyboardSprite);
-            background.style.minWidth = 24;
-            background.style.height = 24;
+            background.style.minWidth = 30;
+            background.style.height = 30;
             background.style.unityBackgroundImageTintColor = keyboardBackgroundColor;
 
             string rebindedKey = starterAssetsInputs != null ? starterAssetsInputs.GetCurrentKeyBindingForAction(actionName) : "";
-            Label keyLabel = new Label(rebindedKey);
+            Label keyLabel = new(rebindedKey);
             keyLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
-            keyLabel.style.fontSize = 20;
+            keyLabel.style.fontSize = 22;
             keyLabel.style.color = Color.white;
+            keyLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
             keyLabel.style.unityFontDefinition = new StyleFontDefinition(font);
             keyLabel.style.marginTop = 0;
             keyLabel.style.marginRight = 0;
             keyLabel.style.marginBottom = 0;
             keyLabel.style.marginLeft = 0;
+            keyLabel.style.paddingLeft = 5;
+            keyLabel.style.paddingRight = 5;
+
+            // Applying text shadow
+            keyLabel.style.textShadow = new TextShadow
+            {
+                offset = new Vector2(2, 2),      // Offset for the shadow (X and Y)
+                color = new Color(0, 0, 0, 0.5f), // Shadow color (black with 50% opacity)
+                blurRadius = 1                   // Optional: blur radius for the shadow
+            };
 
             if (!string.IsNullOrEmpty(overrideKeyName))
             {
@@ -121,8 +132,8 @@ namespace AF.UI
         {
             VisualElement gamepadIcon = new VisualElement();
             gamepadIcon.style.backgroundImage = new StyleBackground(sprite);
-            gamepadIcon.style.width = 24;
-            gamepadIcon.style.height = 24;
+            gamepadIcon.style.width = 30;
+            gamepadIcon.style.height = 30;
 
             if (useColor)
             {
@@ -154,10 +165,13 @@ namespace AF.UI
         // Creates the description label if needed
         private Label CreateDescriptionLabel()
         {
-            Label descriptionLabel = new Label();
-            descriptionLabel.name = "Description";
+            Label descriptionLabel = new()
+            {
+                name = "Description"
+            };
+
             descriptionLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
-            descriptionLabel.style.fontSize = 20;
+            descriptionLabel.style.fontSize = 22;
             descriptionLabel.style.color = Color.white;
             descriptionLabel.style.unityFontDefinition = new StyleFontDefinition(font);
             descriptionLabel.text = description.GetLocalizedString();

@@ -7,7 +7,7 @@ namespace AF
 
     public class EV_TurnFactionAgressiveTowardsPlayer : EventBase
     {
-        public CharacterFaction faction;
+        public Combatant faction;
 
         public override IEnumerator Dispatch()
         {
@@ -20,9 +20,9 @@ namespace AF
                     if (
                         characterInScene is CharacterManager aiCharacter
                         && aiCharacter.targetManager != null
-                        && aiCharacter.combatant.characterFactions != null
-                        && aiCharacter.combatant.characterFactions.Length > 0
-                        && aiCharacter.combatant.characterFactions.Contains(faction))
+                        && aiCharacter.combatant.friendlies != null
+                        && aiCharacter.combatant.friendlies.Length > 0
+                        && aiCharacter.combatant.friendlies.Contains(faction))
                     {
                         aiCharacter.targetManager.SetPlayerAsTarget();
                     }

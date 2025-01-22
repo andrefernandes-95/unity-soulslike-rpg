@@ -5,7 +5,7 @@ namespace AF
 
     public class CharacterBackstabController : MonoBehaviour
     {
-        public readonly int hashBackstabExecuted = Animator.StringToHash("AI Humanoid - Backstabbed");
+        public string hashBackstabExecuted = "Backstabbed";
 
         public bool waitingForBackstab = false;
         public bool isBeingBackstabbed = false;
@@ -36,7 +36,7 @@ namespace AF
                 waitingForBackstab = false;
                 isBeingBackstabbed = true;
 
-                character.PlayBusyHashedAnimationWithRootMotion(hashBackstabExecuted);
+                character.PlayBusyAnimationWithRootMotion(hashBackstabExecuted);
 
                 damage.physical = (int)(damage.physical * backstabDamageMultiplier);
             }

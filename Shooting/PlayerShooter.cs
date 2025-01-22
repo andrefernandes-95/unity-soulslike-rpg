@@ -37,7 +37,6 @@ namespace AF.Shooting
         public LockOnManager lockOnManager;
         public UIManager uIManager;
         public MenuManager menuManager;
-        public NotificationManager notificationManager;
 
         [Header("Refs")]
         public Transform playerFeetRef;
@@ -103,37 +102,6 @@ namespace AF.Shooting
             }
 
             cinemachineThirdPersonFollow = aimingCamera.GetComponent<CinemachineVirtualCamera>().GetCinemachineComponent<Cinemachine3rdPersonFollow>();
-        }
-
-        bool IsRangeWeaponIncompatibleWithProjectile()
-        {
-            Weapon currentRangeWeapon = equipmentDatabase.GetCurrentWeapon().GetItem();
-            Arrow arrow = equipmentDatabase.GetCurrentArrow().GetItem();
-
-            if (currentRangeWeapon == null || arrow == null)
-            {
-                return true;
-            }
-
-            if (currentRangeWeapon.isHuntingRifle && arrow.isRifleBullet)
-            {
-                return false;
-            }
-
-            if (currentRangeWeapon.isCrossbow && arrow.isBolt)
-            {
-                return false;
-            }
-
-            bool isBow = currentRangeWeapon.isCrossbow == false && currentRangeWeapon.isHuntingRifle == false;
-            bool isArrow = arrow.isRifleBullet == false && arrow.isBolt == false;
-
-            if (isBow && isArrow)
-            {
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -336,7 +304,7 @@ namespace AF.Shooting
             queuedSpell = spell;
         }
 
-        public void ShootWithoutClearingProjectilesAndSpells(bool ignoreSpawnFromCamera)
+        public void HandleProjectileShot(bool ignoreSpawnFromCamera)
         {
             Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
 
@@ -354,13 +322,15 @@ namespace AF.Shooting
                 distanceFromCamera = 1f;
             }
 
+            (Vector3 origin, Quaternion lookPosition, Ray updatedRay) =
+                GetProjectileOriginAndLookPosition(ray, distanceFromCamera, queuedSpell, ignoreSpawnFromCamera);
+
             HandleProjectile(
                 queuedProjectile,
-                distanceFromCamera,
-                ray,
-                0f,
-                queuedSpell,
-                ignoreSpawnFromCamera);
+                origin,
+                lookPosition,
+                updatedRay,
+                queuedSpell);
         }
 
         /// <summary>
@@ -368,23 +338,23 @@ namespace AF.Shooting
         /// </summary>
         public void OnShoot()
         {
-            ShootWithoutClearingProjectilesAndSpells(false);
+            HandleProjectileShot(false);
             queuedProjectile = null;
             queuedSpell = null;
         }
 
-        void HandleProjectile(GameObject projectile, float originDistanceFromCamera, Ray ray, float delay, Spell spell, bool ignoreSpawnFromCamera)
+        (Vector3 origin, Quaternion lookPosition, Ray updatedRay) GetProjectileOriginAndLookPosition(Ray updatedRay, float originDistanceFromCamera, Spell spell, bool ignoreSpawnFromCamera)
         {
-            Vector3 origin = ray.GetPoint(originDistanceFromCamera);
+            Vector3 origin = updatedRay.GetPoint(originDistanceFromCamera);
             Quaternion lookPosition = Quaternion.identity;
 
             // If shooting spell but not locked on, use player transform forward to direct the spell
             if (lockOnManager.isLockedOn == false && isAiming == false || spell != null && spell.ignoreSpawnFromCamera || ignoreSpawnFromCamera)
             {
                 origin = lookAtConstraint.transform.position;
-                ray.direction = characterBaseManager.transform.forward;
+                updatedRay.direction = characterBaseManager.transform.forward;
 
-                Vector3 lookDir = ray.direction;
+                Vector3 lookDir = updatedRay.direction;
                 lookDir.y = 0;
                 lookPosition = Quaternion.LookRotation(lookDir);
             }
@@ -399,18 +369,23 @@ namespace AF.Shooting
                 {
                     origin = playerFeetRef.transform.position + new Vector3(0, spell.playerFeetOffsetY, 0);
                 }
+            }
 
-                if (spell.statusEffects != null && spell.statusEffects.Length > 0)
+            return (origin, lookPosition, updatedRay);
+        }
+
+        void HandleProjectile(GameObject projectile, Vector3 origin, Quaternion lookPosition, Ray updatedRay, Spell spell)
+        {
+            if (spell != null && spell.statusEffects != null && spell.statusEffects.Length > 0)
+            {
+                foreach (StatusEffect statusEffect in spell.statusEffects)
                 {
-                    foreach (StatusEffect statusEffect in spell.statusEffects)
-                    {
-                        GetPlayerManager().statusController.statusEffectInstances.FirstOrDefault(x => x.Key == statusEffect).Value?.onConsumeStart?.Invoke();
+                    PlayerManager playerManager = GetPlayerManager();
 
-                        // For positive effects, we override the status effect resistance to be the duration of the consumable effect
-                        GetPlayerManager().combatant.statusEffectResistances[statusEffect] = spell.effectsDurationInSeconds;
-
-                        GetPlayerManager().statusController.InflictStatusEffect(statusEffect, spell.effectsDurationInSeconds, true);
-                    }
+                    playerManager.statusController.statusEffectInstances.FirstOrDefault(x => x.Key == statusEffect).Value?.onConsumeStart?.Invoke();
+                    // For positive effects, we override the status effect resistance to be the duration of the consumable effect
+                    playerManager.combatant.statusEffectResistances[statusEffect] = spell.effectsDurationInSeconds;
+                    playerManager.statusController.InflictStatusEffect(statusEffect, spell.effectsDurationInSeconds, true);
                 }
             }
 
@@ -429,10 +404,9 @@ namespace AF.Shooting
 
             IProjectile[] projectileComponents = GetProjectileComponentsInChildren(projectileInstance);
 
-
             foreach (IProjectile componentProjectile in projectileComponents)
             {
-                componentProjectile.Shoot(characterBaseManager, ray.direction * componentProjectile.GetForwardVelocity(), componentProjectile.GetForceMode());
+                componentProjectile.Shoot(characterBaseManager, updatedRay.direction * componentProjectile.GetForwardVelocity(), componentProjectile.GetForceMode());
             }
 
             HandleProjectileDamageManagers(projectileInstance, spell);
@@ -442,8 +416,7 @@ namespace AF.Shooting
         {
             List<IProjectile> projectileComponents = new List<IProjectile>();
 
-            IProjectile projectile;
-            if (obj.TryGetComponent(out projectile))
+            if (obj.TryGetComponent(out IProjectile projectile))
             {
                 projectileComponents.Add(projectile);
             }
@@ -458,81 +431,69 @@ namespace AF.Shooting
 
         void HandleProjectileDamageManagers(GameObject projectileInstance, Spell currentSpell)
         {
-            // Assign the damage owner to the OnDamageCollisionAbstractManager of the projectile instance, if it exists
-            if (projectileInstance.TryGetComponent(out OnDamageCollisionAbstractManager onDamageCollisionAbstractManager))
+            // Process the main projectile instance
+            if (projectileInstance.TryGetComponent(out OnDamageCollisionAbstractManager mainManager))
             {
-                onDamageCollisionAbstractManager.damageOwner = GetPlayerManager();
-
-                if (currentSpell != null)
-                {
-                    bool shouldDoubleDamage = false;
-
-                    Weapon currentWeapon = GetPlayerManager().attackStatManager.equipmentDatabase.GetCurrentWeapon().GetItem();
-
-                    if (currentWeapon != null)
-                    {
-                        shouldDoubleDamage =
-                            currentWeapon.doubleDamageDuringNightTime && gameSession.IsNightTime() ||
-                            currentWeapon.doubleDamageDuringDayTime && !gameSession.IsNightTime();
-                    }
-
-                    onDamageCollisionAbstractManager.damage.ScaleSpell(
-                        GetPlayerManager().attackStatManager,
-                        GetPlayerManager().attackStatManager.equipmentDatabase.GetCurrentWeapon(),
-                        playerStatsDatabase.GetCurrentReputation(),
-                        currentSpell.isFaithSpell,
-                        currentSpell.isHexSpell,
-                        shouldDoubleDamage);
-                }
-
-                if (GetPlayerManager().statsBonusController.spellDamageBonusMultiplier > 0)
-                {
-                    onDamageCollisionAbstractManager.damage.ScaleDamage(GetPlayerManager().statsBonusController.spellDamageBonusMultiplier);
-                }
+                ScaleDamageForManager(mainManager, currentSpell);
             }
 
-            // Assign the damage owner to all child OnDamageCollisionAbstractManagers of the projectile instance
-            OnDamageCollisionAbstractManager[] onDamageCollisionAbstractManagers = GetAllChildOnDamageCollisionManagers(projectileInstance);
-            foreach (var onChildDamageCollisionAbstractManager in onDamageCollisionAbstractManagers)
+            // Process all child damage managers
+            var childManagers = GetAllChildOnDamageCollisionManagers(projectileInstance);
+            foreach (var childManager in childManagers)
             {
-                onChildDamageCollisionAbstractManager.damageOwner = GetPlayerManager();
-
-                if (currentSpell != null)
-                {
-                    onChildDamageCollisionAbstractManager.damage.ScaleSpell(
-                        GetPlayerManager().attackStatManager,
-                        GetPlayerManager().attackStatManager.equipmentDatabase.GetCurrentWeapon(),
-                        playerStatsDatabase.GetCurrentReputation(),
-                        currentSpell.isFaithSpell,
-                        currentSpell.isHexSpell,
-                        gameSession);
-                }
-
-                if (GetPlayerManager().statsBonusController.spellDamageBonusMultiplier > 0)
-                {
-                    onChildDamageCollisionAbstractManager.damage.ScaleDamage(GetPlayerManager().statsBonusController.spellDamageBonusMultiplier);
-                }
+                ScaleDamageForManager(childManager, currentSpell);
             }
         }
 
-        public OnDamageCollisionAbstractManager[] GetAllChildOnDamageCollisionManagers(GameObject obj)
+        void ScaleDamageForManager(OnDamageCollisionAbstractManager damageManager, Spell currentSpell)
         {
-            List<OnDamageCollisionAbstractManager> managers = new List<OnDamageCollisionAbstractManager>();
+            if (damageManager == null) return;
 
-            foreach (Transform child in obj.transform)
+            var playerManager = GetPlayerManager();
+            damageManager.damageOwner = playerManager;
+
+            if (currentSpell != null)
             {
-                managers.AddRange(GetAllChildOnDamageCollisionManagers(child.gameObject));
+                var attackStatManager = playerManager.attackStatManager;
+                var equipmentDatabase = attackStatManager.equipmentDatabase;
+                var currentWeapon = equipmentDatabase.GetCurrentWeapon()?.GetItem();
+                var isNightTime = gameSession.IsNightTime();
+                var shouldDoubleDamage = currentWeapon != null && (
+                    (currentWeapon.doubleDamageDuringNightTime && isNightTime) ||
+                    (currentWeapon.doubleDamageDuringDayTime && !isNightTime)
+                );
+
+                damageManager.damage.ScaleSpell(
+                    attackStatManager,
+                    equipmentDatabase.GetCurrentWeapon(),
+                    playerStatsDatabase.GetCurrentReputation(),
+                    currentSpell.isFaithSpell,
+                    currentSpell.isHexSpell,
+                    shouldDoubleDamage
+                );
             }
 
-            OnDamageCollisionAbstractManager[] childManagers = obj.GetComponents<OnDamageCollisionAbstractManager>();
-            if (childManagers.Length > 0)
+            if (playerManager.statsBonusController.spellDamageBonusMultiplier > 0)
             {
-                managers.AddRange(childManagers);
+                damageManager.damage.ScaleDamage(playerManager.statsBonusController.spellDamageBonusMultiplier);
+            }
+        }
+
+        OnDamageCollisionAbstractManager[] GetAllChildOnDamageCollisionManagers(GameObject obj)
+        {
+            var managers = new List<OnDamageCollisionAbstractManager>();
+
+            // Include components on the current object
+            managers.AddRange(obj.GetComponents<OnDamageCollisionAbstractManager>());
+
+            // Traverse through all children and gather their components
+            foreach (Transform child in obj.transform)
+            {
+                managers.AddRange(child.GetComponentsInChildren<OnDamageCollisionAbstractManager>());
             }
 
             return managers.ToArray();
         }
-
 
         bool CanAim()
         {
@@ -592,6 +553,37 @@ namespace AF.Shooting
             return true;
         }
 
+        bool IsRangeWeaponIncompatibleWithProjectile()
+        {
+            Weapon currentRangeWeapon = equipmentDatabase.GetCurrentWeapon().GetItem();
+            Arrow arrow = equipmentDatabase.GetCurrentArrow().GetItem();
+
+            if (currentRangeWeapon == null || arrow == null)
+            {
+                return true;
+            }
+
+            if (currentRangeWeapon.isHuntingRifle && arrow.isRifleBullet)
+            {
+                return false;
+            }
+
+            if (currentRangeWeapon.isCrossbow && arrow.isBolt)
+            {
+                return false;
+            }
+
+            bool isBow = currentRangeWeapon.isCrossbow == false && currentRangeWeapon.isHuntingRifle == false;
+            bool isArrow = arrow.isRifleBullet == false && arrow.isBolt == false;
+
+            if (isBow && isArrow)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         PlayerManager GetPlayerManager()
         {
             return characterBaseManager as PlayerManager;
@@ -612,7 +604,7 @@ namespace AF.Shooting
 
             this.queuedProjectile = projectile;
 
-            ShootWithoutClearingProjectilesAndSpells(true);
+            HandleProjectileShot(true);
             queuedProjectile = null;
             queuedSpell = null;
         }

@@ -32,10 +32,8 @@
         public float onFired_AfterDelay = 0.1f;
 
         readonly List<Collider> hitColliders = new();
-
         CharacterBaseManager shooter;
         Vector3 previousPosition;
-
 
         [Header("Collision Options")]
         public bool collideWithAnything = false;
@@ -53,13 +51,15 @@
 
             StartCoroutine(HandleOnFiredAfter_Coroutine());
 
-            if (releaseSfx != null && audioSource != null)
-            {
-                audioSource.PlayOneShot(releaseSfx);
-            }
+            PlayReleaseSFX();
         }
 
         private void Update()
+        {
+            AlignToMovement();
+        }
+
+        void AlignToMovement()
         {
             // Get the direction of movement by comparing the current position to the previous position
             Vector3 direction = (transform.position - previousPosition).normalized;
@@ -81,12 +81,6 @@
             {
                 Instantiate(disappearingFx, transform.position, Quaternion.identity);
             }
-        }
-
-        IEnumerator HandleOnFiredAfter_Coroutine()
-        {
-            yield return new WaitForSeconds(onFired_AfterDelay);
-            onFired_After?.Invoke();
         }
 
         public void Shoot(CharacterBaseManager shooter, Vector3 aimForce, ForceMode forceMode)
@@ -120,18 +114,15 @@
             HandleCollision(damageReceiver);
         }
 
+
         public void HandleCollision(DamageReceiver damageReceiver)
         {
-            if (collideWithAnything == false && damageReceiver == null || damageReceiver?.character == shooter)
+            if (!CanCollide(damageReceiver))
             {
                 return;
             }
 
-            if (onCollisionSfx != null && audioSource != null && !hasPlayedCollisionSfx)
-            {
-                hasPlayedCollisionSfx = true;
-                audioSource.PlayOneShot(onCollisionSfx);
-            }
+            PlayOnCollisionSFX();
 
             if (collideWithAnything)
             {
@@ -139,6 +130,21 @@
                 return;
             }
 
+            if (AreFriends(damageReceiver, shooter))
+            {
+                return;
+            }
+
+            ApplyDamage(damageReceiver);
+            ApplyTarget(damageReceiver);
+
+            onCollision?.Invoke();
+
+            StartCoroutine(HandleDestroy_Coroutine());
+        }
+
+        void ApplyDamage(DamageReceiver damageReceiver)
+        {
             if (shooter is PlayerManager playerManager && playerManager.attackStatManager.equipmentDatabase.GetCurrentWeapon().Exists())
             {
                 if (scaleWithIntelligence)
@@ -157,24 +163,41 @@
             }
 
             damageReceiver.ApplyDamage(shooter, damage);
-
-            if (shooter != null
-                && damageReceiver?.character is CharacterManager characterManager
-                && characterManager.targetManager != null)
-            {
-                characterManager.targetManager.SetTarget(shooter);
-            }
-
-            onCollision?.Invoke();
-
-            StartCoroutine(HandleDestroy_Coroutine());
         }
 
-        IEnumerator HandleDestroy_Coroutine()
+        void ApplyTarget(DamageReceiver damageReceiver)
         {
-            yield return new WaitForSeconds(timeBeforeDestroying);
+            if (shooter == null)
+            {
+                return;
+            }
 
-            Destroy(this.gameObject);
+            if (damageReceiver == null || damageReceiver.character is not CharacterManager characterManager)
+            {
+                return;
+            }
+
+            characterManager.targetManager.SetTarget(shooter);
+        }
+
+        bool CanCollide(DamageReceiver damageReceiver)
+        {
+            if (damageReceiver == null)
+            {
+                return collideWithAnything;
+            }
+
+            return damageReceiver.character != shooter;
+        }
+
+        bool AreFriends(DamageReceiver damageReceiver, CharacterBaseManager shooter)
+        {
+            if (shooter == null || damageReceiver == null || damageReceiver.character == null)
+            {
+                return false;
+            }
+
+            return damageReceiver.character.combatant.IsFriendsWith(shooter.combatant);
         }
 
         public float GetForwardVelocity()
@@ -185,6 +208,36 @@
         public ForceMode GetForceMode()
         {
             return forceMode;
+        }
+
+        void PlayReleaseSFX()
+        {
+            if (releaseSfx != null && audioSource != null)
+            {
+                audioSource.PlayOneShot(releaseSfx);
+            }
+        }
+
+        void PlayOnCollisionSFX()
+        {
+            if (onCollisionSfx != null && audioSource != null && !hasPlayedCollisionSfx)
+            {
+                hasPlayedCollisionSfx = true;
+                audioSource.PlayOneShot(onCollisionSfx);
+            }
+        }
+
+        IEnumerator HandleOnFiredAfter_Coroutine()
+        {
+            yield return new WaitForSeconds(onFired_AfterDelay);
+            onFired_After?.Invoke();
+        }
+
+        IEnumerator HandleDestroy_Coroutine()
+        {
+            yield return new WaitForSeconds(timeBeforeDestroying);
+
+            Destroy(this.gameObject);
         }
     }
 }

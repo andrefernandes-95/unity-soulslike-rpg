@@ -10,6 +10,7 @@ namespace AF
     using AF.Dialogue;
     using AF.Flags;
     using AF.UI;
+    using UnityEngine.Localization;
 
     public class UIDocumentDialogueWindow : MonoBehaviour
     {
@@ -44,6 +45,7 @@ namespace AF
         VisualElement actorContainer;
         VisualElement actorSprite;
         VisualElement actorInfoContainer;
+        VisualElement tutorialInfoContainer;
 
         [Header("Input")]
         VisualElement continueActionButtonContainer;
@@ -66,6 +68,7 @@ namespace AF
             this.actorSprite = this.root.Q<VisualElement>("ActorSprite");
             this.actorInfoContainer = this.root.Q<VisualElement>("ActorInfoContainer");
             this.messageTextLabel = this.root.Q<Label>("MessageText");
+            this.tutorialInfoContainer = this.root.Q<VisualElement>("TutorialInfoContainer");
 
             continueActionButtonContainer = this.root.Q<VisualElement>("ContinueButtonContainer");
             continueActionButtonContainer.Clear();
@@ -90,6 +93,7 @@ namespace AF
                 )
         {
             gameObject.SetActive(true);
+            tutorialInfoContainer.style.display = DisplayStyle.None;
 
             ShowMessage(character, message);
 
@@ -128,11 +132,21 @@ namespace AF
 
         public IEnumerator DisplayTutorialMessage(
             Character character,
+            LocalizedString tutorialName,
             TutorialMessage[] tutorialMessages,
             Response[] responses
         )
         {
             gameObject.SetActive(true);
+
+            tutorialInfoContainer.style.display = DisplayStyle.None;
+            if (!tutorialName.IsEmpty)
+            {
+                tutorialInfoContainer.Q<Label>().text = tutorialName.GetLocalizedString();
+
+                tutorialInfoContainer.style.display = DisplayStyle.Flex;
+            }
+
             ShowTutorialMessage(tutorialMessages);
             // Clone responses to prevent mutation
 

@@ -23,7 +23,7 @@ namespace AF.Detection
         public List<string> tagsToDetect = new();
 
         [Header("Factions")]
-        public List<CharacterFaction> factionsToIgnore = new();
+        public List<Combatant> factionsToIgnore = new();
 
         [Header("Events")]
         public UnityEvent OnTargetSighted;
@@ -92,7 +92,11 @@ namespace AF.Detection
 
                 if (isSighted && hit.TryGetComponent(out CharacterBaseManager target))
                 {
-                    if (factionsToIgnore == null || factionsToIgnore.Count == 0 || !target.combatant.characterFactions.Any(faction => factionsToIgnore.Contains(faction)))
+                    if (
+                        factionsToIgnore == null
+                        || factionsToIgnore.Count == 0
+                        || target.combatant == characterManager.combatant
+                        || !target.combatant.friendlies.Any(faction => factionsToIgnore.Contains(faction)))
                     {
                         targetManager.SetTarget(target, () =>
                         {

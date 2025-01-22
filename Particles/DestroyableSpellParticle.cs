@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace AF
 {
+    // Looks Deprecated
     public class DestroyableSpellParticle : DestroyableParticle, IProjectile
     {
         public Spell spell;

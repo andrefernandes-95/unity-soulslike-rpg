@@ -54,7 +54,7 @@ namespace AF.Inventory
                 instance.transform.rotation = playerManager.transform.rotation;
             }
 
-            instance.Shoot(playerManager, instance.GetForwardVelocity() * instance.transform.forward, instance.forceMode);
+            instance.Shoot(playerManager, instance.GetForwardVelocity() * instance.transform.forward, instance.GetForceMode());
         }
     }
 }

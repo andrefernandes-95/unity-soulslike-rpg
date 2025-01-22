@@ -76,7 +76,6 @@ namespace AF
             SetupRefs();
             DrawUI();
             Invoke(nameof(ResetCanEscapeFlag), 0.5f);
-            playerManager.uIDocumentPlayerHUDV2.HideHUD();
         }
 
         void ResetCanEscapeFlag()
@@ -195,6 +194,13 @@ namespace AF
             {
                 ExitBonfire();
             }
+        }
+
+        public void ActivateBonfire()
+        {
+            playerManager.uIDocumentPlayerHUDV2.HideHUD();
+
+            this.gameObject.SetActive(true);
         }
 
         void ExitBonfire()
