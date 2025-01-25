@@ -1,11 +1,11 @@
-using UnityEngine;
-using UnityEngine.UI;
-using AF.StatusEffects;
-using System.Collections.Generic;
-using AYellowpaper.SerializedCollections;
 
 namespace AF
 {
+    using UnityEngine;
+    using AF.StatusEffects;
+    using System.Collections.Generic;
+    using AYellowpaper.SerializedCollections;
+
     public class CharacterStatusEffectUIManager : MonoBehaviour, IStatusEffectUI
     {
         public CharacterStatusEffectIndicator characterStatusEffectIndicatorPrefab;

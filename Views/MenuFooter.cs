@@ -15,6 +15,10 @@ namespace AF
         public void SetupReferences()
         {
             root = GetComponent<UIDocument>().rootVisualElement;
+            if (root == null)
+            {
+                return;
+            }
 
             tooltipContainer = root.Q<VisualElement>("Tooltip");
             tooltipContainer.style.display = DisplayStyle.None;
@@ -27,7 +31,6 @@ namespace AF
 
         public void DisplayTooltip(string text)
         {
-
             tooltipLabel.text = text;
             tooltipContainer.style.display = DisplayStyle.Flex;
         }
@@ -37,11 +40,7 @@ namespace AF
             tooltipContainer.style.display = DisplayStyle.None;
         }
 
-        public VisualElement GetFooterActionsContainer()
-        {
-
-            return footerActionsContainer;
-        }
+        public VisualElement GetFooterActionsContainer() => footerActionsContainer;
 
     }
 }

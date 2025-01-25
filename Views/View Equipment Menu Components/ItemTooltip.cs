@@ -1,6 +1,8 @@
 namespace AF
 {
     using System;
+    using AF.Health;
+    using UnityEditor.SearchService;
     using UnityEngine;
     using UnityEngine.Localization;
     using UnityEngine.Localization.Settings;
@@ -307,6 +309,10 @@ namespace AF
             {
                 DrawConsumable(consumableInstance);
             }
+            else if (itemInstance is ArrowInstance arrowInstance)
+            {
+                DrawArrow(arrowInstance);
+            }
             else if (itemInstance is SpellInstance spellInstance)
             {
                 DrawSpell(spellInstance);
@@ -408,6 +414,109 @@ namespace AF
             }
         }
 
+        void DrawElementAttackTooltips(
+            int fireAttack, int frostAttack, int lightningAttack, int magicAttack, int darknessAttack, int waterAttack
+        )
+        {
+            if (fireAttack > 0)
+            {
+                CreateTooltip(
+                    fireSprite,
+                    fire,
+                    String.Format(
+                        fireAttackLabel.GetLocalizedString(),
+                        fireAttack));
+            }
+
+            if (frostAttack > 0)
+            {
+                CreateTooltip(
+                    frostSprite,
+                    frost,
+                    String.Format(
+                        frostAttackLabel.GetLocalizedString(),
+                        frostAttack));
+            }
+
+            if (lightningAttack > 0)
+            {
+                CreateTooltip(
+                lightningSprite,
+                lightning,
+                String.Format(
+                    lightningAttackLabel.GetLocalizedString(),
+                    lightningAttack));
+            }
+
+            if (magicAttack > 0)
+            {
+                CreateTooltip(
+                magicSprite,
+                magic,
+                String.Format(
+                    magicAttackLabel.GetLocalizedString(),
+                    magicAttack));
+            }
+
+            if (darknessAttack > 0)
+            {
+                CreateTooltip(
+                darknessSprite,
+                darkness,
+                String.Format(
+                    darknessAttackLabel.GetLocalizedString(),
+                    darknessAttack));
+            }
+
+            if (waterAttack > 0)
+            {
+                CreateTooltip(
+                waterSprite,
+                water,
+                String.Format(
+                    waterAttackLabel.GetLocalizedString(),
+                    waterAttack));
+            }
+        }
+
+        void DrawDamageTooltips(Damage damage)
+        {
+            if (damage.weaponAttackType == WeaponAttackType.Blunt)
+            {
+                CreateTooltip(bluntSprite, Color.white, damageTypeBluntLabel.GetLocalizedString());
+            }
+            if (damage.weaponAttackType == WeaponAttackType.Pierce)
+            {
+                CreateTooltip(pierceSprite, Color.white, damageTypePierceLabel.GetLocalizedString());
+            }
+            if (damage.weaponAttackType == WeaponAttackType.Slash)
+            {
+                CreateTooltip(slashSprite, Color.white, damageTypeSlashLabel.GetLocalizedString());
+            }
+
+            if (damage.pushForce > 0)
+            {
+                CreateTooltip(pushForceSprite, Color.white, String.Format(
+                    pushForceLabel.GetLocalizedString(), damage.pushForce));
+            }
+
+            if (damage.postureDamage > 0)
+            {
+                CreateTooltip(postureSprite, Color.white, String.Format(
+                    postureDamageLabel.GetLocalizedString(), damage.postureDamage));
+            }
+
+            if (damage.ignoreBlocking)
+            {
+                CreateTooltip(defenseAbsorptionSprite, Color.white, ignoresEnemyShields.GetLocalizedString());
+            }
+
+            if (damage.canNotBeParried)
+            {
+                CreateTooltip(defenseAbsorptionSprite, Color.white, canNotBeParried.GetLocalizedString());
+            }
+        }
+
         void DrawWeaponEffects(WeaponInstance weaponInstance)
         {
             Weapon weapon = weaponInstance.GetItem();
@@ -462,16 +571,6 @@ namespace AF
                 playerIntelligence,
                 weaponInstance);
 
-            if (weaponFireAttack > 0)
-            {
-                CreateTooltip(
-                    fireSprite,
-                    fire,
-                    String.Format(
-                        fireAttackLabel.GetLocalizedString(),
-                        weaponFireAttack));
-            }
-
             int weaponFrostAttack = weapon.weaponDamage.GetWeaponAttack(
                 WeaponElementType.Frost,
                 playerManager,
@@ -479,16 +578,6 @@ namespace AF
                 playerDexterity,
                 playerIntelligence,
                 weaponInstance);
-
-            if (weaponFrostAttack > 0)
-            {
-                CreateTooltip(
-                    frostSprite,
-                    frost,
-                    String.Format(
-                        frostAttackLabel.GetLocalizedString(),
-                        weaponFrostAttack));
-            }
 
             int weaponLightningAttack = weapon.weaponDamage.GetWeaponAttack(
                 WeaponElementType.Lightning,
@@ -498,16 +587,6 @@ namespace AF
                 playerIntelligence,
                 weaponInstance);
 
-            if (weaponLightningAttack > 0)
-            {
-                CreateTooltip(
-                lightningSprite,
-                lightning,
-                String.Format(
-                    lightningAttackLabel.GetLocalizedString(),
-                    weaponLightningAttack));
-            }
-
             int weaponMagicAttack = weapon.weaponDamage.GetWeaponAttack(
                 WeaponElementType.Magic,
                 playerManager,
@@ -515,16 +594,6 @@ namespace AF
                 playerDexterity,
                 playerIntelligence,
                 weaponInstance);
-
-            if (weaponMagicAttack > 0)
-            {
-                CreateTooltip(
-                magicSprite,
-                magic,
-                String.Format(
-                    magicAttackLabel.GetLocalizedString(),
-                    weaponMagicAttack));
-            }
 
             int weaponDarknessAttack = weapon.weaponDamage.GetWeaponAttack(
                 WeaponElementType.Darkness,
@@ -534,43 +603,24 @@ namespace AF
                 playerIntelligence,
                 weaponInstance);
 
-            if (weaponDarknessAttack > 0)
-            {
-                CreateTooltip(
-                darknessSprite,
-                darkness,
-                String.Format(
-                    darknessAttackLabel.GetLocalizedString(),
-                    weaponDarknessAttack));
-            }
+            int weaponWaterAttack = weapon.weaponDamage.GetWeaponAttack(
+                WeaponElementType.Water,
+                playerManager,
+                playerStrength,
+                playerDexterity,
+                playerIntelligence,
+                weaponInstance);
 
-            if (currentWeaponDamage.weaponAttackType == WeaponAttackType.Blunt)
-            {
-                CreateTooltip(bluntSprite, Color.white, damageTypeBluntLabel.GetLocalizedString());
-            }
-            if (currentWeaponDamage.weaponAttackType == WeaponAttackType.Pierce)
-            {
-                CreateTooltip(pierceSprite, Color.white, damageTypePierceLabel.GetLocalizedString());
-            }
-            if (currentWeaponDamage.weaponAttackType == WeaponAttackType.Slash)
-            {
-                CreateTooltip(slashSprite, Color.white, damageTypeSlashLabel.GetLocalizedString());
-            }
+            DrawElementAttackTooltips(
+                weaponFireAttack, weaponFrostAttack, weaponLightningAttack, weaponMagicAttack,
+                weaponDarknessAttack, weaponWaterAttack
+            );
+
+            DrawDamageTooltips(currentWeaponDamage);
+
             if (currentWeaponDamage.statusEffects != null && currentWeaponDamage.statusEffects.Length > 0)
             {
                 CreateTooltip(statusEffectsSprite, Color.white, weapon.weaponDamage.GetFormattedStatusDamages(playerManager, weaponInstance));
-            }
-
-            if (currentWeaponDamage.pushForce > 0)
-            {
-                CreateTooltip(pushForceSprite, Color.white, String.Format(
-                    pushForceLabel.GetLocalizedString(), currentWeaponDamage.pushForce));
-            }
-
-            if (currentWeaponDamage.postureDamage > 0)
-            {
-                CreateTooltip(postureSprite, Color.white, String.Format(
-                    postureDamageLabel.GetLocalizedString(), currentWeaponDamage.postureDamage));
             }
 
             CreateTooltip(
@@ -581,16 +631,6 @@ namespace AF
             if (weapon.canBeUpgraded && CraftingUtils.CanBeUpgradedFurther(weaponInstance))
             {
                 CreateTooltip(blacksmithSprite, Color.white, CraftingUtils.GetMaterialCostForNextLevel(weaponInstance));
-            }
-
-            if (currentWeaponDamage.ignoreBlocking)
-            {
-                CreateTooltip(defenseAbsorptionSprite, Color.white, ignoresEnemyShields.GetLocalizedString());
-            }
-
-            if (currentWeaponDamage.canNotBeParried)
-            {
-                CreateTooltip(defenseAbsorptionSprite, Color.white, canNotBeParried.GetLocalizedString());
             }
 
             if (weapon.blockAbsorption != 1)
@@ -628,7 +668,6 @@ namespace AF
 
             if (shield.physicalAbsorption != 1)
             {
-
                 CreateTooltip(
                     defenseAbsorptionSprite,
                     Color.white,
@@ -1027,7 +1066,6 @@ namespace AF
 
                 if (armor.damageDealtToEnemiesUponAttacked.fire != 0)
                 {
-
                     CreateTooltip(
                         fireSprite,
                         fire,
@@ -1035,7 +1073,6 @@ namespace AF
                             fireDamageDealtToAttackingEnemies.GetLocalizedString(),
                             armor.damageDealtToEnemiesUponAttacked.fire
                     ));
-
                 }
 
                 if (armor.damageDealtToEnemiesUponAttacked.frost != 0)
@@ -1048,7 +1085,6 @@ namespace AF
                             frostDamageDealtToAttackingEnemies.GetLocalizedString(),
                             armor.damageDealtToEnemiesUponAttacked.frost
                     ));
-
                 }
 
                 if (armor.damageDealtToEnemiesUponAttacked.lightning != 0)
@@ -1060,7 +1096,6 @@ namespace AF
                             lightningDamageDealtToAttackingEnemies.GetLocalizedString(),
                             armor.damageDealtToEnemiesUponAttacked.lightning
                     ));
-
                 }
 
                 if (armor.damageDealtToEnemiesUponAttacked.magic != 0)
@@ -1072,7 +1107,6 @@ namespace AF
                             magicDamageDealtToAttackingEnemies.GetLocalizedString(),
                             armor.damageDealtToEnemiesUponAttacked.magic
                     ));
-
                 }
 
                 if (armor.damageDealtToEnemiesUponAttacked.darkness != 0)
@@ -1084,7 +1118,6 @@ namespace AF
                             darknessDamageDealtToAttackingEnemies.GetLocalizedString(),
                             armor.damageDealtToEnemiesUponAttacked.darkness
                     ));
-
                 }
 
                 if (armor.damageDealtToEnemiesUponAttacked.water != 0)
@@ -1096,7 +1129,6 @@ namespace AF
                             magicDamageDealtToAttackingEnemies.GetLocalizedString(),
                             armor.damageDealtToEnemiesUponAttacked.water
                     ));
-
                 }
 
                 if (armor.damageDealtToEnemiesUponAttacked.statusEffects != null && armor.damageDealtToEnemiesUponAttacked.statusEffects.Length > 0)
@@ -1242,6 +1274,18 @@ namespace AF
         {
             Spell spell = spellInstance.GetItem();
 
+            Damage spellDamage = spell.projectile != null ? spell.projectile.GetComponent<Projectile>()?.damage : null;
+
+            if (spellDamage != null)
+            {
+                DrawElementAttackTooltips(
+                    spellDamage.fire, spellDamage.frost, spellDamage.lightning, spellDamage.magic,
+                    spellDamage.darkness, spellDamage.water
+                );
+
+                DrawDamageTooltips(spellDamage);
+            }
+
             if (spell.HasRequirements())
             {
                 CreateTooltip(
@@ -1254,9 +1298,9 @@ namespace AF
             {
                 CreateTooltip(statusEffectsSprite, Color.white, spell.GetShortDescription());
             }
+
             if (spell.costPerCast > 0)
             {
-
                 CreateTooltip(
                     spellCastSprite,
                     Color.white,
@@ -1264,7 +1308,6 @@ namespace AF
                         manaPointsRequiredToCast.GetLocalizedString(),
                         spell.costPerCast
                 ));
-
             }
 
             if (spell.statusEffects != null && spell.statusEffects.Length > 0)
@@ -1276,6 +1319,32 @@ namespace AF
                         {
                             CreateTooltip(holyWeaponSprite, Color.white, $"Faith Spell (improves with reputation)");
                         }*/
+        }
+
+        void DrawArrow(ArrowInstance arrowInstance)
+        {
+            Arrow arrow = arrowInstance.GetItem();
+
+            Damage arrowDamage = arrow.projectile != null ? arrow.projectile.GetComponent<Projectile>()?.damage : null;
+
+            if (arrowDamage != null)
+            {
+                if (arrowDamage.physical > 0)
+                {
+                    string damageExplanation = Glossary.IsPortuguese()
+                        ? $"+{arrowDamage.physical} Dano Físico"
+                        : $"+{arrowDamage.physical} Physical Damage";
+
+                    CreateTooltip(weaponPhysicalAttackSprite, Color.white, damageExplanation);
+                }
+
+                DrawElementAttackTooltips(
+                    arrowDamage.fire, arrowDamage.frost, arrowDamage.lightning, arrowDamage.magic,
+                    arrowDamage.darkness, arrowDamage.water
+                );
+
+                DrawDamageTooltips(arrowDamage);
+            }
         }
 
         void DrawCraftingMaterial(CraftingMaterialInstance craftingMaterialInstance)

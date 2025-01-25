@@ -47,28 +47,15 @@ namespace AF
             var scrollView = root.Q<ScrollView>("GemstonesScrollView");
             scrollView.Clear();
 
-            Button exitButton = new()
-            {
-                text = Glossary.IsPortuguese() ? "Regressar" : "Return"
-            };
-            exitButton.AddToClassList("primary-button");
-            UIUtils.SetupButton(exitButton, () =>
-            {
-                onClose();
-            }, soundbank);
-
-            scrollView.Add(exitButton);
-
             PopulateGemstonesScrollView(root, onClose);
 
-            if (lastScrollElementIndex == -1)
-            {
-                scrollView.ScrollTo(exitButton);
-                exitButton.Focus();
-            }
-            else
+            if (lastScrollElementIndex != -1)
             {
                 StartCoroutine(GiveFocusCoroutine(root));
+            }
+            else if (scrollView.childCount > 0)
+            {
+                scrollView.Children().FirstOrDefault().Focus();
             }
         }
 
@@ -156,7 +143,6 @@ namespace AF
                 },
                 () =>
                 {
-                    root.Q<VisualElement>("WeaponStatsContainer").style.opacity = 0;
                 },
                 true,
                 soundbank);

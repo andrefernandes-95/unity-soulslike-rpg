@@ -145,23 +145,6 @@
 
         void ApplyDamage(DamageReceiver damageReceiver)
         {
-            if (shooter is PlayerManager playerManager && playerManager.attackStatManager.equipmentDatabase.GetCurrentWeapon().Exists())
-            {
-                if (scaleWithIntelligence)
-                {
-                    damage.ScaleSpell(
-                        playerManager.attackStatManager, playerManager.attackStatManager.equipmentDatabase.GetCurrentWeapon(), 0, false, false, false);
-                }
-                else if (playerManager.attackStatManager.HasBowEquipped())
-                {
-                    damage.ScaleProjectile(playerManager.attackStatManager, playerManager.attackStatManager.equipmentDatabase.GetCurrentWeapon());
-                }
-            }
-            else if (shooter is CharacterManager enemy)
-            {
-                damage.ScaleDamageForNewGamePlus(enemy.gameSession);
-            }
-
             damageReceiver.ApplyDamage(shooter, damage);
         }
 

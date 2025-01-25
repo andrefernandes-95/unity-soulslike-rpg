@@ -184,12 +184,6 @@ namespace AF
             {
                 this.usedCombatActions.Add(currentCombatAction);
 
-                characterManager.PlayBusyAnimationWithRootMotion("Idle");
-
-                characterManager.PlayCrossFadeBusyAnimationWithRootMotion(currentAnimationToPlay, crossFade);
-
-                OnAttackStart();
-
                 StartCoroutine(ClearCombatActionFromCooldownList(currentCombatAction));
             }
         }
@@ -261,6 +255,12 @@ namespace AF
 
         IEnumerator ClearCombatActionFromCooldownList(CombatAction combatActionToClear)
         {
+            yield return new WaitForEndOfFrame();
+
+            characterManager.PlayCrossFadeBusyAnimationWithRootMotion(currentAnimationToPlay, crossFade);
+
+            OnAttackStart();
+
             yield return new WaitForSeconds(combatActionToClear.maxCooldown);
 
             if (usedCombatActions.Contains(combatActionToClear))

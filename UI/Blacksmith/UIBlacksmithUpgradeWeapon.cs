@@ -1,5 +1,6 @@
 namespace AF
 {
+    using System.Collections;
     using System.Collections.Generic;
     using AF.Health;
     using AF.Inventory;
@@ -129,18 +130,31 @@ namespace AF
             goldItemEntry.Q<Label>("Amount").style.opacity = playerStatsDatabase.gold >= weaponUpgradeLevel.goldCostForUpgrade ? 1 : 0.25f;
 
             root.Q<VisualElement>("ItemInfo").Add(goldItemEntry);
-            root.Q<VisualElement>("IngredientsListPreview").style.opacity = CraftingUtils.ShouldSkipUpgrade(weaponInstance) ? 0 : 1;
 
-            root.Q<Button>("UpgradeButton").RegisterCallback<ClickEvent>(ev =>
+            bool shouldSkipUpgrade = CraftingUtils.ShouldSkipUpgrade(weaponInstance);
+            root.Q<VisualElement>("IngredientsListPreview").style.opacity = shouldSkipUpgrade ? 0 : 1;
+
+            UIUtils.SetupButton(root.Q<Button>("UpgradeButton"), () =>
             {
                 HandleWeaponUpgrade(weaponInstance, root);
-            });
+            }, soundbank);
+
+            if (!shouldSkipUpgrade)
+            {
+                StartCoroutine(GiveFocus_Coroutine(root.Q<Button>("UpgradeButton")));
+            }
 
             root.Q<Button>("UpgradeButton").SetEnabled(CanImproveWeapon(weaponInstance));
 
-            root.Q<Button>("UpgradeButton").style.display = CraftingUtils.ShouldSkipUpgrade(weaponInstance) ? DisplayStyle.None : DisplayStyle.Flex;
+            root.Q<Button>("UpgradeButton").style.display = shouldSkipUpgrade ? DisplayStyle.None : DisplayStyle.Flex;
 
             root.Q<Label>("WeaponFullyUpgradedLabel").style.display = CraftingUtils.IsFullyUpgraded(weaponInstance) ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        IEnumerator GiveFocus_Coroutine(Button button)
+        {
+            yield return new WaitForEndOfFrame();
+            button.Focus();
         }
 
         bool CanImproveWeapon(WeaponInstance weaponInstance) => CraftingUtils.CanImproveWeapon(inventoryDatabase, weaponInstance, playerStatsDatabase.gold);

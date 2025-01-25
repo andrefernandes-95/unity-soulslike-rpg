@@ -3,6 +3,7 @@ namespace AF
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using AF.Inventory;
     using UnityEngine;
     using UnityEngine.UIElements;
@@ -27,7 +28,7 @@ namespace AF
 
         public void ClearPreviews(VisualElement root)
         {
-            selectedWeaponInstance = null;
+            UnselectWeapon();
         }
 
         public void DrawUI(VisualElement root, Action onClose)
@@ -40,28 +41,21 @@ namespace AF
             var scrollView = root.Q<ScrollView>("WeaponsListScrollView");
             scrollView.Clear();
 
-            Button exitButton = new()
-            {
-                text = Glossary.IsPortuguese() ? "Regressar" : "Return"
-            };
-            exitButton.AddToClassList("primary-button");
-            UIUtils.SetupButton(exitButton, () =>
-            {
-                onClose();
-            }, soundbank);
-
-            scrollView.Add(exitButton);
 
             PopulateWeaponsScrollView(root, onClose);
 
-            if (lastScrollElementIndex == -1)
+            if (HasWeaponSelected())
             {
-                scrollView.ScrollTo(exitButton);
-                exitButton.Focus();
+                return;
             }
-            else
+
+            if (lastScrollElementIndex != -1)
             {
                 StartCoroutine(GiveFocusCoroutine(root));
+            }
+            else if (scrollView.childCount > 0)
+            {
+                scrollView.Children().FirstOrDefault().Focus();
             }
         }
 
@@ -103,9 +97,14 @@ namespace AF
 
                 var craftBtn = scrollItem.Q<Button>("CraftButtonItem");
 
-                if (selectedWeaponInstance != null && selectedWeaponInstance.GetId() == weaponInstance.GetId())
+                if (IsWeaponInstanceSelected(weaponInstance))
                 {
+                    scrollItem.Q<VisualElement>("Selected").style.display = DisplayStyle.Flex;
                     scrollItem.Q<Button>("CraftButtonItem").AddToClassList("blacksmith-craft-button-active");
+                }
+                else if (HasWeaponSelected())
+                {
+                    craftBtn.style.opacity = 0.2f;
                 }
 
                 scrollItem.Q<Button>("CraftButtonItem").AddToClassList("blacksmith-craft-button");
@@ -115,8 +114,6 @@ namespace AF
                     lastScrollElementIndex = currentIndex;
 
                     SelectWeapon(weaponInstance);
-
-                    DrawUI(root, onClose);
                 },
                 () =>
                 {
@@ -136,8 +133,37 @@ namespace AF
 
         void SelectWeapon(WeaponInstance weaponInstance)
         {
+            if (IsWeaponInstanceSelected(weaponInstance))
+            {
+                UnselectWeapon();
+                return;
+            }
+
             selectedWeaponInstance = weaponInstance;
+            soundbank.PlaySound(soundbank.uiDecision);
             uIDocumentCraftScreen.UpdateUI();
+        }
+
+        bool IsWeaponInstanceSelected(WeaponInstance weaponInstance)
+        {
+            if (weaponInstance == null || selectedWeaponInstance == null)
+            {
+                return false;
+            }
+
+            return weaponInstance.GetId() == selectedWeaponInstance.GetId();
+        }
+
+        public void UnselectWeapon()
+        {
+            selectedWeaponInstance = null;
+            uIDocumentCraftScreen.UpdateUI();
+            soundbank.PlaySound(soundbank.uiCancel);
+        }
+
+        public bool HasWeaponSelected()
+        {
+            return selectedWeaponInstance != null && selectedWeaponInstance.Exists();
         }
 
         List<WeaponInstance> GetWeaponsList() => inventoryDatabase.FilterByType<WeaponInstance>();

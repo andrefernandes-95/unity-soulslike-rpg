@@ -9,6 +9,8 @@ namespace AF
     {
         public Slider slider;
 
+        public Image fill;
+
         public TextMeshProUGUI label;
 
         public void UpdateUI(AppliedStatusEffect statusEffect, float currentMaximumResistanceToStatusEffect)
@@ -17,13 +19,7 @@ namespace AF
             slider.value = statusEffect.currentAmount;
             slider.maxValue = currentMaximumResistanceToStatusEffect;
 
-            var colors = slider.colors;
-            colors.normalColor = statusEffect.statusEffect.barColor;
-            colors.highlightedColor = statusEffect.statusEffect.barColor;
-            colors.pressedColor = statusEffect.statusEffect.barColor;
-            colors.selectedColor = statusEffect.statusEffect.barColor;
-            colors.disabledColor = Color.gray;
-            slider.colors = colors;
+            fill.color = statusEffect.statusEffect.barColor;
         }
     }
 

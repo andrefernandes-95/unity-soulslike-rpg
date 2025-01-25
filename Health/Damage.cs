@@ -84,30 +84,15 @@ namespace AF.Health
             return physical + fire + frost + magic + lightning + darkness + water;
         }
 
-        public void ScaleDamage(float multiplier)
-        {
-            this.physical = (int)(this.physical * multiplier);
-            this.fire = (int)(this.fire * multiplier);
-            this.frost = (int)(this.frost * multiplier);
-            this.magic = (int)(this.magic * multiplier);
-            this.lightning = (int)(this.lightning * multiplier);
-            this.darkness = (int)(this.darkness * multiplier);
-            this.water = (int)(this.water * multiplier);
-        }
-
-        public void ScaleSpell(
+        public Damage ScaleSpell(
             AttackStatManager attackStatManager,
-            WeaponInstance currentWeaponInstance,
-            int playerReputation,
-            bool isFaithSpell,
-            bool isHexSpell,
-            bool shouldDoubleDamage)
+            float multiplier)
         {
-            float multiplier = shouldDoubleDamage ? 2 : 1f;
 
-            Weapon currentWeapon = currentWeaponInstance.GetItem();
+            WeaponInstance currentWeaponInstance = attackStatManager.equipmentDatabase.GetCurrentWeapon();
 
-            Damage currentWeaponDamage = currentWeapon.weaponDamage.GetCurrentDamage(
+            Damage currentWeaponDamage = currentWeaponInstance.GetItem()
+                .weaponDamage.GetCurrentDamage(
                 attackStatManager.playerManager,
                 attackStatManager.playerManager.statsBonusController.GetCurrentStrength(),
                 attackStatManager.playerManager.statsBonusController.GetCurrentDexterity(),
@@ -116,53 +101,57 @@ namespace AF.Health
                 attackStatManager.playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(currentWeaponInstance)
             );
 
-            if (this.fire > 0)
+            var damage = this.Clone().ApplyMultiplier(multiplier);
+
+            return ScaleWithMagicStaff(damage, currentWeaponDamage);
+        }
+
+        Damage ScaleWithMagicStaff(Damage currentDamage, Damage magicStaffDamage)
+        {
+            Damage damage = currentDamage.Clone();
+
+            if (damage.fire > 0)
             {
-                this.fire += (int)(currentWeaponDamage.fire * multiplier);
+                damage.fire += magicStaffDamage.magic;
             }
 
-            if (this.frost > 0)
+            if (damage.frost > 0)
             {
-                this.frost += (int)(currentWeaponDamage.frost * multiplier);
+                damage.frost += magicStaffDamage.magic;
             }
 
-            if (this.magic > 0)
+            if (damage.magic > 0)
             {
-                this.magic += (int)(currentWeaponDamage.magic * multiplier);
+                damage.magic += magicStaffDamage.magic;
             }
 
-            if (this.lightning > 0)
+            if (damage.lightning > 0)
             {
-                this.lightning += (int)(currentWeaponDamage.lightning * multiplier);
+                damage.lightning += magicStaffDamage.magic;
             }
 
-            if (this.darkness > 0)
+            if (damage.darkness > 0)
             {
-                this.darkness += (int)(currentWeaponDamage.darkness * multiplier);
+                damage.darkness += magicStaffDamage.magic;
             }
 
-            if (this.water > 0)
+            if (damage.water > 0)
             {
-                this.water += (int)(currentWeaponDamage.water * multiplier);
+                damage.water += magicStaffDamage.magic;
             }
 
-            if (this.pushForce > 0 && isFaithSpell)
+            if (damage.statusEffects != null && damage.statusEffects.Length > 0)
             {
-                this.pushForce += playerReputation > 0 ? (playerReputation * 0.1f) : 0;
-            }
-
-            if (currentWeaponDamage.statusEffects != null && currentWeaponDamage.statusEffects.Length > 0)
-            {
-                List<StatusEffectEntry> updatedStatusEffects = new List<StatusEffectEntry>();
+                List<StatusEffectEntry> updatedStatusEffects = new();
 
                 // First, copy all existing status effects
-                foreach (StatusEffectEntry existingEffect in this.statusEffects)
+                foreach (StatusEffectEntry existingEffect in damage.statusEffects)
                 {
                     updatedStatusEffects.Add(new StatusEffectEntry() { amountPerHit = existingEffect.amountPerHit, statusEffect = existingEffect.statusEffect });
                 }
 
                 // Then, combine with weapon status effects
-                foreach (StatusEffectEntry weaponStatusEffectEntry in currentWeaponDamage.statusEffects)
+                foreach (StatusEffectEntry weaponStatusEffectEntry in magicStaffDamage.statusEffects)
                 {
                     StatusEffectEntry existingEffect = updatedStatusEffects.Find(x => x.statusEffect == weaponStatusEffectEntry.statusEffect);
 
@@ -187,11 +176,13 @@ namespace AF.Health
                     }
                 }
 
-                this.statusEffects = updatedStatusEffects.ToArray();
+                damage.statusEffects = updatedStatusEffects.ToArray();
             }
+
+            return damage;
         }
 
-        public void ScaleProjectile(AttackStatManager attackStatManager, WeaponInstance currentWeaponInstance)
+        public Damage ScaleProjectile(AttackStatManager attackStatManager, WeaponInstance currentWeaponInstance)
         {
             Weapon currentWeapon = currentWeaponInstance.GetItem();
 
@@ -204,20 +195,11 @@ namespace AF.Health
                 attackStatManager.playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(currentWeaponInstance)
             );
 
-            // Steel arrow might inherit magic from a magical bow, hence don't check if base values are greater than zero
-            this.physical += currentWeaponDamage.physical;
+            float projectileMultiplierBonus = attackStatManager.playerManager.statsBonusController.projectileMultiplierBonus;
+            float multiplier = projectileMultiplierBonus > 0
+                ? projectileMultiplierBonus : 1f;
 
-            if (attackStatManager.playerManager.statsBonusController.projectileMultiplierBonus > 0f)
-            {
-                this.physical = (int)(this.physical * attackStatManager.playerManager.statsBonusController.projectileMultiplierBonus);
-            }
-
-            this.fire += currentWeaponDamage.fire;
-            this.frost += currentWeaponDamage.frost;
-            this.magic += currentWeaponDamage.magic;
-            this.lightning += currentWeaponDamage.lightning;
-            this.darkness += currentWeaponDamage.darkness;
-            this.water += currentWeaponDamage.water;
+            return this.Clone().ApplyMultiplier(multiplier).Combine(currentWeaponDamage);
         }
 
 

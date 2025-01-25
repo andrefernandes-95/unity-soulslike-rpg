@@ -43,14 +43,35 @@ namespace AF
         public AudioClip uiDialogue;
         public AudioClip itemLostWithUse;
 
+        private float lastUISoundTime = 0f;
+        float _uiSoundDelay = 0.1f;
+
         public void PlaySound(AudioClip sound)
         {
+            if (IsUISound(sound) && Time.time - lastUISoundTime < _uiSoundDelay)
+            {
+                return;
+            }
+
+            if (IsUISound(sound))
+            {
+                lastUISoundTime = Time.time;
+            }
+
             PlaySound(sound, null);
         }
 
         public void PlaySound(AudioClip sound, AudioSource audioSource)
         {
             bgmManager.PlaySound(sound, audioSource);
+        }
+
+        private bool IsUISound(AudioClip sound)
+        {
+            return sound == uiDecision || sound == uiHover || sound == uiCancel ||
+                   sound == uiItemReceived || sound == reputationIncreased || sound == reputationDecreased ||
+                   sound == mainMenuOpen || sound == uiEquip || sound == uiLockOn ||
+                   sound == uiLockOnSwitchTarget || sound == switchTwoHand || sound == puzzleWon;
         }
 
     }

@@ -2,6 +2,7 @@ namespace AF.Shooting
 {
     using System.Collections.Generic;
     using System.Linq;
+    using AF.Health;
     using AF.Inventory;
     using Unity.Cinemachine;
     using UnityEngine;
@@ -431,26 +432,48 @@ namespace AF.Shooting
 
         void HandleProjectileDamageManagers(GameObject projectileInstance, Spell currentSpell)
         {
-            // Process the main projectile instance
+            var playerManager = GetPlayerManager();
+
+            // Process any projectile instance
+            if (projectileInstance.TryGetComponent<Projectile>(out var projectile))
+            {
+                ScaleProjectileDamage(projectile, currentSpell);
+            }
+
+            // Process any particle damage instances
             if (projectileInstance.TryGetComponent(out OnDamageCollisionAbstractManager mainManager))
             {
-                ScaleDamageForManager(mainManager, currentSpell);
+                mainManager.damageOwner = playerManager;
+
+                mainManager.damage = ScaleSpellDamage(mainManager.damage, currentSpell);
             }
 
             // Process all child damage managers
             var childManagers = GetAllChildOnDamageCollisionManagers(projectileInstance);
             foreach (var childManager in childManagers)
             {
-                ScaleDamageForManager(childManager, currentSpell);
+                childManager.damageOwner = playerManager;
+                childManager.damage = ScaleSpellDamage(childManager.damage, currentSpell);
             }
         }
 
-        void ScaleDamageForManager(OnDamageCollisionAbstractManager damageManager, Spell currentSpell)
+        void ScaleProjectileDamage(Projectile projectile, Spell currentSpell)
         {
-            if (damageManager == null) return;
-
             var playerManager = GetPlayerManager();
-            damageManager.damageOwner = playerManager;
+
+            if (equipmentDatabase.IsBowEquipped())
+            {
+                projectile.damage = projectile.damage.ScaleProjectile(playerManager.attackStatManager, equipmentDatabase.GetCurrentWeapon());
+            }
+            else if (equipmentDatabase.IsStaffEquipped())
+            {
+                projectile.damage = ScaleSpellDamage(projectile.damage, currentSpell);
+            }
+        }
+
+        Damage ScaleSpellDamage(Damage damage, Spell currentSpell)
+        {
+            var playerManager = GetPlayerManager();
 
             if (currentSpell != null)
             {
@@ -462,21 +485,17 @@ namespace AF.Shooting
                     (currentWeapon.doubleDamageDuringNightTime && isNightTime) ||
                     (currentWeapon.doubleDamageDuringDayTime && !isNightTime)
                 );
+                float multiplier = shouldDoubleDamage ? 2 : 1f;
 
-                damageManager.damage.ScaleSpell(
-                    attackStatManager,
-                    equipmentDatabase.GetCurrentWeapon(),
-                    playerStatsDatabase.GetCurrentReputation(),
-                    currentSpell.isFaithSpell,
-                    currentSpell.isHexSpell,
-                    shouldDoubleDamage
-                );
+                if (playerManager.statsBonusController.spellDamageBonusMultiplier > 0)
+                {
+                    multiplier += playerManager.statsBonusController.spellDamageBonusMultiplier;
+                }
+
+                damage = damage.ScaleSpell(attackStatManager, multiplier);
             }
 
-            if (playerManager.statsBonusController.spellDamageBonusMultiplier > 0)
-            {
-                damageManager.damage.ScaleDamage(playerManager.statsBonusController.spellDamageBonusMultiplier);
-            }
+            return damage;
         }
 
         OnDamageCollisionAbstractManager[] GetAllChildOnDamageCollisionManagers(GameObject obj)
