@@ -8,6 +8,7 @@ namespace AF
     using System.Linq;
     using AF.Inventory;
     using System;
+    using CI.QuickSave;
 
     [CreateAssetMenu(fileName = "Equipment Database", menuName = "System/New Equipment Database", order = 0)]
     public class EquipmentDatabase : ScriptableObject
@@ -589,6 +590,193 @@ namespace AF
             }
 
             return null;
+        }
+
+        public void LoadEquipmentFromSaveFile(QuickSaveReader quickSaveReader)
+        {
+
+            quickSaveReader.TryRead<int>("currentWeaponIndex", out int currentWeaponIndex);
+            this.currentWeaponIndex = currentWeaponIndex;
+
+            quickSaveReader.TryRead<int>("currentShieldIndex", out int currentShieldIndex);
+            this.currentShieldIndex = currentShieldIndex;
+
+            quickSaveReader.TryRead<int>("currentArrowIndex", out int currentArrowIndex);
+            this.currentArrowIndex = currentArrowIndex;
+
+            quickSaveReader.TryRead<int>("currentSpellIndex", out int currentSpellIndex);
+            this.currentSpellIndex = currentSpellIndex;
+
+            quickSaveReader.TryRead<int>("currentConsumableIndex", out int currentConsumableIndex);
+            this.currentConsumableIndex = currentConsumableIndex;
+
+            quickSaveReader.TryRead<string[]>("weapons", out string[] weapons);
+            if (weapons != null && weapons.Length > 0)
+            {
+                for (int idx = 0; idx < weapons.Length; idx++)
+                {
+                    string weaponId = weapons[idx];
+
+                    if (!string.IsNullOrEmpty(weaponId))
+                    {
+                        if (inventoryDatabase.FindItemById(weaponId) is WeaponInstance weaponInstance)
+                        {
+                            EquipWeapon(weaponInstance, idx);
+                        }
+                    }
+                }
+            }
+
+            // Try to read shields
+            quickSaveReader.TryRead<string[]>("shields", out string[] shields);
+            if (shields != null && shields.Length > 0)
+            {
+                for (int idx = 0; idx < shields.Length; idx++)
+                {
+                    string shieldId = shields[idx];
+
+                    if (!string.IsNullOrEmpty(shieldId))
+                    {
+                        if (inventoryDatabase.FindItemById(shieldId) is ShieldInstance shieldInstance)
+                        {
+                            EquipShield(shieldInstance, idx);
+                        }
+                    }
+                }
+            }
+
+            // Try to read arrows
+            quickSaveReader.TryRead<string[]>("arrows", out string[] arrows);
+            if (arrows != null && arrows.Length > 0)
+            {
+                for (int idx = 0; idx < arrows.Length; idx++)
+                {
+                    string arrowId = arrows[idx];
+
+                    if (!string.IsNullOrEmpty(arrowId))
+                    {
+                        if (inventoryDatabase.FindItemById(arrowId) is ArrowInstance arrowInstance)
+                        {
+                            EquipArrow(arrowInstance, idx);
+                        }
+                    }
+                }
+            }
+
+            // Try to read spells
+            quickSaveReader.TryRead<string[]>("spells", out string[] spells);
+            if (spells != null && spells.Length > 0)
+            {
+                for (int idx = 0; idx < spells.Length; idx++)
+                {
+                    string spellId = spells[idx];
+
+                    if (!string.IsNullOrEmpty(spellId))
+                    {
+                        if (inventoryDatabase.FindItemById(spellId) is SpellInstance spellInstance)
+                        {
+                            EquipSpell(spellInstance, idx);
+                        }
+                    }
+                }
+            }
+
+            // Try to read accessories
+            quickSaveReader.TryRead<string[]>("accessories", out string[] accessories);
+            if (accessories != null && accessories.Length > 0)
+            {
+                for (int idx = 0; idx < accessories.Length; idx++)
+                {
+                    string accessoryId = accessories[idx];
+
+                    if (!string.IsNullOrEmpty(accessoryId))
+                    {
+                        if (inventoryDatabase.FindItemById(accessoryId) is AccessoryInstance accessoryInstance)
+                        {
+                            EquipAccessory(accessoryInstance, idx);
+                        }
+                    }
+                }
+            }
+
+            // Try to read consumables
+            quickSaveReader.TryRead<string[]>("consumables", out string[] consumables);
+            if (consumables != null && consumables.Length > 0)
+            {
+                for (int idx = 0; idx < consumables.Length; idx++)
+                {
+                    string consumableId = consumables[idx];
+
+                    if (!string.IsNullOrEmpty(consumableId))
+                    {
+                        if (inventoryDatabase.FindItemById(consumableId) is ConsumableInstance consumableInstance)
+                        {
+                            EquipConsumable(consumableInstance, idx);
+                        }
+                    }
+                }
+            }
+
+            // Try to read helmet
+            quickSaveReader.TryRead<string>("helmet", out string helmetId);
+            if (!string.IsNullOrEmpty(helmetId))
+            {
+                if (inventoryDatabase.FindItemById(helmetId) is HelmetInstance helmetInstance)
+                {
+                    EquipHelmet(helmetInstance);
+                }
+            }
+            else
+            {
+                UnequipHelmet();
+            }
+
+            // Try to read armor
+            quickSaveReader.TryRead<string>("armor", out string armorId);
+            if (!string.IsNullOrEmpty(armorId))
+            {
+                if (inventoryDatabase.FindItemById(armorId) is ArmorInstance armorInstance)
+                {
+                    EquipArmor(armorInstance);
+                }
+            }
+            else
+            {
+                UnequipArmor();
+            }
+
+            // Try to read gauntlet
+            quickSaveReader.TryRead<string>("gauntlet", out string gauntletId);
+            if (!string.IsNullOrEmpty(gauntletId))
+            {
+                if (inventoryDatabase.FindItemById(gauntletId) is GauntletInstance gauntletInstance)
+                {
+                    EquipGauntlet(gauntletInstance);
+                }
+            }
+            else
+            {
+                UnequipGauntlet();
+            }
+
+            // Try to read legwear
+            quickSaveReader.TryRead<string>("legwear", out string legwearId);
+            if (!string.IsNullOrEmpty(legwearId))
+            {
+                LegwearInstance legwearInstance = inventoryDatabase.FindItemById(legwearId) as LegwearInstance;
+
+                if (legwearInstance != null)
+                {
+                    EquipLegwear(legwearInstance);
+                }
+            }
+            else
+            {
+                UnequipLegwear();
+            }
+
+            quickSaveReader.TryRead<bool>("isTwoHanding", out bool isTwoHanding);
+            this.isTwoHanding = isTwoHanding;
         }
     }
 }
