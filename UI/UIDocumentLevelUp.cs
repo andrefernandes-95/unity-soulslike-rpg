@@ -1,11 +1,11 @@
-using AF.Music;
-using AF.Stats;
-using UnityEngine;
-using UnityEngine.Localization.Settings;
-using UnityEngine.UIElements;
-
 namespace AF
 {
+    using AF.Music;
+    using AF.Stats;
+    using UnityEngine;
+    using UnityEngine.Localization.Settings;
+    using UnityEngine.UIElements;
+
     public class UIDocumentLevelUp : MonoBehaviour
     {
         [Header("UI Documents")]
@@ -255,8 +255,7 @@ namespace AF
                     desiredStrength,
                     desiredDexterity,
                     desiredIntelligence,
-                    playerManager.equipmentDatabase.unarmedWeaponInstance,
-                    playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(playerManager.equipmentDatabase.unarmedWeaponInstance)
+                    playerManager.equipmentDatabase.unarmedWeaponInstance
                     ) + "";
             root.Q<VisualElement>("DefenseAbsorption").Q<Label>("Value").text = playerManager.defenseStatManager.GetCurrentPhysicalDefenseForGivenEndurance(desiredEndurance) + "";
 

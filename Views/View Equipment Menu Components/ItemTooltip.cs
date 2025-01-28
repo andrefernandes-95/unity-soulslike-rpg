@@ -534,8 +534,7 @@ namespace AF
                 playerManager.statsBonusController.GetCurrentStrength(),
                 playerManager.statsBonusController.GetCurrentDexterity(),
                 playerManager.statsBonusController.GetCurrentIntelligence(),
-                weaponInstance,
-                playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance)
+                weaponInstance
             );
 
             int playerStrength = playerManager.statsBonusController.GetCurrentStrength();
@@ -558,7 +557,7 @@ namespace AF
 
             CreateEquipLoadTooltip(weapon.speedPenalty);
 
-            if (weapon.IsHolyWeapon(playerManager, weaponInstance))
+            if (weapon.IsHolyWeapon(weaponInstance, playerManager.playerInventory.inventoryDatabase))
             {
                 CreateTooltip(holyWeaponSprite, Color.white, holyWeaponLabel.GetLocalizedString());
             }

@@ -142,7 +142,14 @@
 
                 string path = Utils.GetItemPath(ownedItem.GetItem());
 
-                serializedItems.Add(new() { id = ownedItem.GetId(), itemPath = path, level = ownedItem.level, wasUsed = ownedItem.wasUsed });
+                serializedItems.Add(new()
+                {
+                    id = ownedItem.GetId(),
+                    itemPath = path,
+                    level = ownedItem.level,
+                    wasUsed = ownedItem.wasUsed,
+                    attachedGemstoneIds = ownedItem.attachedGemstoneIds.ToArray()
+                });
             }
 
             quickSaveWriter.Write("userCreatedItems", userCreatedItems);
@@ -460,19 +467,29 @@
                     {
                         if (item is Consumable consumable)
                         {
-                            ConsumableInstance consumableInstance = new ConsumableInstance(serializedItem.id, consumable);
-                            consumableInstance.wasUsed = serializedItem.wasUsed;
+                            ConsumableInstance consumableInstance = new(serializedItem.id, consumable)
+                            {
+                                wasUsed = serializedItem.wasUsed
+                            };
                             inventoryDatabase.ownedItems.Add(consumableInstance);
                         }
                         else if (item is Weapon weapon)
                         {
-                            WeaponInstance weaponInstance = new WeaponInstance(serializedItem.id, weapon);
-                            weaponInstance.level = serializedItem.level;
+                            WeaponInstance weaponInstance = new(serializedItem.id, weapon)
+                            {
+                                level = serializedItem.level,
+                                attachedGemstoneIds = serializedItem.attachedGemstoneIds.ToList()
+                            };
                             inventoryDatabase.ownedItems.Add(weaponInstance);
+                        }
+                        else if (item is Gemstone gemstone)
+                        {
+                            GemstoneInstance gemstoneInstance = new(serializedItem.id, gemstone);
+                            inventoryDatabase.ownedItems.Add(gemstoneInstance);
                         }
                         else
                         {
-                            ItemInstance itemInstance = new ItemInstance(serializedItem.id, item);
+                            ItemInstance itemInstance = new(serializedItem.id, item);
                             inventoryDatabase.ownedItems.Add(itemInstance);
                         }
                     }

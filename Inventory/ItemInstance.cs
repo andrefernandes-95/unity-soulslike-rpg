@@ -1,6 +1,8 @@
 namespace AF
 {
+    using System.Collections.Generic;
     using System.Linq;
+    using AF.Inventory;
     using UnityEngine;
 
     [System.Serializable]
@@ -13,6 +15,7 @@ namespace AF
 
         // Weapons
         public int level;
+        public List<string> attachedGemstoneIds = new();
 
         // Consumables
         public bool wasUsed = false;
@@ -61,6 +64,32 @@ namespace AF
         public new Weapon GetItem() => base.GetItem() as Weapon;
 
         public new WeaponInstance Clone() => new(this.id, this.item);
+
+        public bool IsGemstoneEquipped(GemstoneInstance gemstoneInstance)
+            => attachedGemstoneIds.Any(
+                attachedGemstoneInstance => attachedGemstoneInstance == gemstoneInstance.GetId());
+
+        public void AttachGemstone(GemstoneInstance gemstoneInstance)
+        {
+            this.attachedGemstoneIds.Add(gemstoneInstance.GetId());
+        }
+
+        public void RemoveGemstone(GemstoneInstance gemstoneInstance)
+        {
+            if (!this.IsGemstoneEquipped(gemstoneInstance))
+            {
+                return;
+            }
+
+            this.attachedGemstoneIds.Remove(gemstoneInstance.GetId());
+        }
+
+        public Gemstone[] GetAttachedGemstones(InventoryDatabase inventoryDatabase) =>
+            inventoryDatabase
+                .FilterByType<GemstoneInstance>()
+                .Where(gemstoneInstance => attachedGemstoneIds.Contains(gemstoneInstance.GetId()))
+                .Select(gemstoneInstance => gemstoneInstance.GetItem())
+                .ToArray();
     }
 
     [System.Serializable]
@@ -218,5 +247,6 @@ namespace AF
 
         public new Gemstone GetItem() => base.GetItem() as Gemstone;
         public new GemstoneInstance Clone() => new(this.id, this.item);
+
     }
 }

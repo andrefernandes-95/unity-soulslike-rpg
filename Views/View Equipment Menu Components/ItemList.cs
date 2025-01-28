@@ -268,155 +268,138 @@ namespace AF
             return true;
         }
 
+        private void ShowTooltipAndStats(ItemInstance itemInstance, Button btn)
+        {
+            itemTooltip.gameObject.SetActive(true);
+            itemTooltip.PrepareTooltipForItem(itemInstance);
+            itemTooltip.DisplayTooltip(btn);
+            playerStatsAndAttributesUI.DrawStats(itemInstance);
+        }
+
+        private void HideTooltipAndClearStats()
+        {
+            itemTooltip.gameObject.SetActive(false);
+            playerStatsAndAttributesUI.DrawStats(null);
+        }
+
+        private void PopulateItemUI(VisualElement instance, ItemInstance itemInstance, int slotIndex, bool isShieldSlot, int itemCount)
+        {
+            var item = itemInstance.GetItem();
+            bool isEquipped = IsItemEquipped(itemInstance, slotIndex, isShieldSlot);
+
+            // Set up item visuals
+            instance.Q<VisualElement>("Sprite").style.backgroundImage = new StyleBackground(item.sprite);
+            instance.Q<VisualElement>("CardSprite").style.display = item is Card ? DisplayStyle.Flex : DisplayStyle.None;
+
+            var itemName = instance.Q<Label>("ItemName");
+            itemName.text = item.GetName();
+            if (itemCount > 1) itemName.text += $" ({itemCount})";
+
+            if (isEquipped)
+            {
+                itemName.text += " " + LocalizationSettings.StringDatabase.GetLocalizedString("Glossary", "(Equipped)");
+            }
+
+            // Set up equipment color indicator
+            var equipmentColorIndicator = GetEquipmentColorIndicator(itemInstance);
+            if (equipmentColorIndicator == Color.black)
+            {
+                instance.Q<VisualElement>("Indicator").style.display = DisplayStyle.None;
+            }
+            else
+            {
+                instance.Q<VisualElement>("Indicator").style.backgroundColor = equipmentColorIndicator;
+                instance.Q<VisualElement>("Indicator").style.display = DisplayStyle.Flex;
+            }
+
+            var btn = instance.Q<Button>("EquipButton");
+
+            UIUtils.SetupButton(btn,
+            () =>
+            {
+
+                lastScrollElementIndex = this.itemsScrollView.IndexOf(instance);
+
+                soundbank.PlaySound(soundbank.uiEquip);
+
+                HandleButtonClick(itemInstance, isEquipped, slotIndex, isShieldSlot, out bool ignoreRerender);
+
+                if (!ignoreRerender)
+                {
+                    ReturnToEquipmentSlots();
+                }
+            },
+            () =>
+            {
+                itemsScrollView.ScrollTo(instance);
+                ShowTooltipAndStats(itemInstance, btn);
+            },
+            () =>
+            {
+                HideTooltipAndClearStats();
+            }, false, soundbank);
+        }
+
+        private void UpdateStackableItemUI(VisualElement instance, Item item, int count)
+        {
+            var itemNameLabel = instance.Q<Label>("ItemName");
+            itemNameLabel.text = item.GetName() + $" ({count})";
+        }
+
         void PopulateScrollView<ItemType>(bool showOnlyKeyItems, int slotIndex, bool isShieldSlot) where ItemType : Item
         {
             this.itemsScrollView.Clear();
 
+            // Filter the query in one step
             var query = inventoryDatabase.ownedItems
                 .Where(item =>
                 {
                     if (isShieldSlot && item is WeaponInstance weaponInstance)
                     {
-                        if (weaponInstance.GetItem().IsRangeWeapon() || weaponInstance.GetItem().IsStaffWeapon())
-                        {
-                            return false;
-                        }
-
-                        return true;
+                        return !(weaponInstance.GetItem().IsRangeWeapon() || weaponInstance.GetItem().IsStaffWeapon());
                     }
 
                     return ShouldShowItem<ItemType>(item, slotIndex, showOnlyKeyItems);
                 });
 
-            Dictionary<Item, int> stackableItems = new();
-            Dictionary<Item, int> stackableItemsPositionInScrollView = new();
+            // Store stackable items directly with counts
+            Dictionary<Item, (ItemInstance itemInstance, int count, VisualElement uiElement)> stackableItems = new();
+            HashSet<Item> stackableProcessed = new();
 
-            for (int i = 0; i < query.Count(); i++)
+            foreach (var itemInstance in query)
             {
-                var itemInstance = query.ElementAt(i);
                 var item = itemInstance.GetItem();
+                bool isStackable = item is Consumable || item is Arrow || showOnlyKeyItems;
 
-                bool isEquipped = IsItemEquipped(itemInstance, slotIndex, isShieldSlot);
-
-                var instance = itemButtonPrefab.CloneTree();
-                instance.Q<VisualElement>("Sprite").style.backgroundImage = new StyleBackground(item.sprite);
-
-                instance.Q<VisualElement>("CardSprite").style.display = item is Card ? DisplayStyle.Flex : DisplayStyle.None;
-
-                instance.Q<VisualElement>("Sprite").style.backgroundImage = new StyleBackground(item.sprite);
-                var itemName = instance.Q<Label>("ItemName");
-                itemName.text = item.GetName();
-
-                if (item is Consumable || item is Arrow || showOnlyKeyItems)
+                // Count stackable items in one go
+                if (isStackable)
                 {
                     if (stackableItems.ContainsKey(item))
                     {
-                        stackableItems[item]++;
-                    }
-                    else
-                    {
-                        stackableItems.Add(item, 1);
+                        stackableItems[item] = (stackableItems[item].itemInstance, stackableItems[item].count + 1, stackableItems[item].uiElement);
+                        continue; // Skip creating a duplicate UI element for stacked items
                     }
                 }
 
-                if (isEquipped)
+                // Create the UI element only once for stackable items or directly for non-stackable ones
+                var instance = itemButtonPrefab.CloneTree();
+                PopulateItemUI(instance, itemInstance, slotIndex, isShieldSlot, isStackable ? 0 : 1);
+
+                this.itemsScrollView.Add(instance);
+
+                // Store the stackable UI element for updating later
+                if (isStackable)
                 {
-                    itemName.text += " " + LocalizationSettings.StringDatabase.GetLocalizedString("Glossary", "(Equipped)");
+                    stackableItems[item] = (itemInstance, 1, instance);
+                    stackableProcessed.Add(item);
                 }
+            }
 
-                var equipmentColorIndicator = GetEquipmentColorIndicator(itemInstance);
-                if (equipmentColorIndicator == Color.black)
-                {
-                    instance.Q<VisualElement>("Indicator").style.display = DisplayStyle.None;
-                }
-                else
-                {
-                    instance.Q<VisualElement>("Indicator").style.backgroundColor = GetEquipmentColorIndicator(itemInstance);
-                    instance.Q<VisualElement>("Indicator").style.display = DisplayStyle.Flex;
-                }
-
-                var btn = instance.Q<Button>("EquipButton");
-
-                int index = i;
-                btn.clicked += () =>
-                {
-                    lastScrollElementIndex = index;
-
-                    soundbank.PlaySound(soundbank.uiEquip);
-
-                    HandleButtonClick(itemInstance, isEquipped, slotIndex, isShieldSlot, out bool ignoreRerender);
-
-                    if (!ignoreRerender)
-                    {
-                        ReturnToEquipmentSlots();
-                    }
-                };
-
-                void ShowTooltipAndStats(ItemInstance itemInstance)
-                {
-                    itemTooltip.gameObject.SetActive(true);
-                    itemTooltip.PrepareTooltipForItem(itemInstance);
-                    itemTooltip.DisplayTooltip(btn);
-
-                    playerStatsAndAttributesUI.DrawStats(itemInstance);
-                }
-
-                void HideTooltipAndClearStats()
-                {
-                    itemTooltip.gameObject.SetActive(false);
-                    playerStatsAndAttributesUI.DrawStats(null);
-                }
-
-                btn.RegisterCallback<MouseEnterEvent>(ev =>
-                {
-                    itemsScrollView.ScrollTo(instance);
-                    ShowTooltipAndStats(itemInstance);
-                });
-                btn.RegisterCallback<FocusInEvent>(ev =>
-                {
-                    itemsScrollView.ScrollTo(instance);
-                    ShowTooltipAndStats(itemInstance);
-                });
-                btn.RegisterCallback<MouseOutEvent>(ev =>
-                {
-                    HideTooltipAndClearStats();
-                });
-                btn.RegisterCallback<FocusOutEvent>(ev =>
-                {
-                    HideTooltipAndClearStats();
-                });
-
-                instance.RegisterCallback<KeyDownEvent>(ev =>
-                {
-                    if (inputs.jump && item is Consumable)
-                    {
-                        inputs.jump = false;
-
-                        if (playerStatsDatabase.currentHealth <= 0)
-                        {
-                            return;
-                        }
-
-                        playerManager.playerInventory.PrepareItemForConsuming(item as Consumable);
-                        menuManager.CloseMenu();
-                    }
-                });
-
-                if (stackableItemsPositionInScrollView.ContainsKey(item))
-                {
-                    this.itemsScrollView
-                        .ElementAt(stackableItemsPositionInScrollView[item])
-                        .Q<Label>("ItemName").text = item.GetName() + $" ({stackableItems[item]})";
-                }
-                else
-                {
-                    this.itemsScrollView.Add(instance);
-
-                    if (stackableItems.ContainsKey(item) && !stackableItemsPositionInScrollView.ContainsKey(item))
-                    {
-                        stackableItemsPositionInScrollView.Add(item, i);
-                    }
-                }
+            // Update counts for all stackable items in their respective UI elements
+            foreach (var kvp in stackableItems)
+            {
+                var (itemInstance, count, uiElement) = kvp.Value;
+                UpdateStackableItemUI(uiElement, itemInstance.GetItem(), count);
             }
 
             Invoke(nameof(GiveFocus), 0f);

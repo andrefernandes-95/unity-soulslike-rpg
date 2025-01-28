@@ -24,7 +24,6 @@ namespace AF
         [Header("Databases")]
         public InventoryDatabase inventoryDatabase;
         public PlayerStatsDatabase playerStatsDatabase;
-        public GemstonesDatabase gemstonesDatabase;
 
         // Last scroll position
         int lastScrollElementIndex = -1;
@@ -110,11 +109,10 @@ namespace AF
 
                 WeaponInstance selectedWeaponInstance = uIDocumentCraftScreen.uIBlacksmithWeaponsList?.selectedWeaponInstance;
 
-                string weaponIdThatThisGemstoneIsAttachedTo = gemstonesDatabase.GetWeaponIdByAttachedGemstone(gemstoneInstance);
+                bool isEquipped = selectedWeaponInstance.IsGemstoneEquipped(gemstoneInstance);
 
-                bool isEquipped = weaponIdThatThisGemstoneIsAttachedTo == selectedWeaponInstance.GetId();
-
-                WeaponInstance weaponThatThisGemstoneIsAttachedTo = inventoryDatabase.FindItemById(weaponIdThatThisGemstoneIsAttachedTo) as WeaponInstance;
+                WeaponInstance weaponThatThisGemstoneIsAttachedTo = inventoryDatabase
+                    .FilterByType<WeaponInstance>().FirstOrDefault(equippedWeapon => equippedWeapon.IsGemstoneEquipped(gemstoneInstance));
 
                 scrollItem.Q<Label>("EquippedIndicator").text = isEquipped
                     ? GetEquippedText()
@@ -124,7 +122,12 @@ namespace AF
 
                 if (isEquipped)
                 {
+                    equipGemstoneButton.Q<VisualElement>("Selected").style.display = DisplayStyle.Flex;
                     equipGemstoneButton.AddToClassList("blacksmith-craft-button-active");
+                }
+                else
+                {
+                    equipGemstoneButton.Q<VisualElement>("Selected").style.display = DisplayStyle.None;
                 }
 
                 UIUtils.SetupButton(equipGemstoneButton, () =>
@@ -161,13 +164,23 @@ namespace AF
 
             if (weaponInstanceToAttach != null)
             {
-                if (gemstonesDatabase.GetWeaponIdByAttachedGemstone(gemstoneInstance) == weaponInstanceToAttach.GetId())
+                if (weaponInstanceToAttach.IsGemstoneEquipped(selectedGemstone))
                 {
-                    gemstonesDatabase.DettachGemstoneFromWeapon(weaponInstanceToAttach, selectedGemstone);
+                    weaponInstanceToAttach.RemoveGemstone(selectedGemstone);
+                    soundbank.PlaySound(soundbank.uiCancel);
                 }
                 else
                 {
-                    gemstonesDatabase.AttachGemstoneToWeapon(weaponInstanceToAttach, selectedGemstone);
+                    WeaponInstance weaponInstanceThatHasGemstoneEquipped = inventoryDatabase.FilterByType<WeaponInstance>()
+                        .FirstOrDefault(weapon => weapon.IsGemstoneEquipped(selectedGemstone));
+
+                    if (weaponInstanceThatHasGemstoneEquipped != null)
+                    {
+                        weaponInstanceThatHasGemstoneEquipped.RemoveGemstone(selectedGemstone);
+                    }
+
+                    weaponInstanceToAttach.AttachGemstone(selectedGemstone);
+                    soundbank.PlaySound(soundbank.uiDecision);
                 }
             }
 
@@ -189,16 +202,13 @@ namespace AF
 
             Weapon weapon = selectedWeaponInstance.GetItem();
 
-            Gemstone[] equippedGemstones = gemstonesDatabase.GetAttachedGemstonesFromWeapon(selectedWeaponInstance);
-
             Damage currentWeaponDamage = weapon.weaponDamage.GetCurrentDamage(playerManager,
                 playerManager.statsBonusController.GetCurrentStrength(),
                 playerManager.statsBonusController.GetCurrentDexterity(),
                 playerManager.statsBonusController.GetCurrentIntelligence(),
-                selectedWeaponInstance,
-                equippedGemstones);
+                selectedWeaponInstance);
 
-            string gemstoneNames = string.Join(", ", equippedGemstones.Select(gemstone => gemstone.GetName()));
+            string gemstoneNames = string.Join(", ", selectedWeaponInstance.GetAttachedGemstones(inventoryDatabase).Select(gemstone => gemstone.GetName()));
 
             uIWeaponStatsContainer.PreviewWeaponDamageDifference(
                 weapon.GetName() + " +" + selectedWeaponInstance.level + ", " + gemstoneNames,
@@ -220,15 +230,11 @@ namespace AF
 
             Weapon weapon = selectedWeaponInstance.GetItem();
 
-            Gemstone[] attachedGemstones = playerManager.gemstonesDatabase
-                .GetAttachedGemstonesFromWeapon(selectedWeaponInstance);
-
             Damage currentWeaponDamage = weapon.weaponDamage.GetCurrentDamage(playerManager,
                 playerManager.statsBonusController.GetCurrentStrength(),
                 playerManager.statsBonusController.GetCurrentDexterity(),
                 playerManager.statsBonusController.GetCurrentIntelligence(),
-                selectedWeaponInstance,
-                attachedGemstones);
+                selectedWeaponInstance);
 
             if (gemstone != null)
             {
@@ -240,10 +246,7 @@ namespace AF
                         playerManager.statsBonusController.GetCurrentStrength(),
                         playerManager.statsBonusController.GetCurrentDexterity(),
                         playerManager.statsBonusController.GetCurrentIntelligence(),
-                        selectedWeaponInstance,
-                        playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(selectedWeaponInstance)
-                            .Where(gem => gem != gemstone)
-                            .ToArray());
+                        selectedWeaponInstance);
 
                 uIWeaponStatsContainer.PreviewWeaponDamageDifference(
                     weapon.GetName() + " + " + gemstone.GetName(),

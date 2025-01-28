@@ -1,13 +1,14 @@
-using System.Collections;
-using UnityEngine;
-using UnityEngine.Events;
-using AF.Combat;
-using System;
-using TigerForge;
-using AF.Events;
-
 namespace AF
 {
+    using System.Collections;
+    using UnityEngine;
+    using UnityEngine.Events;
+    using AF.Combat;
+    using System;
+    using TigerForge;
+    using AF.Events;
+    using AF.Inventory;
+
     public class VampireReviver : MonoBehaviour, IDamageable
     {
         public bool allowDamage = false;
@@ -38,7 +39,7 @@ namespace AF
         {
             Weapon playerWeapon = equipmentDatabase.GetCurrentWeapon().GetItem();
 
-            if (playerWeapon != null && playerWeapon.IsHolyWeapon(FindFirstObjectByType<PlayerManager>(FindObjectsInactive.Include), equipmentDatabase.GetCurrentWeapon()))
+            if (playerWeapon != null && playerWeapon.IsHolyWeapon(equipmentDatabase.GetCurrentWeapon(), equipmentDatabase.inventoryDatabase))
             {
                 this.gameObject.SetActive(false);
                 return;

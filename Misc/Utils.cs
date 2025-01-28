@@ -151,6 +151,10 @@
             {
                 subFolder = "Weapons/";
             }
+            else if (item is Gemstone)
+            {
+                subFolder = "Gemstones/";
+            }
             else if (item is KeyItem || item is Item)
             {
                 subFolder = "Key Items/";

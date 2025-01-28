@@ -7,5 +7,7 @@ namespace AF
         public string id;
         public bool wasUsed;
         public int level = 0;
+
+        public string[] attachedGemstoneIds;
     }
 }

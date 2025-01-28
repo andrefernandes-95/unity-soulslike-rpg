@@ -2,6 +2,7 @@
 namespace AF
 {
     using System;
+    using AF.Inventory;
     using AF.Stats;
     using UnityEditor;
     using UnityEngine;
@@ -125,7 +126,8 @@ namespace AF
             return text.TrimEnd();
         }
 
-        public bool IsHolyWeapon(PlayerManager playerManager, WeaponInstance weaponInstance) => weaponDamage.HasHolyDamage(weaponInstance, playerManager);
+        public bool IsHolyWeapon(WeaponInstance weaponInstance, InventoryDatabase inventoryDatabase)
+            => weaponDamage.HasHolyDamage(weaponInstance, inventoryDatabase);
 
         public bool IsRangeWeapon()
         {

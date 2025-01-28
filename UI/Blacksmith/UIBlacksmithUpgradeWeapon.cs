@@ -63,8 +63,7 @@ namespace AF
                 playerManager.statsBonusController.GetCurrentStrength(),
                 playerManager.statsBonusController.GetCurrentDexterity(),
                 playerManager.statsBonusController.GetCurrentIntelligence(),
-                weaponInstance,
-                playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance));
+                weaponInstance);
 
             uIWeaponStatsContainer.PreviewWeaponDamageDifference(
                 weapon.GetName() + " +" + weaponInstance.level,
@@ -88,8 +87,7 @@ namespace AF
                     playerManager.statsBonusController.GetCurrentStrength(),
                     playerManager.statsBonusController.GetCurrentDexterity(),
                     playerManager.statsBonusController.GetCurrentIntelligence(),
-                    nextWeaponInstance,
-                    playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(nextWeaponInstance));
+                    nextWeaponInstance);
 
                 uIWeaponStatsContainer.PreviewWeaponDamageDifference(
                     weapon.GetName() + " +" + nextWeaponInstance.level,

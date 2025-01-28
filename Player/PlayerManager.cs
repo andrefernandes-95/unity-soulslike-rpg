@@ -56,7 +56,6 @@ namespace AF
         public PlayerStatsDatabase playerStatsDatabase;
 
         public EquipmentDatabase equipmentDatabase;
-        public GemstonesDatabase gemstonesDatabase;
 
         // Animator Overrides
         protected AnimatorOverrideController animatorOverrideController;

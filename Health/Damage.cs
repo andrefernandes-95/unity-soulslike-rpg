@@ -97,8 +97,7 @@ namespace AF.Health
                 attackStatManager.playerManager.statsBonusController.GetCurrentStrength(),
                 attackStatManager.playerManager.statsBonusController.GetCurrentDexterity(),
                 attackStatManager.playerManager.statsBonusController.GetCurrentIntelligence(),
-                currentWeaponInstance,
-                attackStatManager.playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(currentWeaponInstance)
+                currentWeaponInstance
             );
 
             var damage = this.Clone().ApplyMultiplier(multiplier);
@@ -191,8 +190,7 @@ namespace AF.Health
                 attackStatManager.playerManager.statsBonusController.GetCurrentStrength(),
                 attackStatManager.playerManager.statsBonusController.GetCurrentDexterity(),
                 attackStatManager.playerManager.statsBonusController.GetCurrentIntelligence(),
-                currentWeaponInstance,
-                attackStatManager.playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(currentWeaponInstance)
+                currentWeaponInstance
             );
 
             float projectileMultiplierBonus = attackStatManager.playerManager.statsBonusController.projectileMultiplierBonus;

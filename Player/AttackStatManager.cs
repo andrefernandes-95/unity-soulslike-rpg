@@ -57,8 +57,7 @@
                 playerManager.statsBonusController.GetCurrentStrength(),
                 playerManager.statsBonusController.GetCurrentDexterity(),
                 playerManager.statsBonusController.GetCurrentIntelligence(),
-                weaponInstance,
-                playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance));
+                weaponInstance);
 
             return playerManager.playerWeaponsManager.GetBuffedDamage(weaponDamage);
         }

@@ -4,6 +4,7 @@ namespace AF
     using System.Collections.Generic;
     using System.Linq;
     using AF.Health;
+    using AF.Inventory;
     using UnityEngine;
     using UnityEngine.Localization.Settings;
 
@@ -23,11 +24,11 @@ namespace AF
             return weaponUpgradeLevels[level];
         }
 
-        Damage GetCurrentDamage(WeaponInstance weaponInstance, Gemstone[] attachedGemstones)
+        Damage GetCurrentDamage(WeaponInstance weaponInstance, InventoryDatabase inventoryDatabase)
         {
             Damage levelDamage = GetWeaponUpgradeLevel(weaponInstance.level)?.damage;
 
-            return EnhanceWithGemstonesDamage(levelDamage, attachedGemstones);
+            return EnhanceWithGemstonesDamage(levelDamage, weaponInstance.GetAttachedGemstones(inventoryDatabase));
         }
 
         public Damage EnhanceWithGemstonesDamage(Damage currentDamage, Gemstone[] attachedGemstones)
@@ -53,12 +54,9 @@ namespace AF
             int playerStrength,
             int playerDexterity,
             int playerIntelligence,
-            WeaponInstance currentWeaponInstance,
-            Gemstone[] attachedGemstones)
+            WeaponInstance currentWeaponInstance)
         {
-            Weapon currentWeapon = currentWeaponInstance.GetItem();
-
-            Damage currentDamage = GetCurrentDamage(currentWeaponInstance, attachedGemstones);
+            Damage currentDamage = GetCurrentDamage(currentWeaponInstance, playerManager.playerInventory.inventoryDatabase);
 
             return new(
                    physical: GetWeaponAttack(WeaponElementType.Physical, playerManager, playerStrength, playerDexterity, playerIntelligence, currentWeaponInstance),
@@ -80,7 +78,7 @@ namespace AF
 
         int GetWeaponPostureDamage(PlayerManager playerManager, WeaponInstance weaponInstance)
         {
-            int currentPostureDamage = GetCurrentDamage(weaponInstance, playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance)).postureDamage;
+            int currentPostureDamage = GetCurrentDamage(weaponInstance, playerManager.playerInventory.inventoryDatabase).postureDamage;
 
             if (playerManager.playerCombatController.isHeavyAttacking)
             {
@@ -97,7 +95,7 @@ namespace AF
 
         int GetWeaponPoiseDamage(PlayerManager playerManager, WeaponInstance weaponInstance)
         {
-            int currentPoiseDamage = GetCurrentDamage(weaponInstance, playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance)).poiseDamage;
+            int currentPoiseDamage = GetCurrentDamage(weaponInstance, playerManager.playerInventory.inventoryDatabase).poiseDamage;
 
             if (playerManager.playerCombatController.isHeavyAttacking)
             {
@@ -114,7 +112,7 @@ namespace AF
 
         float GetWeaponPushForceDamage(PlayerManager playerManager, WeaponInstance weaponInstance)
         {
-            float currentPushForceDamage = GetCurrentDamage(weaponInstance, playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance)).pushForce;
+            float currentPushForceDamage = GetCurrentDamage(weaponInstance, playerManager.playerInventory.inventoryDatabase).pushForce;
 
             if (playerManager.playerCombatController.isHeavyAttacking)
             {
@@ -133,7 +131,7 @@ namespace AF
         {
             List<StatusEffectEntry> effects = new();
 
-            Damage currentDamage = GetCurrentDamage(weaponInstance, playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance));
+            Damage currentDamage = GetCurrentDamage(weaponInstance, playerManager.playerInventory.inventoryDatabase);
             if (currentDamage == null)
             {
                 return new List<StatusEffectEntry>().ToArray();
@@ -179,7 +177,7 @@ namespace AF
 
             Weapon currentWeapon = currentWeaponInstance.GetItem();
 
-            Damage currentDamage = GetCurrentDamage(currentWeaponInstance, playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(currentWeaponInstance));
+            Damage currentDamage = GetCurrentDamage(currentWeaponInstance, playerManager.playerInventory.inventoryDatabase);
 
             if (element == WeaponElementType.Physical) elementAttack = currentDamage.physical;
             if (element == WeaponElementType.Fire) elementAttack = currentDamage.fire;
@@ -270,7 +268,7 @@ namespace AF
 
         private float GetWeaponTypeBonus(WeaponInstance weaponInstance, PlayerManager playerManager) =>
             weaponInstance.GetItem().weaponDamage
-                .GetCurrentDamage(weaponInstance, playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance)).weaponAttackType switch
+                .GetCurrentDamage(weaponInstance, playerManager.playerInventory.inventoryDatabase).weaponAttackType switch
             {
                 WeaponAttackType.Pierce => playerManager.statsBonusController.pierceDamageMultiplier,
                 WeaponAttackType.Slash => playerManager.statsBonusController.slashDamageMultiplier,
@@ -315,15 +313,15 @@ namespace AF
             return attackMultiplier;
         }
 
-        public bool HasHolyDamage(WeaponInstance weaponInstance, PlayerManager playerManager) =>
-            GetCurrentDamage(weaponInstance, playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance)).lightning != 0;
-        public bool HasHexDamage(WeaponInstance weaponInstance, PlayerManager playerManager) =>
-            GetCurrentDamage(weaponInstance, playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance)).darkness != 0;
+        public bool HasHolyDamage(WeaponInstance weaponInstance, InventoryDatabase inventoryDatabase) =>
+            GetCurrentDamage(weaponInstance, inventoryDatabase).lightning != 0;
+        public bool HasHexDamage(WeaponInstance weaponInstance, InventoryDatabase inventoryDatabase) =>
+            GetCurrentDamage(weaponInstance, inventoryDatabase).darkness != 0;
 
-        public bool IsRangeWeapon(WeaponInstance weaponInstance, PlayerManager playerManager) =>
-            GetCurrentDamage(weaponInstance, playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance)).weaponAttackType == WeaponAttackType.Range;
-        public bool IsMagicStave(WeaponInstance weaponInstance, PlayerManager playerManager) =>
-            GetCurrentDamage(weaponInstance, playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstance)).weaponAttackType == WeaponAttackType.Staff;
+        public bool IsRangeWeapon(WeaponInstance weaponInstance, InventoryDatabase inventoryDatabase) =>
+            GetCurrentDamage(weaponInstance, inventoryDatabase).weaponAttackType == WeaponAttackType.Range;
+        public bool IsMagicStave(WeaponInstance weaponInstance, InventoryDatabase inventoryDatabase) =>
+            GetCurrentDamage(weaponInstance, inventoryDatabase).weaponAttackType == WeaponAttackType.Staff;
 
     }
 }

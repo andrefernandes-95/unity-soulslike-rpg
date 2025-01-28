@@ -68,16 +68,14 @@ namespace AF
                 playerManager.statsBonusController.GetCurrentStrength(),
                 playerManager.statsBonusController.GetCurrentDexterity(),
                 playerManager.statsBonusController.GetCurrentIntelligence(),
-                currentWeaponInstance,
-                playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(currentWeaponInstance)).physical;
+                currentWeaponInstance).physical;
 
             int itemPhysicalAttack = weaponInstanceToEquip != null ? weaponToEquip.weaponDamage.GetCurrentDamage(
                 playerManager,
                 playerManager.statsBonusController.GetCurrentStrength(),
                 playerManager.statsBonusController.GetCurrentDexterity(),
                 playerManager.statsBonusController.GetCurrentIntelligence(),
-                weaponInstanceToEquip,
-                playerManager.gemstonesDatabase.GetAttachedGemstonesFromWeapon(weaponInstanceToEquip)).physical : 0;
+                weaponInstanceToEquip).physical : 0;
 
             Item item = itemInstance != null ? itemInstance.GetItem() : null;
 
