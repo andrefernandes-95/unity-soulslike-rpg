@@ -475,11 +475,12 @@
                         }
                         else if (item is Weapon weapon)
                         {
-                            WeaponInstance weaponInstance = new(serializedItem.id, weapon)
-                            {
-                                level = serializedItem.level,
-                                attachedGemstoneIds = serializedItem.attachedGemstoneIds.ToList()
-                            };
+                            WeaponInstance weaponInstance = new(
+                                serializedItem.id,
+                                weapon,
+                                serializedItem.level,
+                                serializedItem.attachedGemstoneIds.ToList());
+
                             inventoryDatabase.ownedItems.Add(weaponInstance);
                         }
                         else if (item is Gemstone gemstone)

@@ -55,15 +55,17 @@ namespace AF
     [System.Serializable]
     public class WeaponInstance : ItemInstance
     {
-        public WeaponInstance(string id, Item item) : base(id, item)
+        public WeaponInstance(string id, Item item, int level, List<string> attachedGemstoneIds) : base(id, item)
         {
             this.id = id;
             this.item = item;
+            this.level = level;
+            this.attachedGemstoneIds = attachedGemstoneIds;
         }
 
         public new Weapon GetItem() => base.GetItem() as Weapon;
 
-        public new WeaponInstance Clone() => new(this.id, this.item);
+        public new WeaponInstance Clone() => new(this.id, this.item, this.level, this.attachedGemstoneIds);
 
         public bool IsGemstoneEquipped(GemstoneInstance gemstoneInstance)
             => attachedGemstoneIds.Any(

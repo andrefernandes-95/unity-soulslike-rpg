@@ -137,10 +137,9 @@ namespace AF.Inventory
             {
                 string id = Guid.NewGuid().ToString();
 
-
                 var toAdd = itemToAdd switch
                 {
-                    Weapon => new WeaponInstance(id, itemToAdd),
+                    Weapon => new WeaponInstance(id, itemToAdd, 0, new()),
                     Shield => new ShieldInstance(id, itemToAdd),
                     Arrow => new ArrowInstance(id, itemToAdd),
                     Spell => new SpellInstance(id, itemToAdd),

@@ -627,10 +627,11 @@ namespace AF
                 Color.white,
                 String.Format(staminaCostLabel.GetLocalizedString(), weapon.lightAttackStaminaCost, weapon.heavyAttackStaminaCost));
 
-            if (weapon.canBeUpgraded && CraftingUtils.CanBeUpgradedFurther(weaponInstance))
-            {
-                CreateTooltip(blacksmithSprite, Color.white, CraftingUtils.GetMaterialCostForNextLevel(weaponInstance));
-            }
+            /*
+                        if (weapon.canBeUpgraded && CraftingUtils.CanBeUpgradedFurther(weaponInstance))
+                        {
+                            CreateTooltip(blacksmithSprite, Color.white, CraftingUtils.GetMaterialCostForNextLevel(weaponInstance));
+                        }*/
 
             if (weapon.blockAbsorption != 1)
             {

@@ -14,7 +14,7 @@ namespace AF.Tests
         public void SetUp()
         {
             var scriptableWeapon = ScriptableObject.CreateInstance<Weapon>();
-            weapon = new WeaponInstance("", scriptableWeapon);
+            weapon = new WeaponInstance("", scriptableWeapon, 0, new());
             itemList = new GameObject().AddComponent<ItemList>();
             equipmentDatabase = ScriptableObject.CreateInstance<EquipmentDatabase>();
             itemList.equipmentDatabase = equipmentDatabase;

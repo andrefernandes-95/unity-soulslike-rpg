@@ -78,9 +78,11 @@ namespace AF
                 // Serialize the original weapon into JSON
                 string json = JsonUtility.ToJson(weapon);
 
-                WeaponInstance nextWeaponInstance = new WeaponInstance("fakeId", weaponInstance.GetItem());
-                nextWeaponInstance.level = weaponInstance.level + 1;
-
+                WeaponInstance nextWeaponInstance = new(
+                    "fakeId",
+                    weaponInstance.GetItem(),
+                    weaponInstance.level + 1,
+                    new());
 
                 Damage desiredWeaponDamage = weapon.weaponDamage.GetCurrentDamage(
                     playerManager,

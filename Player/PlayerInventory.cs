@@ -87,7 +87,6 @@ namespace AF
 
         public void AddItem(Item item, int quantity)
         {
-
             if (item is Weapon weapon)
             {
                 if (weapon.tradingItemRequirements != null && weapon.tradingItemRequirements.Count > 0)
