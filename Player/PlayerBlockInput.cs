@@ -116,12 +116,7 @@ namespace AF
 
         bool CanBlock()
         {
-            if (equipmentDatabase.IsBowEquipped())
-            {
-                return false;
-            }
-
-            if (equipmentDatabase.IsStaffEquipped())
+            if (!equipmentDatabase.CanBlock())
             {
                 return false;
             }

@@ -11,6 +11,8 @@ namespace AF.Shooting
 
     public class PlayerShooter : CharacterBaseShooter
     {
+        public readonly int hashFireBow = Animator.StringToHash("Shoot");
+        public readonly int hashIsAiming = Animator.StringToHash("IsAiming");
         public readonly int hashFireBowLockedOn = Animator.StringToHash("Locked On - Shoot Bow");
 
         [Header("Stamina Cost")]
@@ -38,6 +40,8 @@ namespace AF.Shooting
         public LockOnManager lockOnManager;
         public UIManager uIManager;
         public MenuManager menuManager;
+        public PlayerBowShooting playerBowShooting;
+        public PlayerMagicShooting playerMagicShooting;
 
         [Header("Refs")]
         public Transform playerFeetRef;
@@ -112,13 +116,8 @@ namespace AF.Shooting
         {
             if (CanShoot())
             {
-                if (equipmentDatabase.IsBowEquipped() && equipmentDatabase.HasEnoughCurrentArrows())
+                if (playerBowShooting.CanShootBow())
                 {
-                    if (IsRangeWeaponIncompatibleWithProjectile())
-                    {
-                        return;
-                    }
-
                     ShootBow(equipmentDatabase.GetCurrentArrow()?.GetItem(), transform, lockOnManager.nearestLockOnTarget?.transform);
                     uIDocumentPlayerHUDV2.equipmentHUD.UpdateUI();
                     return;
@@ -135,7 +134,7 @@ namespace AF.Shooting
 
                     HandleSpellCastAnimationOverrides();
 
-                    playerManager.PlayBusyHashedAnimationWithRootMotion(hashCast);
+                    playerMagicShooting.PlayCastingAnimation();
                 }
             }
         }
@@ -198,7 +197,6 @@ namespace AF.Shooting
 
             GetPlayerManager().thirdPersonController.virtualCamera.gameObject.SetActive(false);
 
-
             if (bowDrawSfx != null && combatAudioSource != null)
             {
                 combatAudioSource.PlayOneShot(bowDrawSfx);
@@ -231,6 +229,7 @@ namespace AF.Shooting
                 lookAtConstraint.constraintActive = GetPlayerManager().thirdPersonController._input.move.magnitude <= 0;
             }
         }
+
         public void ShootBow(ConsumableProjectile consumableProjectile, Transform origin, Transform lockOnTarget)
         {
             if (equipmentDatabase.IsBowEquipped())
@@ -526,7 +525,7 @@ namespace AF.Shooting
                 return false;
             }
 
-            return equipmentDatabase.IsBowEquipped() || equipmentDatabase.IsStaffEquipped();
+            return equipmentDatabase.CanAim();
         }
 
         public override bool CanShoot()
@@ -551,10 +550,11 @@ namespace AF.Shooting
                 return false;
             }
 
-            if (GetPlayerManager().characterBlockController.isBlocking)
-            {
-                return false;
-            }
+            /*
+                        if (GetPlayerManager().characterBlockController.isBlocking)
+                        {
+                            return false;
+                        }*/
 
             // If not ranged weapons equipped, dont allow shooting
             if (
@@ -565,37 +565,6 @@ namespace AF.Shooting
             }
 
             if (GetPlayerManager().thirdPersonController.isSwimming)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        bool IsRangeWeaponIncompatibleWithProjectile()
-        {
-            Weapon currentRangeWeapon = equipmentDatabase.GetCurrentWeapon().GetItem();
-            Arrow arrow = equipmentDatabase.GetCurrentArrow().GetItem();
-
-            if (currentRangeWeapon == null || arrow == null)
-            {
-                return true;
-            }
-
-            if (currentRangeWeapon.isHuntingRifle && arrow.isRifleBullet)
-            {
-                return false;
-            }
-
-            if (currentRangeWeapon.isCrossbow && arrow.isBolt)
-            {
-                return false;
-            }
-
-            bool isBow = currentRangeWeapon.isCrossbow == false && currentRangeWeapon.isHuntingRifle == false;
-            bool isArrow = arrow.isRifleBullet == false && arrow.isBolt == false;
-
-            if (isBow && isArrow)
             {
                 return false;
             }

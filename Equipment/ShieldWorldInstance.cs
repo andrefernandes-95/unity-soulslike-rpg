@@ -8,21 +8,14 @@ namespace AF
     {
         [Header("Shield")]
         public Shield shield;
-
         public GameObject shieldInTheBack;
-        public bool shouldHide = true;
 
         [Header("Equipment Database")]
         public EquipmentDatabase equipmentDatabase;
 
         private void Awake()
         {
-            if (!shouldHide)
-            {
-                return;
-            }
-
-            EventManager.StartListening(EventMessages.ON_TWO_HANDING_CHANGED, OnTwoHandingChanged);
+            EventManager.StartListening(EventMessages.ON_TWO_HANDING_CHANGED, ResetStates);
         }
 
         private void OnEnable()
@@ -30,25 +23,41 @@ namespace AF
             ResetStates();
         }
 
+        bool IsShieldEquipped()
+        {
+            if (!equipmentDatabase.GetCurrentShield().Exists())
+            {
+                return false;
+            }
+
+            return equipmentDatabase.GetCurrentShield().HasItem(shield);
+        }
+
         public void ResetStates()
         {
-            if (equipmentDatabase != null && equipmentDatabase.isTwoHanding == false)
-            {
-                ShowShield();
-            }
-            else
+            if (!IsShieldEquipped())
             {
                 HideShield();
+                return;
             }
+
+            if (equipmentDatabase.isTwoHanding || equipmentDatabase.IsBowEquipped())
+            {
+                ShowBackShield();
+                return;
+            }
+
+            ShowShield();
         }
 
         public void HideShield()
         {
-            if (!shouldHide)
-            {
-                return;
-            }
+            gameObject.SetActive(false);
+            shieldInTheBack?.gameObject.SetActive(false);
+        }
 
+        public void ShowBackShield()
+        {
             if (shieldInTheBack != null)
             {
                 shieldInTheBack.SetActive(true);
@@ -67,21 +76,5 @@ namespace AF
             }
         }
 
-        public void OnTwoHandingChanged()
-        {
-            if (equipmentDatabase.GetCurrentShield().HasItem(shield))
-            {
-                return;
-            }
-
-            if (!equipmentDatabase.isTwoHanding)
-            {
-                ShowShield();
-            }
-            else
-            {
-                HideShield();
-            }
-        }
     }
 }

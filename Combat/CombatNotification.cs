@@ -16,33 +16,19 @@ namespace AF
         public Ease popupEase = Ease.OutBack;
 
         public float maxDuration = 2f;
-        private float currentDuration = 0f;
 
         private Tween fadeTween;
         private Tween scaleTween;
 
         void Awake()
         {
-            character.damageReceiver.onDamageEvent += OnDamageEvent;
-
             textMeshPro.text = "";
             this.gameObject.SetActive(false);
-        }
-
-        public Damage OnDamageEvent(CharacterBaseManager attacker, CharacterBaseManager receiver, Damage damage)
-        {
-            if (damage != null)
-            {
-                ShowDamage(damage);
-            }
-
-            return damage;
         }
 
         public void ShowDamage(Damage damage)
         {
             this.gameObject.SetActive(false);
-            currentDuration = 0f;
             textMeshPro.alpha = 1f;
 
             textMeshPro.text = GetDamageText(damage);

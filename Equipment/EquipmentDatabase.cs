@@ -446,6 +446,9 @@ namespace AF
         public int GetEquippedWeaponSlot(ItemInstance weapon) => Array.FindIndex(weapons, equippedWeapon =>
             equippedWeapon.Exists() && equippedWeapon.IsId(weapon.GetId()));
 
+        public int GetEquippedSecondaryWeaponSlot(ItemInstance weapon) => Array.FindIndex(secondaryWeapons, equippedWeapon =>
+            equippedWeapon.Exists() && equippedWeapon.IsId(weapon.GetId()));
+
         public int GetEquippedShieldSlot(ItemInstance shield) => Array.FindIndex(shields, equippedShield =>
             equippedShield.Exists() && equippedShield.IsId(shield.GetId()));
 
@@ -549,6 +552,53 @@ namespace AF
             isTwoHanding = value;
 
             EventManager.EmitEvent(EventMessages.ON_TWO_HANDING_CHANGED);
+        }
+
+        public bool ShouldBlockShieldSlot()
+        {
+            if (IsBowEquipped())
+            {
+                return true;
+            }
+
+
+            if (IsStaffEquipped())
+            {
+                return GetCurrentSecondaryWeapon() == null;
+            }
+
+            return false;
+        }
+
+        public bool CanAim()
+        {
+            if (IsBowEquipped())
+            {
+                return true;
+            }
+
+            if (IsStaffEquipped())
+            {
+                return isTwoHanding || !GetCurrentSecondaryWeapon().Exists();
+            }
+
+            return false;
+        }
+
+        public bool CanBlock()
+        {
+            if (IsBowEquipped())
+            {
+                return false;
+            }
+
+            // If using a staff, only block if a shield is on the left hand
+            if (IsStaffEquipped())
+            {
+                return GetCurrentShield() != null;
+            }
+
+            return true;
         }
 
         public bool IsEquipped(ArmorBase armorBase)

@@ -24,9 +24,9 @@ namespace AF
         public List<HolsteredWeapon> holsteredWeapons;
 
         [Header("Current Weapon")]
-        public CharacterWeaponHitbox currentWeaponInstance;
+        public CharacterWeaponHitbox currentWeaponWorldInstance;
         public CharacterWeaponHitbox currentSecondaryWeaponInstance;
-        public ShieldWorldInstance currentShieldInstance;
+        public ShieldWorldInstance currentShieldWorldInstance;
 
         [Header("Dual Wielding")]
         public CharacterWeaponHitbox secondaryWeaponInstance;
@@ -86,7 +86,7 @@ namespace AF
         /// </summary>
         public void CloseAllWeaponHitboxes()
         {
-            currentWeaponInstance?.DisableHitbox();
+            currentWeaponWorldInstance?.DisableHitbox();
             currentSecondaryWeaponInstance?.DisableHitbox();
             leftFootHitbox?.DisableHitbox();
             rightFootHitbox?.DisableHitbox();
@@ -99,7 +99,7 @@ namespace AF
             var CurrentWeaponInstance = equipmentDatabase.GetCurrentWeapon();
             var SecondaryWeaponInstance = equipmentDatabase.GetCurrentSecondaryWeapon();
 
-            if (currentWeaponInstance != null) currentWeaponInstance = null;
+            if (currentWeaponWorldInstance != null) currentWeaponWorldInstance = null;
             if (currentSecondaryWeaponInstance != null) currentSecondaryWeaponInstance = null;
 
             List<CharacterWeaponHitbox> weaponsList = new List<CharacterWeaponHitbox>();
@@ -119,11 +119,11 @@ namespace AF
             if (CurrentWeaponInstance.Exists())
             {
                 var gameObjectWeapon = weaponInstances.FirstOrDefault(weapon => CurrentWeaponInstance.HasItem(weapon.weapon));
-                currentWeaponInstance = gameObjectWeapon;
+                currentWeaponWorldInstance = gameObjectWeapon;
 
-                if (currentWeaponInstance != null)
+                if (currentWeaponWorldInstance != null)
                 {
-                    currentWeaponInstance.gameObject.SetActive(true);
+                    currentWeaponWorldInstance.gameObject.SetActive(true);
                 }
             }
 
@@ -160,16 +160,7 @@ namespace AF
 
             playerManager.UpdateAnimatorOverrideControllerClips();
 
-            // If we equipped a bow, we must hide any active shield
-            if (equipmentDatabase.IsBowEquipped() || equipmentDatabase.IsStaffEquipped())
-            {
-                UnassignShield();
-            }
-            // Otherwise, we need to check if we should activate a bow if we just switched from a bow to other weapon that might allow a shield
-            else
-            {
-                UpdateCurrentShield();
-            }
+            UpdateCurrentShield();
         }
 
         void UpdateCurrentArrows()
@@ -178,8 +169,6 @@ namespace AF
             {
                 return;
             }
-
-            UnassignShield();
         }
 
         void UpdateCurrentSpells()
@@ -188,8 +177,6 @@ namespace AF
             {
                 return;
             }
-
-            UnassignShield();
         }
 
         void UpdateCurrentShield()
@@ -198,32 +185,21 @@ namespace AF
 
             statsBonusController.RecalculateEquipmentBonus();
 
-            if (currentShieldInstance != null)
+            if (currentShieldWorldInstance != null)
             {
-                currentShieldInstance = null;
+                currentShieldWorldInstance = null;
             }
 
             foreach (var shieldInstance in shieldInstances)
             {
-                shieldInstance.gameObject.SetActive(false);
-                shieldInstance.shieldInTheBack.SetActive(false);
+                shieldInstance.HideShield();
             }
 
             if (CurrentShieldInstance.Exists())
             {
                 var gameObjectShield = shieldInstances.FirstOrDefault(shield => CurrentShieldInstance.HasItem(shield.shield));
-                currentShieldInstance = gameObjectShield;
-                currentShieldInstance.gameObject.SetActive(true);
-            }
-        }
-
-        void UnassignShield()
-        {
-            if (currentShieldInstance != null)
-            {
-                currentShieldInstance.gameObject.SetActive(false);
-                currentShieldInstance.shieldInTheBack.gameObject.SetActive(false);
-                currentShieldInstance = null;
+                currentShieldWorldInstance = gameObjectShield;
+                currentShieldWorldInstance.ResetStates();
             }
         }
 
@@ -275,30 +251,30 @@ namespace AF
 
         public void ShowEquipment()
         {
-            currentWeaponInstance?.ShowWeapon();
+            currentWeaponWorldInstance?.ShowWeapon();
             currentSecondaryWeaponInstance?.ShowWeapon();
-            currentShieldInstance?.ResetStates();
+            currentShieldWorldInstance?.ResetStates();
         }
 
         public void HideEquipment()
         {
-            currentWeaponInstance?.HideWeapon();
+            currentWeaponWorldInstance?.HideWeapon();
             currentSecondaryWeaponInstance?.HideWeapon();
-            currentShieldInstance?.HideShield();
+            currentShieldWorldInstance?.ShowBackShield();
         }
 
-        public void HideShield() => currentShieldInstance?.HideShield();
-        public void ShowShield() => currentShieldInstance?.ShowShield();
+        public void HideShield() => currentShieldWorldInstance?.ShowBackShield();
+        public void ShowShield() => currentShieldWorldInstance?.ResetStates();
 
         bool CanApplyBuff()
         {
-            if (currentWeaponInstance == null || currentWeaponInstance.characterWeaponBuffs == null)
+            if (currentWeaponWorldInstance == null || currentWeaponWorldInstance.characterWeaponBuffs == null)
             {
                 notificationManager.ShowNotification(
                     CanNotApplyBuffToThisWeapon.GetLocalizedString(), notificationManager.systemError);
                 return false;
             }
-            else if (currentWeaponInstance.characterWeaponBuffs.HasOnGoingBuff())
+            else if (currentWeaponWorldInstance.characterWeaponBuffs.HasOnGoingBuff())
             {
                 notificationManager.ShowNotification(
                     WeaponIsAlreadyBuffed.GetLocalizedString(), notificationManager.systemError);
@@ -382,64 +358,64 @@ namespace AF
 
             if (customDuration > 0)
             {
-                currentWeaponInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffName, customDuration);
+                currentWeaponWorldInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffName, customDuration);
                 secondaryWeaponInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffName, customDuration);
             }
             else
             {
-                currentWeaponInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffName);
+                currentWeaponWorldInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffName);
                 secondaryWeaponInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffName);
             }
         }
 
         public Damage GetBuffedDamage(Damage weaponDamage)
         {
-            if (currentWeaponInstance == null || currentWeaponInstance.characterWeaponBuffs == null || currentWeaponInstance.characterWeaponBuffs.HasOnGoingBuff() == false)
+            if (currentWeaponWorldInstance == null || currentWeaponWorldInstance.characterWeaponBuffs == null || currentWeaponWorldInstance.characterWeaponBuffs.HasOnGoingBuff() == false)
             {
                 return weaponDamage;
             }
 
-            if (currentWeaponInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.FIRE)
+            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.FIRE)
             {
-                weaponDamage.fire += currentWeaponInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.FIRE].damageBonus;
+                weaponDamage.fire += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.FIRE].damageBonus;
             }
 
-            if (currentWeaponInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.FROST)
+            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.FROST)
             {
-                weaponDamage.frost += currentWeaponInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.FROST].damageBonus;
+                weaponDamage.frost += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.FROST].damageBonus;
             }
 
-            if (currentWeaponInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.LIGHTNING)
+            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.LIGHTNING)
             {
-                weaponDamage.lightning += currentWeaponInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.LIGHTNING].damageBonus;
+                weaponDamage.lightning += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.LIGHTNING].damageBonus;
             }
 
-            if (currentWeaponInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.MAGIC)
+            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.MAGIC)
             {
-                weaponDamage.magic += currentWeaponInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.MAGIC].damageBonus;
+                weaponDamage.magic += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.MAGIC].damageBonus;
             }
 
-            if (currentWeaponInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.DARKNESS)
+            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.DARKNESS)
             {
-                weaponDamage.darkness += currentWeaponInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.DARKNESS].damageBonus;
+                weaponDamage.darkness += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.DARKNESS].damageBonus;
             }
 
-            if (currentWeaponInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.WATER)
+            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.WATER)
             {
-                weaponDamage.water += currentWeaponInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.WATER].damageBonus;
+                weaponDamage.water += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.WATER].damageBonus;
             }
 
-            if (currentWeaponInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.SHARPNESS)
+            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.SHARPNESS)
             {
-                weaponDamage.physical += currentWeaponInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.SHARPNESS].damageBonus;
+                weaponDamage.physical += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.SHARPNESS].damageBonus;
             }
 
-            if (currentWeaponInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.POISON)
+            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.POISON)
             {
                 StatusEffectEntry statusEffectToApply = new()
                 {
-                    statusEffect = currentWeaponInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.POISON].statusEffect,
-                    amountPerHit = currentWeaponInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.POISON].statusEffectAmountToApply,
+                    statusEffect = currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.POISON].statusEffect,
+                    amountPerHit = currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.POISON].statusEffectAmountToApply,
                 };
 
                 if (weaponDamage.statusEffects == null)
@@ -454,12 +430,12 @@ namespace AF
                 }
             }
 
-            if (currentWeaponInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.BLOOD)
+            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.BLOOD)
             {
                 StatusEffectEntry statusEffectToApply = new()
                 {
-                    statusEffect = currentWeaponInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.BLOOD].statusEffect,
-                    amountPerHit = currentWeaponInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.BLOOD].statusEffectAmountToApply,
+                    statusEffect = currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.BLOOD].statusEffect,
+                    amountPerHit = currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.BLOOD].statusEffectAmountToApply,
                 };
 
                 if (weaponDamage.statusEffects == null)
@@ -479,12 +455,12 @@ namespace AF
 
         public int GetCurrentBlockStaminaCost()
         {
-            if (playerManager.playerWeaponsManager.currentShieldInstance == null)
+            if (playerManager.playerWeaponsManager.currentShieldWorldInstance == null)
             {
                 return playerManager.characterBlockController.unarmedStaminaCostPerBlock;
             }
 
-            return (int)playerManager.playerWeaponsManager.currentShieldInstance.shield.blockStaminaCost;
+            return (int)playerManager.playerWeaponsManager.currentShieldWorldInstance.shield.blockStaminaCost;
         }
 
         public Damage GetCurrentShieldDefenseAbsorption(Damage incomingDamage)
@@ -494,56 +470,56 @@ namespace AF
                 incomingDamage.physical = (int)(incomingDamage.physical * equipmentDatabase.GetCurrentWeapon().GetItem().blockAbsorption);
                 return incomingDamage;
             }
-            else if (currentShieldInstance == null || currentShieldInstance.shield == null)
+            else if (currentShieldWorldInstance == null || currentShieldWorldInstance.shield == null)
             {
                 incomingDamage.physical = (int)(incomingDamage.physical * playerManager.characterBlockController.unarmedDefenseAbsorption);
                 return incomingDamage;
             }
 
-            return currentShieldInstance.shield.FilterDamage(incomingDamage);
+            return currentShieldWorldInstance.shield.FilterDamage(incomingDamage);
         }
         public Damage GetCurrentShieldPassiveDamageFilter(Damage incomingDamage)
         {
-            if (currentShieldInstance == null || currentShieldInstance.shield == null)
+            if (currentShieldWorldInstance == null || currentShieldWorldInstance.shield == null)
             {
                 return incomingDamage;
             }
 
-            return currentShieldInstance.shield.FilterPassiveDamage(incomingDamage);
+            return currentShieldWorldInstance.shield.FilterPassiveDamage(incomingDamage);
         }
 
         public void ApplyShieldDamageToAttacker(CharacterManager attacker)
         {
-            if (currentShieldInstance == null || currentShieldInstance.shield == null)
+            if (currentShieldWorldInstance == null || currentShieldWorldInstance.shield == null)
             {
                 return;
             }
 
-            currentShieldInstance.shield.AttackShieldAttacker(attacker);
+            currentShieldWorldInstance.shield.AttackShieldAttacker(attacker);
         }
 
         public void HandleWeaponSpecial()
         {
             if (
-                playerManager.playerWeaponsManager.currentWeaponInstance == null
-                || playerManager.playerWeaponsManager.currentWeaponInstance.onWeaponSpecial == null
-                || playerManager.playerWeaponsManager.currentWeaponInstance.weapon == null
+                playerManager.playerWeaponsManager.currentWeaponWorldInstance == null
+                || playerManager.playerWeaponsManager.currentWeaponWorldInstance.onWeaponSpecial == null
+                || playerManager.playerWeaponsManager.currentWeaponWorldInstance.weapon == null
                 )
             {
                 return;
             }
 
-            if (playerManager.manaManager.playerStatsDatabase.currentMana < playerManager.playerWeaponsManager.currentWeaponInstance.weapon.manaCostToUseWeaponSpecialAttack)
+            if (playerManager.manaManager.playerStatsDatabase.currentMana < playerManager.playerWeaponsManager.currentWeaponWorldInstance.weapon.manaCostToUseWeaponSpecialAttack)
             {
                 //                notificationManager.ShowNotification(NotEnoughManaToUseWeaponSpecial.GetLocalizedString());
                 return;
             }
 
             playerManager.manaManager.DecreaseMana(
-                playerManager.playerWeaponsManager.currentWeaponInstance.weapon.manaCostToUseWeaponSpecialAttack
+                playerManager.playerWeaponsManager.currentWeaponWorldInstance.weapon.manaCostToUseWeaponSpecialAttack
             );
 
-            playerManager.playerWeaponsManager.currentWeaponInstance.onWeaponSpecial?.Invoke();
+            playerManager.playerWeaponsManager.currentWeaponWorldInstance.onWeaponSpecial?.Invoke();
         }
 
         /// <summary>

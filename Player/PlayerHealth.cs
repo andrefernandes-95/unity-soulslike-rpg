@@ -206,7 +206,7 @@ namespace AF
         {
             if (attacker is PlayerManager playerManager)
             {
-                int healthRestoredWithEachHit = (int)(playerManager.playerWeaponsManager?.currentWeaponInstance?.weapon?.healthRestoredWithEachHit ?? 0);
+                int healthRestoredWithEachHit = (int)(playerManager.playerWeaponsManager?.currentWeaponWorldInstance?.weapon?.healthRestoredWithEachHit ?? 0);
                 playerManager.health.RestoreHealth(healthRestoredWithEachHit);
             }
 

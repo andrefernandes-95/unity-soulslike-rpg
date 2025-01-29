@@ -234,7 +234,6 @@
 
             playerManager.playerWeaponsManager.HideShield();
 
-
             if (heavyAttackComboIndex > GetMaxHeavyCombo())
             {
                 heavyAttackComboIndex = 0;

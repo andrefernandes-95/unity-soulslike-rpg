@@ -212,6 +212,10 @@ namespace AF
             return 0;
         }
 
+        string GetInflictedPerHit() => Glossary.IsPortuguese()
+            ? "infligido por ataque"
+            : "inflicted per hit";
+
         public string GetFormattedStatusDamages(PlayerManager playerManager, WeaponInstance currentWeaponInstance)
         {
             string result = "";
@@ -220,7 +224,7 @@ namespace AF
             {
                 if (statusEffect != null)
                 {
-                    result += $"+{statusEffect.amountPerHit} {statusEffect.statusEffect.GetName()} {LocalizationSettings.StringDatabase.GetLocalizedString("UIDocuments", "Inflicted per Hit")}\n";
+                    result += $"+{statusEffect.amountPerHit} {statusEffect.statusEffect.GetName()} {GetInflictedPerHit()}\n";
                 }
             }
 

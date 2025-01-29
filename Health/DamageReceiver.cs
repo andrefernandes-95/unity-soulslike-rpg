@@ -13,6 +13,7 @@ namespace AF
         public CharacterBaseManager character;
 
         [Header("Damage Effects")]
+        public CombatNotification combatNotification;
         public DamageEffect physicalDamageEffect;
         public DamageEffect fireDamageEffect;
 
@@ -75,6 +76,8 @@ namespace AF
             {
                 return false;
             }
+
+            combatNotification?.ShowDamage(damage);
 
             character?.health.TakeDamage(damage.GetTotalDamage());
 

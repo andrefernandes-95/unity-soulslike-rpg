@@ -63,9 +63,9 @@ namespace AF.Animations
 
         public void OpenRightWeaponHitbox()
         {
-            if (playerManager.playerWeaponsManager.currentWeaponInstance != null)
+            if (playerManager.playerWeaponsManager.currentWeaponWorldInstance != null)
             {
-                playerManager.playerWeaponsManager.currentWeaponInstance.EnableHitbox();
+                playerManager.playerWeaponsManager.currentWeaponWorldInstance.EnableHitbox();
             }
             else if (playerManager.playerWeaponsManager.rightHandHitbox != null)
             {
@@ -77,9 +77,9 @@ namespace AF.Animations
 
         public void CloseRightWeaponHitbox()
         {
-            if (playerManager.playerWeaponsManager.currentWeaponInstance != null)
+            if (playerManager.playerWeaponsManager.currentWeaponWorldInstance != null)
             {
-                playerManager.playerWeaponsManager.currentWeaponInstance.DisableHitbox();
+                playerManager.playerWeaponsManager.currentWeaponWorldInstance.DisableHitbox();
             }
 
             if (playerManager.playerWeaponsManager.rightHandHitbox != null)

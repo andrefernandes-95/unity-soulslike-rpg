@@ -6,10 +6,6 @@ namespace AF.Shooting
     {
         public GameObject rifleWeapon;
 
-        public readonly int hashFireBow = Animator.StringToHash("Shoot");
-        public readonly int hashCast = Animator.StringToHash("Cast");
-        public readonly int hashIsAiming = Animator.StringToHash("IsAiming");
-
         [Header("Components")]
         public CharacterBaseManager characterBaseManager;
 

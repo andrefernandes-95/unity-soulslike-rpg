@@ -104,6 +104,8 @@ namespace AF
 
         public bool IsEquipmentDisplayed() => uIDocumentPlayerHUDV2.uIDocument.rootVisualElement.visible && equipmentContainer.visible;
 
+        bool ShouldShowBlockedIcon() => equipmentDatabase.ShouldBlockShieldSlot();
+
         private void UpdateSlotContents()
         {
             UpdateSlot(
@@ -111,12 +113,14 @@ namespace AF
                 equipmentDatabase.IsBowEquipped() ? equipmentDatabase.GetCurrentArrow() : equipmentDatabase.GetCurrentSpell(), unequippedSpellSlot, unequippedArrowSlot);
             UpdateSlot(weaponSlotContainer, equipmentDatabase.GetCurrentWeapon(), unequippedWeaponSlot);
             UpdateSlot(consumableSlotContainer, equipmentDatabase.GetCurrentConsumable(), unequippedConsumableSlot);
+
             UpdateSlot(shieldSlotContainer,
-                equipmentDatabase.GetCurrentSecondaryWeapon() != null
+                equipmentDatabase.GetCurrentSecondaryWeapon().Exists()
                     ? equipmentDatabase.GetCurrentSecondaryWeapon()
                     : equipmentDatabase.GetCurrentShield(),
                 unequippedShieldSlot);
-            shieldBlockedIcon.style.display = equipmentDatabase.IsBowEquipped() || equipmentDatabase.IsStaffEquipped() ? DisplayStyle.Flex : DisplayStyle.None;
+
+            shieldBlockedIcon.style.display = ShouldShowBlockedIcon() ? DisplayStyle.Flex : DisplayStyle.None;
 
             UpdateSlotInputUI(spellSlotContainer.Q<VisualElement>("Keyboard"), switchSpellGamepad, switchSpellKey);
             UpdateSlotInputUI(weaponSlotContainer.Q<VisualElement>("Keyboard"), switchWeaponGamepad, switchWeaponKey);

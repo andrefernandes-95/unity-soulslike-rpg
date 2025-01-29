@@ -234,12 +234,7 @@ namespace AF
             }
 
             int equippedSlotIndex = -1;
-
-            if (item is Weapon && itemInstance is WeaponInstance weaponInstance)
-            {
-                equippedSlotIndex = equipmentDatabase.GetEquippedWeaponSlot(weaponInstance);
-            }
-            else if (item is Shield && itemInstance is ShieldInstance shieldInstance)
+            if (item is Shield && itemInstance is ShieldInstance shieldInstance)
             {
                 equippedSlotIndex = equipmentDatabase.GetEquippedShieldSlot(shieldInstance);
             }
@@ -346,6 +341,39 @@ namespace AF
             itemNameLabel.text = item.GetName() + $" ({count})";
         }
 
+        bool ShouldDisplayWeaponInstanceOnItemList(WeaponInstance weaponInstance, bool isShieldSlot, int equippedSlotIndex)
+        {
+            int equippedPrimarySlot = equipmentDatabase.GetEquippedWeaponSlot(weaponInstance);
+            int equippedSecondarySlot = equipmentDatabase.GetEquippedSecondaryWeaponSlot(weaponInstance);
+            bool isNotEquipped = equippedSecondarySlot == -1 && equippedPrimarySlot == -1;
+
+            if (isShieldSlot)
+            {
+                if (weaponInstance.GetItem().IsRangeWeapon())
+                {
+                    return false;
+                }
+                if (weaponInstance.GetItem().IsStaffWeapon())
+                {
+                    return false;
+                }
+
+                if (isNotEquipped)
+                {
+                    return true;
+                }
+
+                return equippedSecondarySlot == equippedSlotIndex;
+            }
+
+            if (isNotEquipped)
+            {
+                return true;
+            }
+
+            return equippedPrimarySlot == equippedSlotIndex;
+        }
+
         void PopulateScrollView<ItemType>(bool showOnlyKeyItems, int slotIndex, bool isShieldSlot) where ItemType : Item
         {
             this.itemsScrollView.Clear();
@@ -354,9 +382,13 @@ namespace AF
             var query = inventoryDatabase.ownedItems
                 .Where(item =>
                 {
-                    if (isShieldSlot && item is WeaponInstance weaponInstance)
+                    if (item is WeaponInstance weaponInstance)
                     {
-                        return !(weaponInstance.GetItem().IsRangeWeapon() || weaponInstance.GetItem().IsStaffWeapon());
+                        // If shield slot or weapon slot
+                        if (isShieldSlot || item.GetItem() is ItemType)
+                        {
+                            return ShouldDisplayWeaponInstanceOnItemList(weaponInstance, isShieldSlot, slotIndex);
+                        }
                     }
 
                     return ShouldShowItem<ItemType>(item, slotIndex, showOnlyKeyItems);
