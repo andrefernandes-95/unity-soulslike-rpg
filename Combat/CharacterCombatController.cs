@@ -260,7 +260,9 @@ namespace AF
 
         IEnumerator ClearCombatActionFromCooldownList(CombatAction combatActionToClear)
         {
-            yield return new WaitForEndOfFrame();
+            characterManager.animator.ForceStateNormalizedTime(0f);
+
+            yield return new WaitForFixedUpdate();
 
             characterManager.PlayCrossFadeBusyAnimationWithRootMotion(currentAnimationToPlay, crossFade);
 

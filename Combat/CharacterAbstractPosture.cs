@@ -154,6 +154,8 @@ namespace AF
             {
                 RecoverFromStunned();
 
+                if (incomingDamage == null) return incomingDamage;
+
                 // Apply stunned bonus damage
                 return incomingDamage.ApplyMultiplier(damageMultiplierWhenStunned);
             }
