@@ -1,7 +1,6 @@
 ﻿
 namespace AF
 {
-    using AF.Animations;
     using AF.Combat;
     using AF.Equipment;
     using AF.Events;
@@ -44,7 +43,7 @@ namespace AF
         public float cutDistanceToTargetSpeed = 12f;
         public float rotationSpeed = 6f;
         float defaultAcceleration;
-        public float ACCELERATION_RECOVER_SPEED = 1f;
+        float _ACCELERATION_RECOVER_SPEED = 2f;
 
         Coroutine RestoreAccelerationCoroutine;
         [HideInInspector] public bool isCuttingDistanceToTarget = false;
@@ -242,21 +241,37 @@ namespace AF
             }
 
             agent.speed = 0f;
-            agent.acceleration = 0f;
+            agent.acceleration = defaultAcceleration;
         }
 
         public void SetAgentSpeed(float speed)
         {
-            agent.speed = speed;
+            if (speed == agent.speed)
+            {
+                return;
+            }
 
+            agent.speed = speed;
             RestoreAccelerationCoroutine = StartCoroutine(RestoreAcceleration());
         }
 
         IEnumerator RestoreAcceleration()
         {
+            agent.acceleration = 0f;
+
+            float multiplierSpeed = defaultAcceleration - agent.acceleration;
+
             while (agent.acceleration < defaultAcceleration)
             {
-                agent.acceleration += Time.deltaTime * ACCELERATION_RECOVER_SPEED;
+                agent.acceleration += Time.deltaTime * multiplierSpeed;
+
+                multiplierSpeed = defaultAcceleration - agent.acceleration;
+
+                if (multiplierSpeed <= 2)
+                {
+                    multiplierSpeed = 2;
+                }
+
                 yield return null;
             }
 
