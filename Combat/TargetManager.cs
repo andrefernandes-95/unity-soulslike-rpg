@@ -1,15 +1,8 @@
-using System.Collections;
-using System.Linq;
-using AF.Characters;
-using AF.Companions;
-using AF.Events;
-using AF.Health;
-using TigerForge;
-using UnityEngine;
-using UnityEngine.Events;
-
 namespace AF.Combat
 {
+    using AF.Companions;
+    using UnityEngine;
+    using UnityEngine.Events;
 
     public class TargetManager : MonoBehaviour
     {

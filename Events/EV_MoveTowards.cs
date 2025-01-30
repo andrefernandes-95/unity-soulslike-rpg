@@ -18,7 +18,8 @@ namespace AF.Events
         {
             if (characterManager.agent.enabled)
             {
-                characterManager.agent.speed = shouldRun ? characterManager.chaseSpeed : characterManager.patrolSpeed;
+                characterManager.SetAgentSpeed(
+                    shouldRun ? characterManager.chaseSpeed : characterManager.patrolSpeed);
 
                 characterManager.agent.destination = targetDestination.transform.position;
 
@@ -33,7 +34,7 @@ namespace AF.Events
 
                 if (shouldWaitUntilReachingWaypoint)
                 {
-                    characterManager.agent.speed = 0f;
+                    characterManager.StopAgentSpeed();
                 }
             }
         }

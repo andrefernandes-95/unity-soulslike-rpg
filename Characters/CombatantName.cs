@@ -11,7 +11,22 @@ namespace AF
 
         void Awake()
         {
-            textMeshPro.text = character.combatant?.name?.GetLocalizedString() ?? "";
+            textMeshPro.text = GetCombatantName();
+        }
+
+        string GetCombatantName()
+        {
+            if (character == null || character.combatant == null)
+            {
+                return "";
+            }
+
+            if (character.combatant.name.IsEmpty)
+            {
+                return "";
+            }
+
+            return character.combatant.name.GetLocalizedString();
         }
 
         private void FaceCamera()

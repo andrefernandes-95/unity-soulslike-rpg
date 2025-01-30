@@ -90,7 +90,7 @@ namespace AF.Events
         {
             isRunning = true;
 
-            EventManager.EmitEvent(EventMessages.ON_MOMENT_START);
+            EventManager.EmitEventData(EventMessages.ON_MOMENT_START, this);
 
             foreach (EventBase ev in events)
             {
@@ -107,7 +107,7 @@ namespace AF.Events
         {
             onMoment_End?.Invoke();
             isRunning = false;
-            EventManager.EmitEvent(EventMessages.ON_MOMENT_END);
+            EventManager.EmitEventData(EventMessages.ON_MOMENT_END, this);
         }
 
         private void OnDisable()

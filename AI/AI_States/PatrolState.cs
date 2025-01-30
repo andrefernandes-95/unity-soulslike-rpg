@@ -1,12 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.Events;
-using UnityEngine.Splines;
-
 namespace AF
 {
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using UnityEngine.AI;
+    using UnityEngine.Events;
+    using UnityEngine.Splines;
+
     public class PatrolState : State
     {
         [Header("Waypoints")]
@@ -36,8 +36,6 @@ namespace AF
         public UnityEvent onWaitOnWaypoint_End;
 
         Vector3 originalPosition;
-
-
 
         private void Awake()
         {
@@ -98,7 +96,7 @@ namespace AF
         {
             if (!isWaitingOnWaypoint)
             {
-                characterManager.agent.speed = characterManager.patrolSpeed;
+                characterManager.SetAgentSpeed(characterManager.patrolSpeed);
             }
 
             onStateUpdate?.Invoke();
@@ -114,7 +112,7 @@ namespace AF
                 else if (!isWaitingOnWaypoint)
                 {
                     isWaitingOnWaypoint = true;
-                    characterManager.agent.speed = 0f;
+                    characterManager.StopAgentSpeed();
 
                     if (waitCoroutine != null)
                     {

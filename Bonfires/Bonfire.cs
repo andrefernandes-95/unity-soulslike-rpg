@@ -95,10 +95,7 @@ namespace AF.Bonfires
 
         void CurePlayer()
         {
-            GetPlayerManager().health.RestoreFullHealth();
-            GetPlayerManager().staminaStatManager.RestoreStaminaPercentage(100);
-            GetPlayerManager().statusController.RemoveAllStatuses();
-            GetPlayerManager().manaManager.RestoreManaPercentage(100);
+            GetPlayerManager().CurePlayer();
         }
 
         bool CanUseBonfire()

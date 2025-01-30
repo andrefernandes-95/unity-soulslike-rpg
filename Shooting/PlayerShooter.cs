@@ -11,9 +11,7 @@ namespace AF.Shooting
 
     public class PlayerShooter : CharacterBaseShooter
     {
-        public readonly int hashFireBow = Animator.StringToHash("Shoot");
         public readonly int hashIsAiming = Animator.StringToHash("IsAiming");
-        public readonly int hashFireBowLockedOn = Animator.StringToHash("Locked On - Shoot Bow");
 
         [Header("Stamina Cost")]
         public int minimumStaminaToShoot = 10;
@@ -51,8 +49,6 @@ namespace AF.Shooting
         public bool isAiming = false;
         public bool isShooting = false;
 
-        // For cache purposes
-        Spell previousSpell;
 
         [Header("Events")]
         public UnityEvent onSpellAim_Begin;
@@ -60,35 +56,10 @@ namespace AF.Shooting
 
         [Header("Cinemachine")]
         Cinemachine3rdPersonFollow cinemachineThirdPersonFollow;
-
         public CinemachineImpulseSource cinemachineImpulseSource;
-
         Coroutine FireDelayedProjectileCoroutine;
-
         public GameObject queuedProjectile;
         public Spell queuedSpell;
-
-        [Header("SFX")]
-        public AudioSource combatAudioSource;
-        public AudioClip bowDrawSfx;
-
-        private void Awake()
-        {
-            HideArrowPlaceholder();
-        }
-
-        void ShowArrowPlaceholder()
-        {
-            if (isAiming && equipmentDatabase.IsBowEquipped() && equipmentDatabase.HasEnoughCurrentArrows())
-            {
-                arrowPlaceholder.SetActive(true);
-            }
-        }
-
-        void HideArrowPlaceholder()
-        {
-            arrowPlaceholder.SetActive(false);
-        }
 
         public void ResetStates()
         {
@@ -96,7 +67,7 @@ namespace AF.Shooting
             queuedProjectile = null;
             queuedSpell = null;
 
-            ShowArrowPlaceholder();
+            playerBowShooting.ResetStates();
         }
 
         void SetupCinemachine3rdPersonFollowReference()
@@ -118,53 +89,14 @@ namespace AF.Shooting
             {
                 if (playerBowShooting.CanShootBow())
                 {
-                    ShootBow(equipmentDatabase.GetCurrentArrow()?.GetItem(), transform, lockOnManager.nearestLockOnTarget?.transform);
-                    uIDocumentPlayerHUDV2.equipmentHUD.UpdateUI();
+                    playerBowShooting.ShootBow();
                     return;
                 }
 
-                PlayerManager playerManager = GetPlayerManager();
-
-                if (
-                   equipmentDatabase.IsStaffEquipped()
-                   && equipmentDatabase.GetCurrentSpell() != null
-                   && playerManager.manaManager.HasEnoughManaForSpell(equipmentDatabase.GetCurrentSpell()?.GetItem()))
-                {
-                    playerManager.manaManager.DecreaseMana(equipmentDatabase.GetCurrentSpell().GetItem()?.costPerCast ?? 0);
-
-                    HandleSpellCastAnimationOverrides();
-
-                    playerMagicShooting.PlayCastingAnimation();
-                }
+                playerMagicShooting.CastSpell();
             }
         }
 
-        void HandleSpellCastAnimationOverrides()
-        {
-            Spell currentSpell = equipmentDatabase.GetCurrentSpell()?.GetItem();
-
-            if (currentSpell == previousSpell)
-            {
-                return;
-            }
-
-            previousSpell = currentSpell;
-
-            bool ignoreSpellsAnimationClips = false;
-            if (
-                currentSpell.animationCanNotBeOverriden == false &&
-                equipmentDatabase.GetCurrentWeapon().Exists() &&
-                equipmentDatabase.GetCurrentWeapon().GetItem().ignoreSpellsAnimationClips)
-            {
-                ignoreSpellsAnimationClips = true;
-            }
-
-            if (currentSpell.castAnimationOverride != null && ignoreSpellsAnimationClips == false)
-            {
-                GetPlayerManager().UpdateAnimatorOverrideControllerClip("Cacildes - Spell - Cast", currentSpell.castAnimationOverride);
-                GetPlayerManager().RefreshAnimationOverrideState();
-            }
-        }
 
         public void Aim_Begin()
         {
@@ -197,12 +129,8 @@ namespace AF.Shooting
 
             GetPlayerManager().thirdPersonController.virtualCamera.gameObject.SetActive(false);
 
-            if (bowDrawSfx != null && combatAudioSource != null)
-            {
-                combatAudioSource.PlayOneShot(bowDrawSfx);
-            }
-
-            ShowArrowPlaceholder();
+            playerBowShooting.PlayBowDrawSfx();
+            playerBowShooting.ShowArrowPlaceholder();
         }
 
         public void Aim_End()
@@ -219,7 +147,7 @@ namespace AF.Shooting
             GetPlayerManager().animator.SetBool(hashIsAiming, false);
             GetPlayerManager().thirdPersonController.virtualCamera.gameObject.SetActive(true);
 
-            HideArrowPlaceholder();
+            playerBowShooting.HideArrowPlaceholder();
         }
 
         private void Update()
@@ -228,25 +156,6 @@ namespace AF.Shooting
             {
                 lookAtConstraint.constraintActive = GetPlayerManager().thirdPersonController._input.move.magnitude <= 0;
             }
-        }
-
-        public void ShootBow(ConsumableProjectile consumableProjectile, Transform origin, Transform lockOnTarget)
-        {
-            if (equipmentDatabase.IsBowEquipped())
-            {
-                achievementOnShootingBowForFirstTime.AwardAchievement();
-            }
-
-            if (equipmentDatabase.GetCurrentArrow().GetItem()?.loseUponFiring ?? false)
-            {
-                inventoryDatabase.RemoveItem(consumableProjectile);
-            }
-
-            GetPlayerManager().staminaStatManager.DecreaseStamina(minimumStaminaToShoot);
-
-            FireProjectile(consumableProjectile.projectile.gameObject, lockOnTarget, null);
-
-            HideArrowPlaceholder();
         }
 
 
@@ -271,8 +180,6 @@ namespace AF.Shooting
                 return;
             }
 
-            GetPlayerManager().staminaStatManager.DecreaseStamina(minimumStaminaToShoot);
-
             if (spell.projectile != null)
             {
                 FireProjectile(spell.projectile.gameObject, lockOnTarget, spell);
@@ -286,18 +193,6 @@ namespace AF.Shooting
                 var rotation = lockOnTarget.transform.position - characterBaseManager.transform.position;
                 rotation.y = 0;
                 characterBaseManager.transform.rotation = Quaternion.LookRotation(rotation);
-            }
-
-            if (equipmentDatabase.IsBowEquipped())
-            {
-                if (isAiming)
-                {
-                    characterBaseManager.PlayBusyHashedAnimation(hashFireBow);
-                }
-                else
-                {
-                    characterBaseManager.PlayBusyHashedAnimation(hashFireBowLockedOn);
-                }
             }
 
             queuedProjectile = projectile;
@@ -444,7 +339,7 @@ namespace AF.Shooting
             {
                 mainManager.damageOwner = playerManager;
 
-                mainManager.damage = ScaleSpellDamage(mainManager.damage, currentSpell);
+                mainManager.damage = playerMagicShooting.ScaleSpellDamage(mainManager.damage, currentSpell);
             }
 
             // Process all child damage managers
@@ -452,7 +347,7 @@ namespace AF.Shooting
             foreach (var childManager in childManagers)
             {
                 childManager.damageOwner = playerManager;
-                childManager.damage = ScaleSpellDamage(childManager.damage, currentSpell);
+                childManager.damage = playerMagicShooting.ScaleSpellDamage(childManager.damage, currentSpell);
             }
         }
 
@@ -466,36 +361,11 @@ namespace AF.Shooting
             }
             else if (equipmentDatabase.IsStaffEquipped())
             {
-                projectile.damage = ScaleSpellDamage(projectile.damage, currentSpell);
+                projectile.damage = playerMagicShooting.ScaleSpellDamage(projectile.damage, currentSpell);
             }
         }
 
-        Damage ScaleSpellDamage(Damage damage, Spell currentSpell)
-        {
-            var playerManager = GetPlayerManager();
 
-            if (currentSpell != null)
-            {
-                var attackStatManager = playerManager.attackStatManager;
-                var equipmentDatabase = attackStatManager.equipmentDatabase;
-                var currentWeapon = equipmentDatabase.GetCurrentWeapon()?.GetItem();
-                var isNightTime = gameSession.IsNightTime();
-                var shouldDoubleDamage = currentWeapon != null && (
-                    (currentWeapon.doubleDamageDuringNightTime && isNightTime) ||
-                    (currentWeapon.doubleDamageDuringDayTime && !isNightTime)
-                );
-                float multiplier = shouldDoubleDamage ? 2 : 1f;
-
-                if (playerManager.statsBonusController.spellDamageBonusMultiplier > 0)
-                {
-                    multiplier += playerManager.statsBonusController.spellDamageBonusMultiplier;
-                }
-
-                damage = damage.ScaleSpell(attackStatManager, multiplier);
-            }
-
-            return damage;
-        }
 
         OnDamageCollisionAbstractManager[] GetAllChildOnDamageCollisionManagers(GameObject obj)
         {
@@ -549,12 +419,6 @@ namespace AF.Shooting
             {
                 return false;
             }
-
-            /*
-                        if (GetPlayerManager().characterBlockController.isBlocking)
-                        {
-                            return false;
-                        }*/
 
             // If not ranged weapons equipped, dont allow shooting
             if (

@@ -73,6 +73,11 @@ namespace AF
             PopulateCombatActions();
         }
 
+        private void OnEnable()
+        {
+            usedCombatActions.Clear();
+        }
+
         void PopulateCombatActions()
         {
             PopulateActions(reactionActionsContainer, reactionsToTarget);

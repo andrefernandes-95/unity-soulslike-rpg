@@ -271,5 +271,20 @@ namespace AF
 
             return damage;
         }
+
+        public void RevivePlayer()
+        {
+            CurePlayer();
+
+            PlayCrossFadeBusyAnimationWithRootMotion("Idle Walk Run Blend", 0.2f);
+        }
+
+        public void CurePlayer()
+        {
+            health.RestoreFullHealth();
+            staminaStatManager.RestoreStaminaPercentage(100);
+            statusController.RemoveAllStatuses();
+            manaManager.RestoreManaPercentage(100);
+        }
     }
 }

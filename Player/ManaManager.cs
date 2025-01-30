@@ -70,7 +70,7 @@ namespace AF
                 return false;
             }
 
-            return HasEnoughManaForAction((int)spell.costPerCast);
+            return HasEnoughManaForAction((int)spell.manaCostPerCast);
         }
 
         public bool HasEnoughManaForAction(int actionCost)

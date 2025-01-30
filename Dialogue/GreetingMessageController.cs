@@ -1,169 +1,92 @@
-using System.Collections;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.Events;
-
 namespace AF.Dialogue
 {
+    using System.Collections;
+    using System.Linq;
+    using UnityEngine;
+    using UnityEngine.Events;
+
     public class GreetingMessageController : MonoBehaviour
     {
-        [Header("Greetings")]
+        [Header("Greeting Settings")]
         public CharacterGreeting[] characterGreetings;
-        public float timeBeforeDisplayingAgain = 15f;
-        Coroutine DisplayAgainCoroutine;
+        public float greetingCooldown = 15f;
+        public float minGreetingDelay = 0f;
+        public float maxGreetingDelay = 0f;
+        public bool showWhenAggressive = false;
 
-        [Header("Components")]
+        [Header("References")]
         public CharacterManager characterManager;
         public GreetingMessageUI greetingMessageUI;
 
         [Header("Events")]
-        public UnityEvent onGreetingBegin;
+        public UnityEvent onGreetingStart;
         public UnityEvent onGreetingEnd;
 
-        [Header("Delay Before Showing Greeting")]
-        public float minimumDelayBeforeShowingGreeting = 0f;
-        public float maximumDelayBeforeShowingGreeting = 0f;
-
-        [Header("Taunt Options")]
-        public bool displayMessageWhenAgressive = false;
-
-        bool hasDisplayed = false;
-        bool hasStoppedDisplaying = false;
-
-        Coroutine ShowGreetingMessageCoroutine;
-        Coroutine HideGreetingMessageCoroutine;
-
+        private bool hasDisplayed;
+        private Coroutine cooldownCoroutine;
 
         private void Awake()
         {
-            if (characterManager != null && characterManager.targetManager != null)
+            characterManager?.targetManager?.onAgressiveTowardsPlayer_Event.AddListener(HandleAggression);
+        }
+
+        void HandleAggression()
+        {
+            if (showWhenAggressive)
             {
-                characterManager.targetManager.onAgressiveTowardsPlayer += (isAgressive) =>
-                {
-                    if (isAgressive)
-                    {
-                        if (displayMessageWhenAgressive)
-                        {
-                            DisplayGreetingMessage();
-                        }
-                        else
-                        {
-                            StopDisplayingGreetingMessage();
-                        }
-                    }
-                    else
-                    {
-                        ResetIsDisplayed();
-                    }
-                };
+                ShowGreeting();
+            }
+            else
+            {
+                HideGreeting();
             }
         }
 
-
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void StopDisplayingGreetingMessage()
+        public void ShowGreeting()
         {
-            if (characterGreetings == null || characterGreetings.Length <= 0 || hasStoppedDisplaying)
-            {
+            if (hasDisplayed || characterGreetings == null || characterGreetings.Length == 0)
                 return;
-            }
 
-            hasStoppedDisplaying = true;
-            HideGreetingMessage();
+            var greeting = characterGreetings.FirstOrDefault(g => g?.isActiveAndEnabled == true);
+            if (greeting != null)
+                StartCoroutine(GreetingRoutine(greeting));
         }
 
-        public void HideGreetingMessage()
+        private IEnumerator GreetingRoutine(CharacterGreeting greeting)
         {
+            hasDisplayed = true;
+            yield return new WaitForSeconds(Random.Range(minGreetingDelay, maxGreetingDelay));
+
+            onGreetingStart?.Invoke();
+            greetingMessageUI?.Display(greeting.greeting);
+
+            yield return new WaitForSeconds(greeting.duration);
+            HideGreeting();
+
+            cooldownCoroutine = StartCoroutine(GreetingCooldown());
+        }
+
+        public void HideGreeting()
+        {
+            if (!hasDisplayed) return;
+
+            hasDisplayed = false;
             onGreetingEnd?.Invoke();
             greetingMessageUI?.Hide();
         }
 
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void DisplayGreetingMessage(CharacterGreeting greetingMessage)
+        private IEnumerator GreetingCooldown()
         {
-            hasDisplayed = true;
-
-            if (ShowGreetingMessageCoroutine != null)
-            {
-                StopCoroutine(ShowGreetingMessageCoroutine);
-            }
-
-            ShowGreetingMessageCoroutine = StartCoroutine(DisplayGreeting_Coroutine(greetingMessage));
-        }
-
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void DisplayGreetingMessage()
-        {
-            if (hasStoppedDisplaying || hasDisplayed || characterGreetings == null || characterGreetings.Length <= 0)
-            {
-                return;
-            }
-
-            var greetingMessage =
-                characterGreetings.FirstOrDefault(messageGameObject => messageGameObject != null && messageGameObject.isActiveAndEnabled);
-
-            if (greetingMessage == null)
-            {
-                return;
-            }
-
-            DisplayGreetingMessage(greetingMessage);
-        }
-
-        IEnumerator DisplayGreeting_Coroutine(CharacterGreeting characterGreeting)
-        {
-            yield return new WaitForSeconds(Random.Range(minimumDelayBeforeShowingGreeting, maximumDelayBeforeShowingGreeting));
-
-            onGreetingBegin?.Invoke();
-
-            greetingMessageUI.Display(characterGreeting.greeting);
-
-            if (HideGreetingMessageCoroutine != null)
-            {
-                StopCoroutine(HideGreetingMessageCoroutine);
-            }
-
-            HideGreetingMessageCoroutine = StartCoroutine(HideGreetingMessage_Coroutine(characterGreeting.duration));
-        }
-
-        IEnumerator HideGreetingMessage_Coroutine(float duration)
-        {
-            yield return new WaitForSeconds(duration);
-
-            HideGreetingMessage();
-
-            if (DisplayAgainCoroutine != null)
-            {
-                StopCoroutine(DisplayAgainCoroutine);
-            }
-
-            DisplayAgainCoroutine = StartCoroutine(ResetIsDiplayed_Coroutine());
-        }
-
-        IEnumerator ResetIsDiplayed_Coroutine()
-        {
-            yield return new WaitForSeconds(timeBeforeDisplayingAgain);
+            yield return new WaitForSeconds(greetingCooldown);
             hasDisplayed = false;
         }
 
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void ResetIsDisplayed()
+        public void ResetGreetingState()
         {
-            if (DisplayAgainCoroutine != null)
-            {
-                StopCoroutine(DisplayAgainCoroutine);
-            }
+            if (cooldownCoroutine != null)
+                StopCoroutine(cooldownCoroutine);
 
             hasDisplayed = false;
         }
-
     }
 }

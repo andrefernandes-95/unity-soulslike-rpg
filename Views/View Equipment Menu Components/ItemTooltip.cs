@@ -1299,15 +1299,26 @@ namespace AF
                 CreateTooltip(statusEffectsSprite, Color.white, spell.GetShortDescription());
             }
 
-            if (spell.costPerCast > 0)
+            if (spell.manaCostPerCast > 0)
             {
                 CreateTooltip(
                     spellCastSprite,
                     Color.white,
                     String.Format(
                         manaPointsRequiredToCast.GetLocalizedString(),
-                        spell.costPerCast
+                        spell.manaCostPerCast
                 ));
+            }
+
+            if (spell.staminaCostPerCast > 0)
+            {
+                CreateTooltip(
+                    staminaCostSprite,
+                    Color.white,
+                    Glossary.IsPortuguese()
+                        ? $"{spell.staminaCostPerCast} pontos de stamina para lançar"
+                        : $"{spell.staminaCostPerCast} stamina points to cast"
+                );
             }
 
             if (spell.statusEffects != null && spell.statusEffects.Length > 0)
@@ -1344,6 +1355,17 @@ namespace AF
                 );
 
                 DrawDamageTooltips(arrowDamage);
+
+                if (arrow.staminaCostPerCast > 0)
+                {
+                    CreateTooltip(
+                        staminaCostSprite,
+                        Color.white,
+                        Glossary.IsPortuguese()
+                            ? $"{arrow.staminaCostPerCast} pontos de stamina por disparo"
+                            : $"{arrow.staminaCostPerCast} stamina points to shoot"
+                    );
+                }
             }
         }
 

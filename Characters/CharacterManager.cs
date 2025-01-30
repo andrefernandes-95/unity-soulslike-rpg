@@ -12,6 +12,9 @@ namespace AF
     using UnityEngine.Events;
     using AF.Companions;
     using UnityEngine.AI;
+    using AF.Dialogue;
+    using System.Collections;
+
     public class CharacterManager : CharacterBaseManager
     {
         public CompanionID companionID;
@@ -27,6 +30,7 @@ namespace AF
         public CharacterLoot characterLoot;
         public LockOnRef characterLockOnRef;
         public CharacterHUD characterHUD;
+        public GreetingMessageController greetingMessageController;
 
         // Animator Overrides
         [HideInInspector] public AnimatorOverrideController animatorOverrideController;
@@ -39,6 +43,10 @@ namespace AF
         public float chaseSpeed = 4.5f;
         public float cutDistanceToTargetSpeed = 12f;
         public float rotationSpeed = 6f;
+        float defaultAcceleration;
+        public float ACCELERATION_RECOVER_SPEED = 1f;
+
+        Coroutine RestoreAccelerationCoroutine;
         [HideInInspector] public bool isCuttingDistanceToTarget = false;
 
         [Header("Settings")]
@@ -65,7 +73,6 @@ namespace AF
 
         public GameSession gameSession;
 
-
         private void Awake()
         {
             SetupAnimatorOverrides();
@@ -76,6 +83,8 @@ namespace AF
             EventManager.StartListening(EventMessages.ON_LEAVING_BONFIRE, Revive);
 
             damageReceiver.onDamageEvent += OnDamageEvent;
+
+            defaultAcceleration = agent.acceleration;
         }
 
         void SetupAnimatorOverrides()
@@ -225,6 +234,35 @@ namespace AF
             transform.rotation = initialRotation;
         }
 
+        public void StopAgentSpeed()
+        {
+            if (RestoreAccelerationCoroutine != null)
+            {
+                StopCoroutine(RestoreAccelerationCoroutine);
+            }
+
+            agent.speed = 0f;
+            agent.acceleration = 0f;
+        }
+
+        public void SetAgentSpeed(float speed)
+        {
+            agent.speed = speed;
+
+            RestoreAccelerationCoroutine = StartCoroutine(RestoreAcceleration());
+        }
+
+        IEnumerator RestoreAcceleration()
+        {
+            while (agent.acceleration < defaultAcceleration)
+            {
+                agent.acceleration += Time.deltaTime * ACCELERATION_RECOVER_SPEED;
+                yield return null;
+            }
+
+            agent.acceleration = defaultAcceleration;
+        }
+
         public void Revive()
         {
             if (characterBossController.IsBoss() || !canRevive)
@@ -232,7 +270,7 @@ namespace AF
                 return;
             }
 
-            agent.speed = 0f;
+            StopAgentSpeed();
 
             targetManager.ClearTarget();
 
@@ -260,6 +298,8 @@ namespace AF
                     animator.Play(defaultAnimationHash);
                 }
             }
+
+            stateManager.ResetDefaultState();
         }
 
         public string GetCharacterID()
@@ -350,7 +390,8 @@ namespace AF
         public void ForceCombatWithPlayer()
         {
             targetManager.SetPlayerAsTarget();
-            stateManager.ScheduleState(stateManager.chaseState);
+
+            stateManager.ScheduleState(stateManager.combatState);
 
             if (characterBossController.isBoss)
             {

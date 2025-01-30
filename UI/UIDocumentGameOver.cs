@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using AF.Events;
 using AF.Music;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -24,6 +25,10 @@ namespace AF
         [Header("You Died Texts")]
         public LocalizedString[] youDiedText;
 
+        [Header("Edge Cases")]
+        [SerializeField]
+        private Moment gameOverOverride;
+
         private void Awake()
         {
             this.gameObject.SetActive(false);
@@ -34,6 +39,13 @@ namespace AF
         /// </summary>
         public void DisplayGameOver()
         {
+            if (gameOverOverride != null)
+            {
+                gameOverOverride.Trigger();
+                gameOverOverride = null;
+                return;
+            }
+
             playerManager.uIDocumentPlayerHUDV2.HideHUD();
             this.gameObject.SetActive(true);
             StartCoroutine(GameOver_Coroutine());
@@ -65,6 +77,16 @@ namespace AF
             yield return new WaitForSeconds(GAME_OVER_DURATION);
 
             saveManager.LoadLastSavedGame(true);
+        }
+
+        public void SetGameOverOverride(Moment gameOverOverride)
+        {
+            this.gameOverOverride = gameOverOverride;
+        }
+
+        public void ClearGameOverOverride()
+        {
+            this.gameOverOverride = null;
         }
     }
 }

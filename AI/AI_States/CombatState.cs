@@ -42,7 +42,7 @@ namespace AF
         {
             if (!characterManager.isCuttingDistanceToTarget)
             {
-                characterManager.agent.speed = 0f;
+                characterManager.StopAgentSpeed();
             }
 
             if (characterManager.IsBusy())

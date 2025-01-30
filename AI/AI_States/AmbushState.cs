@@ -62,7 +62,7 @@ namespace AF
                 characterManager.agent.ResetPath();
             }
 
-            characterManager.agent.speed = 0f;
+            characterManager.StopAgentSpeed();
 
             characterManager.animator.Play(ambushIdle);
         }

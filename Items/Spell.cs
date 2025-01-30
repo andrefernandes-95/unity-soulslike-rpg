@@ -7,10 +7,9 @@ namespace AF
     [CreateAssetMenu(menuName = "Items / Spell / New Spell")]
     public class Spell : Item
     {
-
         public GameObject projectile;
-
-        public float costPerCast = 20;
+        public float manaCostPerCast = 20;
+        public float staminaCostPerCast = 10;
 
         [Header("Animations")]
         public AnimationClip castAnimationOverride;

@@ -16,7 +16,7 @@ namespace AF
         public Projectile projectile;
 
         public ProjectileType projectileType = ProjectileType.BOW;
-
+        public int staminaCostPerCast = 30;
     }
 
 }

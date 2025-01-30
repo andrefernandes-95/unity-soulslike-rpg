@@ -53,7 +53,7 @@
 
         public bool CanSave()
         {
-            if (momentManager.HasMomentOnGoing)
+            if (momentManager.HasMomentOngoing())
             {
                 return false;
             }

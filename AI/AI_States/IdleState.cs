@@ -34,7 +34,7 @@ namespace AF
             onStateEnter?.Invoke();
 
             characterManager.agent.ResetPath();
-            characterManager.agent.speed = 0f;
+            characterManager.StopAgentSpeed();
         }
 
         public override void OnStateExit(StateManager stateManager)

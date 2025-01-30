@@ -12,6 +12,7 @@ namespace AF
         [Header("Settings")]
         public float sceneFadeInSpeed = 1f;
 
+
         private void Awake()
         {
             canvasGroup.alpha = 1;
@@ -26,7 +27,6 @@ namespace AF
         {
             FadeOut(sceneFadeInSpeed);
         }
-
 
         public void FadeIn(float fadeDuration)
         {
@@ -60,6 +60,7 @@ namespace AF
                 yield return new WaitForSeconds(fadeDuration);
                 callback?.Invoke();
             }
+
         }
     }
 

@@ -45,7 +45,7 @@ namespace AF
         {
             currentIntervalBetweenChaseActions = 0f;
 
-            characterManager.agent.speed = characterManager.chaseSpeed;
+            characterManager.SetAgentSpeed(characterManager.chaseSpeed);
             characterManager.agent.ResetPath();
             onStateEnter?.Invoke();
         }
@@ -67,7 +67,7 @@ namespace AF
 
             if (!characterManager.isCuttingDistanceToTarget)
             {
-                characterManager.agent.speed = characterManager.chaseSpeed;
+                characterManager.SetAgentSpeed(characterManager.chaseSpeed);
             }
 
             if (characterManager.IsBusy())

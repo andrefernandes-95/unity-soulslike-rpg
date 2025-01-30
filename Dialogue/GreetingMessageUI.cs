@@ -1,7 +1,7 @@
-using DG.Tweening;
-using UnityEngine;
 namespace AF.Dialogue
 {
+    using DG.Tweening;
+    using UnityEngine;
 
     public class GreetingMessageUI : MonoBehaviour
     {

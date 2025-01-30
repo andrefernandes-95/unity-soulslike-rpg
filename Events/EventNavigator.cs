@@ -13,6 +13,7 @@ namespace AF
         public MomentManager momentManager;
         public GameSettings gameSettings;
         public UIDocumentKeyPrompt uIDocumentKeyPrompt;
+        public FadeManager fadeManager;
 
         IEventNavigatorCapturable currentTarget;
 
@@ -33,7 +34,12 @@ namespace AF
 
         bool CanInteract()
         {
-            if (uiManager.IsShowingFullScreenGUI() || momentManager.HasMomentOnGoing)
+            if (uiManager.IsShowingFullScreenGUI())
+            {
+                return false;
+            }
+
+            if (momentManager.HasMomentOngoing())
             {
                 return false;
             }
@@ -80,7 +86,7 @@ namespace AF
                     {
                         currentTarget = eventNavigatorCapturable;
 
-                        if (uiManager.CanShowGUI() && momentManager.HasMomentOnGoing == false)
+                        if (uiManager.CanShowGUI() && CanInteract())
                         {
                             currentTarget?.OnCaptured();
                         }
