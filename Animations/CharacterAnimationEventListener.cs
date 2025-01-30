@@ -47,10 +47,7 @@ namespace AF.Animations
 
         void OverrideAnimatorClips()
         {
-            foreach (var entry in clipOverrides)
-            {
-                characterManager.UpdateAnimatorOverrideControllerClips(entry.Key, entry.Value);
-            }
+            characterManager.UpdateAnimatorOverrideControllerClips(clipOverrides);
         }
 
         private void OnAnimatorMove()

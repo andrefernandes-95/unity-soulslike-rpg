@@ -1,7 +1,6 @@
 namespace AF
 {
     using System.Linq;
-    using AF.Characters;
     using AF.Inventory;
     using AYellowpaper.SerializedCollections;
     using UnityEngine;
@@ -38,6 +37,13 @@ namespace AF
         [Header("Experience")]
         public int gold = 400;
 
+        [Header("Sounds")]
+        public AudioClip conversationClip;
+        public AudioClip hurtClip;
+        public AudioClip knockdownClip;
+        public AudioClip deathClip;
+        public AudioClip evadeClip;
+
         public enum InheritOption
         {
             INHERIT,
@@ -61,6 +67,52 @@ namespace AF
             }
 
             return friendlies.Any(friend => friend == possibleFriendly);
+        }
+
+        public void PlayConversation(AudioSource audioSource)
+        {
+            if (audioSource == null || conversationClip == null)
+            {
+                return;
+            }
+
+            audioSource.PlayOneShot(conversationClip);
+        }
+        public void PlayHurt(AudioSource audioSource)
+        {
+            if (audioSource == null || hurtClip == null)
+            {
+                return;
+            }
+
+            audioSource.PlayOneShot(hurtClip);
+        }
+        public void PlayKnockdown(AudioSource audioSource)
+        {
+            if (audioSource == null || knockdownClip == null)
+            {
+                return;
+            }
+
+            audioSource.PlayOneShot(knockdownClip);
+        }
+        public void PlayDeath(AudioSource audioSource)
+        {
+            if (audioSource == null || deathClip == null)
+            {
+                return;
+            }
+
+            audioSource.PlayOneShot(deathClip);
+        }
+        public void PlayEvade(AudioSource audioSource)
+        {
+            if (audioSource == null || evadeClip == null)
+            {
+                return;
+            }
+
+            audioSource.PlayOneShot(evadeClip);
         }
     }
 }

@@ -1,13 +1,11 @@
-using AF.Events;
-using AF.Health;
-using AF.Stats;
-using TigerForge;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Localization.Settings;
-
 namespace AF
 {
+    using AF.Health;
+    using AF.Stats;
+    using UnityEngine;
+    using UnityEngine.Events;
+    using UnityEngine.Localization.Settings;
+
     public class PlayerHealth : CharacterBaseHealth
     {
 

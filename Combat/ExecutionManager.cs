@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using AF.Health;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -44,8 +45,12 @@ namespace AF
 
             characterManager.Teleport(position, rotation);
 
-            characterManager.UpdateAnimatorOverrideControllerClips(hashExecution, executionClip);
-            characterManager.UpdateAnimatorOverrideControllerClips(hashExecutionToDeath, executionClip);
+            Dictionary<string, AnimationClip> clips = new() {
+                { hashExecution, executionClip },
+                { hashExecutionToDeath, executionClip },
+            };
+
+            characterManager.UpdateAnimatorOverrideControllerClips(clips);
 
             characterManager.targetManager.SetPlayerAsTarget();
             characterManager.damageReceiver.ApplyDamage(characterManager, characterManager.GetAttackDamage());

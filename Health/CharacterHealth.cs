@@ -109,7 +109,8 @@ namespace AF.Health
 
         private void HandleDeath()
         {
-            PlayDeath();
+            characterManager.combatant.PlayDeath(characterManager.combatAudioSource);
+
             characterManager.PlayBusyAnimationWithRootMotion(hashDeath);
             characterManager.DisableComponents();
             characterManager.characterLoot.GiveLoot();

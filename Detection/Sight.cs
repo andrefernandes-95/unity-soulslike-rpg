@@ -84,6 +84,11 @@ namespace AF.Detection
 
             if (hit != null)
             {
+                if (hit.transform.CompareTag("Player"))
+                {
+                    characterManager.greetingMessageController.ShowGreeting();
+                }
+
                 // Check if the hit object's tag is in the list of tags to detect
                 if (tagsToDetect.Count > 0)
                 {

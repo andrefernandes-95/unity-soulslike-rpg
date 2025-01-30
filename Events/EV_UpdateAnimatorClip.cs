@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Linq;
-using AF.Characters;
-using UnityEngine;
-
 namespace AF
 {
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
 
     public class EV_UpdateAnimatorClip : EventBase
     {
@@ -14,7 +12,11 @@ namespace AF
 
         public override IEnumerator Dispatch()
         {
-            characterManager.UpdateAnimatorOverrideControllerClips(nameOfAnimationClipToOverride, animationClip);
+            Dictionary<string, AnimationClip> clips = new() {
+                { nameOfAnimationClipToOverride, animationClip },
+            };
+
+            characterManager.UpdateAnimatorOverrideControllerClips(clips);
 
             yield return null;
         }

@@ -13,6 +13,7 @@ namespace AF
     using UnityEngine.AI;
     using AF.Dialogue;
     using System.Collections;
+    using System.Collections.Generic;
 
     public class CharacterManager : CharacterBaseManager
     {
@@ -88,10 +89,8 @@ namespace AF
 
         void SetupAnimatorOverrides()
         {
-
             animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
             animator.runtimeAnimatorController = animatorOverrideController;
-
         }
 
         private void Start()
@@ -120,16 +119,30 @@ namespace AF
             characterBackstabController.ResetStates();
         }
 
-        public void UpdateAnimatorOverrideControllerClips(string animationName, AnimationClip animationClip)
+        public void UpdateAnimatorOverrideControllerClips(Dictionary<string, AnimationClip> animationUpdates)
         {
             if (animatorOverrideController == null)
             {
                 SetupAnimatorOverrides();
             }
 
-            var clipOverrides = new AnimationClipOverrides(animatorOverrideController.overridesCount);
+            AnimationClipOverrides clipOverrides = new AnimationClipOverrides(animatorOverrideController.overridesCount);
             animatorOverrideController.GetOverrides(clipOverrides);
-            clipOverrides[animationName] = animationClip;
+
+            foreach (var kvp in animationUpdates)
+            {
+                string animationName = kvp.Key;
+                AnimationClip animationClip = kvp.Value;
+
+                if (animationClip == null)
+                {
+                    Debug.LogWarning($"Provided animation clip for '{animationName}' is null. Skipping update.");
+                    continue;
+                }
+
+                clipOverrides[animationName] = animationClip;
+            }
+
             animatorOverrideController.ApplyOverrides(clipOverrides);
         }
 

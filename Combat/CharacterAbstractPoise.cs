@@ -59,7 +59,7 @@ namespace AF
                     characterManager.PlayBusyAnimationWithRootMotion(takingDamageAnimationClip);
                 }
 
-                characterManager.health.PlayPostureHit();
+                characterManager.combatant.PlayHurt(characterManager.combatAudioSource);
             }
             else
             {

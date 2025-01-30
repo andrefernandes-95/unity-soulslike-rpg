@@ -44,7 +44,6 @@ namespace AF
         public string hashPreComboAttack = "Pre Combo Attack Initiator";
         public string hashPrePreComboAttack = "Pre Pre Combo Attack Initiator";
 
-
         [Header("Unity Events")]
         public UnityEvent onResetState;
 
@@ -105,76 +104,10 @@ namespace AF
             OnAttackEnd();
         }
 
-        bool CanReact()
-        {
-            if (reactionsToTarget.Count <= 0)
-            {
-                return false;
-            }
-
-            if (Random.Range(0, 100) > chanceToReact)
-            {
-                return false;
-            }
-
-            return characterManager.targetManager.IsTargetBusy() || characterManager.targetManager.IsTargetShooting();
-        }
-
-        bool IsTargetBehind()
-        {
-            if (characterManager.targetManager == null || characterManager.targetManager.currentTarget == null)
-            {
-                return false;
-            }
-
-            // Calculate vector from enemy to player
-            Vector3 toPlayer = characterManager.targetManager.currentTarget.transform.position - characterManager.transform.position;
-
-            // Calculate angle between enemy's forward direction and vector to player
-            float angle = Vector3.Angle(characterManager.transform.forward, toPlayer);
-
-            return angle > 90f;
-        }
-
-        CombatAction GetCombatAction()
-        {
-            if (CanReact())
-            {
-                var shuffledReactions = Randomize(reactionsToTarget.ToArray());
-
-                foreach (CombatAction possibleReaction in shuffledReactions)
-                {
-                    if (possibleReaction.CanUseCombatAction())
-                    {
-                        return possibleReaction;
-                    }
-                }
-            }
-
-            if (reactionToTargetBehindBack != null && IsTargetBehind())
-            {
-                return reactionToTargetBehindBack;
-            }
-
-            if (combatActions.Count > 0)
-            {
-                var shuffledCombatActions = Randomize(combatActions.ToArray());
-
-                foreach (CombatAction possibleCombatAction in shuffledCombatActions)
-                {
-                    if (possibleCombatAction != null && possibleCombatAction.CanUseCombatAction())
-                    {
-                        return possibleCombatAction;
-                    }
-                }
-            }
-
-            return null;
-        }
-
         public void ChooseNextCombatAction()
         {
             CombatAction newCombatAction = GetCombatAction();
+
             if (newCombatAction == null)
             {
                 return;
@@ -189,122 +122,38 @@ namespace AF
             {
                 this.usedCombatActions.Add(currentCombatAction);
 
+                characterManager.PlayBusyAnimationWithRootMotion(currentAnimationToPlay);
+
+                OnAttackStart();
+
                 StartCoroutine(ClearCombatActionFromCooldownList(currentCombatAction));
             }
         }
 
         public void UseChaseAction()
         {
+            SetupChaseAction();
+            UseCombatAction();
+        }
+
+        void SetupChaseAction()
+        {
             CombatAction newCombatAction = null;
 
             // If target is aiming, let us try to dodge the aim
             if (reactionsToTarget.Count > 0 && characterManager.targetManager.IsTargetShooting())
             {
-                var shuffledReactions = Randomize(reactionsToTarget.ToArray());
-
-                foreach (CombatAction possibleReaction in shuffledReactions)
-                {
-                    if (possibleReaction.CanUseCombatAction())
-                    {
-                        newCombatAction = possibleReaction;
-                        break;
-                    }
-                }
+                newCombatAction = GetReactionAction();
             }
             else if (chaseActions.Count > 0)
             {
-                var shuffledChaseActions = Randomize(chaseActions.ToArray());
-
-                foreach (CombatAction possibleChaseAction in shuffledChaseActions)
-                {
-                    if (possibleChaseAction.CanUseCombatAction())
-                    {
-                        newCombatAction = possibleChaseAction;
-                        break;
-                    }
-                }
+                newCombatAction = GetChaseAction();
             }
 
             if (newCombatAction != null)
             {
                 SetCombatAction(newCombatAction);
-
-                UseCombatAction();
             }
-        }
-
-
-        void OnPlayerDodgeFinished()
-        {
-            if (combatActionToRespondToDodgeInput == null)
-            {
-                return;
-            }
-
-            if (Random.Range(0, 1f) < chanceToReactToDodgeInput)
-            {
-                return;
-            }
-
-            if (characterAnimationEventListener == null)
-            {
-                characterAnimationEventListener = characterManager.GetComponent<CharacterAnimationEventListener>();
-            }
-
-            characterManager.FaceTarget();
-            characterAnimationEventListener.RestoreDefaultAnimatorSpeed();
-
-            this.currentCombatAction = combatActionToRespondToDodgeInput;
-            SetCombatAction(currentCombatAction);
-        }
-
-        IEnumerator ClearCombatActionFromCooldownList(CombatAction combatActionToClear)
-        {
-            characterManager.animator.ForceStateNormalizedTime(0f);
-
-            yield return new WaitForFixedUpdate();
-
-            characterManager.PlayCrossFadeBusyAnimationWithRootMotion(currentAnimationToPlay, crossFade);
-
-            OnAttackStart();
-
-            yield return new WaitForSeconds(combatActionToClear.maxCooldown);
-
-            if (usedCombatActions.Contains(combatActionToClear))
-            {
-                usedCombatActions.Remove(combatActionToClear);
-            }
-        }
-
-        public void OnAttackStart()
-        {
-            if (currentCombatAction != null)
-            {
-                currentCombatAction.onAttack_Start?.Invoke();
-                currentCombatAction.PlayGruntSfx();
-            }
-        }
-        public void OnAttack_HitboxOpen()
-        {
-            if (currentCombatAction != null)
-            {
-                currentCombatAction.onAttack_HitboxOpen?.Invoke();
-            }
-        }
-        public void OnAttackEnd()
-        {
-            if (currentCombatAction != null)
-            {
-                currentCombatAction.onAttack_End?.Invoke();
-                currentCombatAction = null;
-                currentAnimationToPlay = "";
-            }
-        }
-
-        public IEnumerable<CombatAction> Randomize(CombatAction[] source)
-        {
-            System.Random rnd = new System.Random();
-            return source.OrderBy((item) => rnd.Next());
         }
 
         public void SetCombatAction(CombatAction combatAction)
@@ -336,28 +185,44 @@ namespace AF
             {
                 if (currentCombatAction.comboClip3 != null)
                 {
-                    characterManager.UpdateAnimatorOverrideControllerClips(PRE_PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip);
-                    characterManager.UpdateAnimatorOverrideControllerClips(PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip);
-                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip2);
-                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip3);
+                    Dictionary<string, AnimationClip> clips = new() {
+                        { PRE_PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip },
+                        { PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip },
+                        { COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip2 },
+                        { COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip3 },
+                    };
+
+                    characterManager.UpdateAnimatorOverrideControllerClips(clips);
                     animationToPlay = hashPrePreComboAttack;
                 }
                 else if (currentCombatAction.comboClip2 != null)
                 {
-                    characterManager.UpdateAnimatorOverrideControllerClips(PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip);
-                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip);
-                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip2);
+                    Dictionary<string, AnimationClip> clips = new() {
+                        { PRE_COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip },
+                        { COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.comboClip },
+                        { COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip2 },
+                    };
+
+                    characterManager.UpdateAnimatorOverrideControllerClips(clips);
                     animationToPlay = hashPreComboAttack;
                 }
                 else if (currentCombatAction.comboClip != null)
                 {
-                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip);
-                    characterManager.UpdateAnimatorOverrideControllerClips(COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip);
+                    Dictionary<string, AnimationClip> clips = new() {
+                        { COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_ATTACK, currentCombatAction.attackAnimationClip },
+                        { COMBO_ANIMATION_CLIP_TO_OVERRIDE_NAME_FOLLOWUP_ATTACK, currentCombatAction.comboClip },
+                    };
+
+                    characterManager.UpdateAnimatorOverrideControllerClips(clips);
                     animationToPlay = hashComboAttack;
                 }
                 else
                 {
-                    characterManager.UpdateAnimatorOverrideControllerClips(ANIMATION_CLIP_TO_OVERRIDE_NAME, currentCombatAction.attackAnimationClip);
+                    Dictionary<string, AnimationClip> clips = new() {
+                        { ANIMATION_CLIP_TO_OVERRIDE_NAME, currentCombatAction.attackAnimationClip },
+                    };
+
+                    characterManager.UpdateAnimatorOverrideControllerClips(clips);
                     animationToPlay = hashLightAttack1;
                 }
             }
@@ -369,7 +234,6 @@ namespace AF
             this.currentAnimationToPlay = animationToPlay;
         }
 
-
         public Damage GetCurrentDamage()
         {
             if (characterManager.characterWeaponsManager.currentAttackingWeapon != null)
@@ -380,6 +244,151 @@ namespace AF
             }
 
             return currentCombatAction?.damage?.Copy();
+        }
+
+        public void OnAttackStart()
+        {
+            if (currentCombatAction != null)
+            {
+                currentCombatAction.onAttack_Start?.Invoke();
+                currentCombatAction.PlayGruntSfx();
+            }
+        }
+
+        public void OnAttack_HitboxOpen()
+        {
+            if (currentCombatAction != null)
+            {
+                currentCombatAction.onAttack_HitboxOpen?.Invoke();
+            }
+        }
+
+        public void OnAttackEnd()
+        {
+            if (currentCombatAction != null)
+            {
+                currentCombatAction.onAttack_End?.Invoke();
+                currentCombatAction = null;
+                currentAnimationToPlay = "";
+            }
+        }
+
+        IEnumerable<CombatAction> Randomize(CombatAction[] source)
+        {
+            System.Random rnd = new();
+            return source.OrderBy((item) => rnd.Next());
+        }
+
+        void OnPlayerDodgeFinished()
+        {
+            if (combatActionToRespondToDodgeInput == null)
+            {
+                return;
+            }
+
+            if (Random.Range(0, 1f) < chanceToReactToDodgeInput)
+            {
+                return;
+            }
+
+            if (characterAnimationEventListener == null)
+            {
+                characterAnimationEventListener = characterManager.GetComponent<CharacterAnimationEventListener>();
+            }
+
+            characterManager.FaceTarget();
+            characterAnimationEventListener.RestoreDefaultAnimatorSpeed();
+
+            this.currentCombatAction = combatActionToRespondToDodgeInput;
+            SetCombatAction(currentCombatAction);
+        }
+
+        IEnumerator ClearCombatActionFromCooldownList(CombatAction combatActionToClear)
+        {
+            yield return new WaitForSeconds(combatActionToClear.maxCooldown);
+
+            if (usedCombatActions.Contains(combatActionToClear))
+            {
+                usedCombatActions.Remove(combatActionToClear);
+            }
+        }
+
+        bool CanReact()
+        {
+            if (reactionsToTarget.Count <= 0)
+            {
+                return false;
+            }
+
+            if (Random.Range(0, 100) > chanceToReact)
+            {
+                return false;
+            }
+
+            return characterManager.targetManager.IsTargetBusy() || characterManager.targetManager.IsTargetShooting();
+        }
+
+        CombatAction GetReactionAction()
+        {
+            var shuffledReactions = Randomize(reactionsToTarget.ToArray());
+
+            foreach (CombatAction possibleReaction in shuffledReactions)
+            {
+                if (possibleReaction.CanUseCombatAction())
+                {
+                    return possibleReaction;
+                }
+            }
+
+            return null;
+        }
+
+        CombatAction GetAttackAction()
+        {
+            if (combatActions.Count > 0)
+            {
+                var shuffledCombatActions = Randomize(combatActions.ToArray());
+
+                foreach (CombatAction possibleCombatAction in shuffledCombatActions)
+                {
+                    if (possibleCombatAction != null && possibleCombatAction.CanUseCombatAction())
+                    {
+                        return possibleCombatAction;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        CombatAction GetCombatAction()
+        {
+            if (CanReact())
+            {
+                return GetReactionAction();
+            }
+
+            if (reactionToTargetBehindBack != null && CombatUtils.IsTargetBehind(characterManager))
+            {
+                return reactionToTargetBehindBack;
+            }
+
+            return GetAttackAction();
+        }
+
+        CombatAction GetChaseAction()
+        {
+            var shuffledChaseActions = Randomize(chaseActions.ToArray());
+
+            foreach (CombatAction possibleChaseAction in shuffledChaseActions)
+            {
+                if (possibleChaseAction.CanUseCombatAction())
+                {
+                    return possibleChaseAction;
+                }
+            }
+
+            return null;
         }
     }
 }

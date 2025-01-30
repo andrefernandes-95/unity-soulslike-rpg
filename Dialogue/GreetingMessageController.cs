@@ -68,9 +68,6 @@ namespace AF.Dialogue
 
         public void HideGreeting()
         {
-            if (!hasDisplayed) return;
-
-            hasDisplayed = false;
             onGreetingEnd?.Invoke();
             greetingMessageUI?.Hide();
         }
@@ -81,12 +78,5 @@ namespace AF.Dialogue
             hasDisplayed = false;
         }
 
-        public void ResetGreetingState()
-        {
-            if (cooldownCoroutine != null)
-                StopCoroutine(cooldownCoroutine);
-
-            hasDisplayed = false;
-        }
     }
 }

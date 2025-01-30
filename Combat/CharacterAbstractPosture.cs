@@ -1,10 +1,10 @@
-using System.Collections;
-using AF.Health;
-using UnityEngine;
-using UnityEngine.Events;
-
 namespace AF
 {
+    using System.Collections;
+    using AF.Health;
+    using UnityEngine;
+    using UnityEngine.Events;
+
     public abstract class CharacterAbstractPosture : MonoBehaviour
     {
         [Header("Posture")]
@@ -131,7 +131,7 @@ namespace AF
         {
             currentPostureDamage = 0f;
             isStunned = true;
-            characterBaseManager.health.PlayPostureBroke();
+            characterBaseManager.combatant.PlayKnockdown(characterBaseManager.combatAudioSource);
         }
 
         public void RecoverFromStunned()

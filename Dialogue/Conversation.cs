@@ -7,11 +7,8 @@ namespace AF
     [RequireComponent(typeof(Moment))]
     public class Conversation : MonoBehaviour
     {
-
         public CharacterManager npc;
-
         Moment conversation => GetComponent<Moment>();
-
         private State stateCharacterWasInBeforeConversationStarted;
 
         private void Awake()
@@ -33,6 +30,18 @@ namespace AF
             npc.agent.isStopped = true;
 
             StopStateMachine();
+
+            PlayAudioGreeting();
+        }
+
+        void PlayAudioGreeting()
+        {
+            if (npc.combatAudioSource == null || npc.combatant.conversationClip == null)
+            {
+                return;
+            }
+
+            npc.combatAudioSource.PlayOneShot(npc.combatant.conversationClip);
         }
 
         void OnEndConversation()
