@@ -1,8 +1,9 @@
 ﻿namespace AF
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Linq;
-    using AF.Characters;
     using AF.Combat;
     using UnityEngine;
     using UnityEngine.AI;
@@ -197,5 +198,6 @@
                 x => x.currentTarget != null
                 && x.characterManager.health.GetCurrentHealth() > 0);
         }
+
     }
 }

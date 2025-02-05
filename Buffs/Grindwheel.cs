@@ -1,16 +1,16 @@
-using System.Collections;
-using UnityEngine;
 namespace AF
 {
+    using System.Collections;
+    using UnityEngine;
 
-    public class ApplyWeaponBuff : MonoBehaviour
+    public class Grindwheel : ApplyWeaponBuff
     {
-        public CharacterWeaponBuffs.WeaponBuffName weaponBuffName;
-        public float buffDuration = 180f;
+        public new virtual void Apply()
+        {
+            base.Apply();
 
-        PlayerManager playerManager;
-
-        public Transform grindingWheel;
+            AnimateGrindingWheel();
+        }
 
         public void AnimateGrindingWheel()
         {
@@ -40,21 +40,6 @@ namespace AF
                 // Wait for the next frame
                 yield return null;
             }
-        }
-
-        public void Apply()
-        {
-            GetPlayerManager().playerWeaponsManager.ApplyWeaponBuffToWeapon(weaponBuffName, buffDuration);
-        }
-
-        PlayerManager GetPlayerManager()
-        {
-            if (playerManager == null)
-            {
-                playerManager = FindAnyObjectByType<PlayerManager>(FindObjectsInactive.Include);
-            }
-
-            return playerManager;
         }
     }
 }

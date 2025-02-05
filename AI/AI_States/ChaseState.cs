@@ -139,7 +139,7 @@ namespace AF
             }
             else if (distanceToTarget >= companionsDatabase.maxDistanceToPlayerBeforeTeleportingNear)
             {
-                characterManager.TeleportNearPlayer();
+                characterManager.characterTeleportManager.TeleportNearPlayer();
             }
 
             return this;

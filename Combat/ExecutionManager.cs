@@ -43,7 +43,7 @@ namespace AF
 
             isBeingExecuted = true;
 
-            characterManager.Teleport(position, rotation);
+            characterManager.characterTeleportManager.Teleport(position, rotation);
 
             Dictionary<string, AnimationClip> clips = new() {
                 { hashExecution, executionClip },

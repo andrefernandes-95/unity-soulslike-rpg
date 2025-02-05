@@ -283,174 +283,44 @@ namespace AF
 
             return true;
         }
-
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void ApplyFireToWeapon(float customDuration)
-        {
-            ApplyWeaponBuffToWeapon(CharacterWeaponBuffs.WeaponBuffName.FIRE, customDuration);
-        }
-
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void ApplyFrostToWeapon(float customDuration)
-        {
-            ApplyWeaponBuffToWeapon(CharacterWeaponBuffs.WeaponBuffName.FROST, customDuration);
-        }
-
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void ApplyLightningToWeapon(float customDuration)
-        {
-            ApplyWeaponBuffToWeapon(CharacterWeaponBuffs.WeaponBuffName.LIGHTNING, customDuration);
-        }
-
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void ApplyMagicToWeapon(float customDuration)
-        {
-            ApplyWeaponBuffToWeapon(CharacterWeaponBuffs.WeaponBuffName.MAGIC, customDuration);
-        }
-
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void ApplyDarknessToWeapon(float customDuration)
-        {
-            ApplyWeaponBuffToWeapon(CharacterWeaponBuffs.WeaponBuffName.DARKNESS, customDuration);
-        }
-
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void ApplyPoisonToWeapon(float customDuration)
-        {
-            ApplyWeaponBuffToWeapon(CharacterWeaponBuffs.WeaponBuffName.POISON, customDuration);
-        }
-
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void ApplyBloodToWeapon(float customDuration)
-        {
-            ApplyWeaponBuffToWeapon(CharacterWeaponBuffs.WeaponBuffName.BLOOD, customDuration);
-        }
-
-        /// <summary>
-        /// Unity Event
-        /// </summary>
-        public void ApplySharpnessToWeapon(float customDuration)
-        {
-            ApplyWeaponBuffToWeapon(CharacterWeaponBuffs.WeaponBuffName.SHARPNESS, customDuration);
-        }
-
-
-        public void ApplyWeaponBuffToWeapon(CharacterWeaponBuffs.WeaponBuffName weaponBuffName, float customDuration)
+        public void ApplyWeaponBuffToWeapon(WeaponBuffType weaponBuffType)
         {
             if (!CanApplyBuff())
             {
                 return;
             }
 
-            if (customDuration > 0)
-            {
-                currentWeaponWorldInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffName, customDuration);
-                secondaryWeaponInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffName, customDuration);
-            }
-            else
-            {
-                currentWeaponWorldInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffName);
-                secondaryWeaponInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffName);
-            }
+            currentWeaponWorldInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffType);
+            secondaryWeaponInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffType);
         }
 
-        public Damage GetBuffedDamage(Damage weaponDamage)
+        CharacterWeaponHitbox GetCharacterWeaponHitboxFromWeaponInstance(WeaponInstance weaponInstance)
         {
-            if (currentWeaponWorldInstance == null || currentWeaponWorldInstance.characterWeaponBuffs == null || currentWeaponWorldInstance.characterWeaponBuffs.HasOnGoingBuff() == false)
+            if (equipmentDatabase.GetCurrentWeapon() == weaponInstance)
+            {
+                return currentWeaponWorldInstance;
+            }
+
+            if (equipmentDatabase.GetCurrentSecondaryWeapon() == weaponInstance)
+            {
+                return secondaryWeaponInstance;
+            }
+
+            return null;
+        }
+
+        public Damage GetBuffedDamage(WeaponInstance weaponInstance, Damage weaponDamage)
+        {
+            CharacterWeaponHitbox weaponWorldInstance = GetCharacterWeaponHitboxFromWeaponInstance(weaponInstance);
+
+            if (weaponWorldInstance == null
+                || weaponWorldInstance.characterWeaponBuffs == null
+                || weaponWorldInstance.characterWeaponBuffs.HasOnGoingBuff() == false)
             {
                 return weaponDamage;
             }
 
-            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.FIRE)
-            {
-                weaponDamage.fire += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.FIRE].damageBonus;
-            }
-
-            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.FROST)
-            {
-                weaponDamage.frost += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.FROST].damageBonus;
-            }
-
-            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.LIGHTNING)
-            {
-                weaponDamage.lightning += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.LIGHTNING].damageBonus;
-            }
-
-            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.MAGIC)
-            {
-                weaponDamage.magic += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.MAGIC].damageBonus;
-            }
-
-            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.DARKNESS)
-            {
-                weaponDamage.darkness += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.DARKNESS].damageBonus;
-            }
-
-            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.WATER)
-            {
-                weaponDamage.water += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.WATER].damageBonus;
-            }
-
-            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.SHARPNESS)
-            {
-                weaponDamage.physical += currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.SHARPNESS].damageBonus;
-            }
-
-            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.POISON)
-            {
-                StatusEffectEntry statusEffectToApply = new()
-                {
-                    statusEffect = currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.POISON].statusEffect,
-                    amountPerHit = currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.POISON].statusEffectAmountToApply,
-                };
-
-                if (weaponDamage.statusEffects == null)
-                {
-                    weaponDamage.statusEffects = new StatusEffectEntry[] {
-                        statusEffectToApply
-                    };
-                }
-                else
-                {
-                    weaponDamage.statusEffects = weaponDamage.statusEffects.Append(statusEffectToApply).ToArray();
-                }
-            }
-
-            if (currentWeaponWorldInstance.characterWeaponBuffs.appliedBuff == CharacterWeaponBuffs.WeaponBuffName.BLOOD)
-            {
-                StatusEffectEntry statusEffectToApply = new()
-                {
-                    statusEffect = currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.BLOOD].statusEffect,
-                    amountPerHit = currentWeaponWorldInstance.characterWeaponBuffs.weaponBuffs[CharacterWeaponBuffs.WeaponBuffName.BLOOD].statusEffectAmountToApply,
-                };
-
-                if (weaponDamage.statusEffects == null)
-                {
-                    weaponDamage.statusEffects = new StatusEffectEntry[] {
-                        statusEffectToApply
-                    };
-                }
-                else
-                {
-                    weaponDamage.statusEffects = weaponDamage.statusEffects.Append(statusEffectToApply).ToArray();
-                }
-            }
-
-            return weaponDamage;
+            return weaponWorldInstance.characterWeaponBuffs.CombineBuffDamage(weaponDamage);
         }
 
         public int GetCurrentBlockStaminaCost()

@@ -10,8 +10,6 @@ namespace AF.Dialogue
         [Header("Greeting Settings")]
         public CharacterGreeting[] characterGreetings;
         public float greetingCooldown = 15f;
-        public float minGreetingDelay = 0f;
-        public float maxGreetingDelay = 0f;
         public bool showWhenAggressive = false;
 
         [Header("References")]
@@ -23,7 +21,6 @@ namespace AF.Dialogue
         public UnityEvent onGreetingEnd;
 
         private bool hasDisplayed;
-        private Coroutine cooldownCoroutine;
 
         private void Awake()
         {
@@ -55,7 +52,6 @@ namespace AF.Dialogue
         private IEnumerator GreetingRoutine(CharacterGreeting greeting)
         {
             hasDisplayed = true;
-            yield return new WaitForSeconds(Random.Range(minGreetingDelay, maxGreetingDelay));
 
             onGreetingStart?.Invoke();
             greetingMessageUI?.Display(greeting.greeting);
@@ -63,7 +59,7 @@ namespace AF.Dialogue
             yield return new WaitForSeconds(greeting.duration);
             HideGreeting();
 
-            cooldownCoroutine = StartCoroutine(GreetingCooldown());
+            StartCoroutine(GreetingCooldown());
         }
 
         public void HideGreeting()

@@ -117,6 +117,8 @@ namespace AF.Combat
             {
                 characterManager.stateManager.ScheduleState(characterManager.stateManager.chaseState);
             }
+
+            characterManager.characterWeaponsManager.ShowWeapon();
         }
 
         void NotifyClosestCombatPartner()

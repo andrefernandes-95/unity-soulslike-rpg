@@ -43,6 +43,17 @@ namespace AF
         public AudioClip uiDialogue;
         public AudioClip itemLostWithUse;
 
+        [Header("Weapon Effects Loop")]
+        public AudioClip weaponFire;
+        public AudioClip weaponFrost;
+        public AudioClip weaponMagic;
+        public AudioClip weaponLightning;
+        public AudioClip weaponDarkness;
+        public AudioClip weaponWater;
+        public AudioClip weaponSharp;
+        public AudioClip weaponPoison;
+        public AudioClip weaponBleed;
+
         private float lastUISoundTime = 0f;
         float _uiSoundDelay = 0.1f;
 

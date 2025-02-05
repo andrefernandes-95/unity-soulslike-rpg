@@ -1,98 +1,72 @@
-using System.Linq;
-using AYellowpaper.SerializedCollections;
-using UnityEngine;
 namespace AF
 {
+    using AF.Health;
+    using AYellowpaper.SerializedCollections;
+    using UnityEngine;
 
     public class CharacterWeaponBuffs : MonoBehaviour
     {
 
-        [System.Serializable]
-        public class WeaponBuff
-        {
-            public GameObject container;
-            public int damageBonus;
-            public StatusEffect statusEffect;
-            public int statusEffectAmountToApply;
-        }
+        public SerializedDictionary<WeaponBuffType, WeaponBuff> weaponBuffs = new();
 
-        public enum WeaponBuffName
-        {
-            NONE,
-            PHYSICAL,
-            FIRE,
-            FROST,
-            MAGIC,
-            LIGHTNING,
-            DARKNESS,
-            POISON,
-            BLOOD,
-            SHARPNESS,
-            WATER,
-        }
-
-
-        [Header("Enchantments and Buffs")]
-        public WeaponBuffName appliedBuff = WeaponBuffName.NONE;
-        public float buffDuration = 60f;
-        public SerializedDictionary<WeaponBuffName, WeaponBuff> weaponBuffs = new();
+        WeaponBuffType currentAppliedBuff = WeaponBuffType.NONE;
 
         private void Awake()
         {
+            GetBuffs();
+
             DisableAllBuffContainers();
+        }
+
+        void GetBuffs()
+        {
+            foreach (WeaponBuff weaponBuff in transform.GetComponentsInChildren<WeaponBuff>())
+            {
+                if (!weaponBuffs.ContainsKey(weaponBuff.weaponBuffType))
+                {
+                    weaponBuffs.Add(weaponBuff.weaponBuffType, weaponBuff);
+                }
+            }
         }
 
         void DisableAllBuffContainers()
         {
             foreach (var weaponBuff in weaponBuffs)
             {
-                if (weaponBuff.Value != null && weaponBuff.Value.container != null)
-                {
-                    weaponBuff.Value.container.SetActive(false);
-                }
+                weaponBuff.Value.gameObject.SetActive(false);
             }
         }
 
 
-        public void ApplyBuff(WeaponBuffName weaponBuffName, float customDuration)
+        public void ApplyBuff(WeaponBuffType weaponBuffType)
         {
-            HandleApplyBuff(weaponBuffName, customDuration);
-        }
-
-        public void ApplyBuff(WeaponBuffName weaponBuffName)
-        {
-            HandleApplyBuff(weaponBuffName, this.buffDuration);
-        }
-
-        void HandleApplyBuff(WeaponBuffName weaponBuffName, float duration)
-        {
-            if (!CanUseBuff(weaponBuffName))
+            if (!CanUseBuff(weaponBuffType))
             {
                 return;
             }
 
-            appliedBuff = weaponBuffName;
+            currentAppliedBuff = weaponBuffType;
 
-            weaponBuffs[weaponBuffName].container.SetActive(true);
+            weaponBuffs[weaponBuffType].gameObject.SetActive(true);
 
-            Invoke(nameof(DisableBuff), duration);
+            Invoke(nameof(DisableBuff), weaponBuffs[weaponBuffType].appliedDuration);
         }
 
         void DisableBuff()
         {
             DisableAllBuffContainers();
 
-            appliedBuff = WeaponBuffName.NONE;
+            currentAppliedBuff = WeaponBuffType.NONE;
         }
 
-        bool CanUseBuff(WeaponBuffName weaponBuffName)
+        bool CanUseBuff(WeaponBuffType weaponBuffType)
         {
             if (HasOnGoingBuff())
             {
                 return false;
             }
 
-            if (!weaponBuffs.ContainsKey(weaponBuffName))
+            if (!weaponBuffs.ContainsKey(weaponBuffType))
             {
                 return false;
             }
@@ -102,17 +76,12 @@ namespace AF
 
         public bool HasOnGoingBuff()
         {
-            return appliedBuff != WeaponBuffName.NONE;
+            return currentAppliedBuff != WeaponBuffType.NONE;
         }
 
-        public int GetCurrentBuffDamage()
+        public Damage CombineBuffDamage(Damage baseDamage)
         {
-            if (!HasOnGoingBuff())
-            {
-                return 0;
-            }
-
-            return weaponBuffs[appliedBuff].damageBonus;
+            return baseDamage.Combine(weaponBuffs[currentAppliedBuff].damageModifier);
         }
     }
 }

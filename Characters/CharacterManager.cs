@@ -10,7 +10,6 @@ namespace AF
     using UnityEngine;
     using UnityEngine.Events;
     using AF.Companions;
-    using UnityEngine.AI;
     using AF.Dialogue;
     using System.Collections;
     using System.Collections.Generic;
@@ -31,6 +30,7 @@ namespace AF
         public LockOnRef characterLockOnRef;
         public CharacterHUD characterHUD;
         public GreetingMessageController greetingMessageController;
+        public CharacterTeleportManager characterTeleportManager;
 
         // Animator Overrides
         [HideInInspector] public AnimatorOverrideController animatorOverrideController;
@@ -338,55 +338,6 @@ namespace AF
         public bool IsCompanion()
         {
             return companionID != null;
-        }
-
-        public void TeleportNearPlayer()
-        {
-            Vector3 desiredPosition = GetPlayerManager().transform.position + (GetPlayerManager().transform.forward * -4.5f);
-            NavMesh.SamplePosition(desiredPosition, out NavMeshHit hit, 15f, NavMesh.AllAreas);
-
-            if (IsValidPosition(hit.position))
-            {
-                characterController.enabled = false;
-                agent.enabled = false;
-                transform.position = hit.position;
-                agent.nextPosition = hit.position;
-                agent.enabled = true;
-                characterController.enabled = true;
-            }
-        }
-
-        public void Teleport(Vector3 desiredPosition)
-        {
-            NavMesh.SamplePosition(desiredPosition, out NavMeshHit hit, Mathf.Infinity, NavMesh.AllAreas);
-
-            if (IsValidPosition(hit.position))
-            {
-                characterController.enabled = false;
-                agent.enabled = false;
-                transform.position = hit.position;
-                agent.nextPosition = hit.position;
-                agent.enabled = true;
-                characterController.enabled = true;
-            }
-        }
-
-        public void Teleport(Vector3 desiredPosition, Quaternion desiredRotation)
-        {
-            characterController.enabled = false;
-            agent.enabled = false;
-            transform.position = desiredPosition;
-            transform.rotation = desiredRotation;
-            agent.nextPosition = desiredPosition;
-            agent.enabled = true;
-            characterController.enabled = true;
-        }
-
-        private bool IsValidPosition(Vector3 position)
-        {
-            // Check for Infinity or NaN values
-            return !float.IsInfinity(position.x) && !float.IsInfinity(position.y) && !float.IsInfinity(position.z) &&
-                   !float.IsNaN(position.x) && !float.IsNaN(position.y) && !float.IsNaN(position.z);
         }
 
         public void EnableComponents()

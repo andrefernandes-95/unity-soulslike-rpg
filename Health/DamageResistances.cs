@@ -1,51 +1,22 @@
-using System;
-using AF.Health;
-using UnityEngine;
-
 namespace AF
 {
+    using System;
+    using AF.Health;
+    using UnityEngine;
+
     [Serializable]
     public class DamageResistances : MonoBehaviour
     {
         public DamageReceiver damageReceiver;
-
-        [Serializable]
-        public class WeaponTypeResistance
-        {
-            public WeaponAttackType weaponAttackType;
-            [Range(0.1f, 1f)] public float damageResistance = 1;
-            [Range(1f, 2.5f)] public float damageBonus = 1;
-        }
-
-        [Header("Resistant To Weapons")]
-        public WeaponTypeResistance[] weaponTypeResistances;
-
-        [Header("Elemental Damages")]
-        [Range(0.1f, 1f)] public float fireDamageFilter = 1;
-        [Range(1, 5f)] public float fireDamageBonus = 1;
-
-        [Range(0.1f, 1f)] public float frostDamageFilter = 1;
-        [Range(1, 5f)] public float frostDamageBonus = 1;
-
-        [Range(0.1f, 1f)] public float magicDamageFilter = 1;
-        [Range(1, 5f)] public float magicDamageBonus = 1;
-
-        [Range(0.1f, 1f)] public float lightningDamageFilter = 1;
-        [Range(1, 5f)] public float lightningDamageBonus = 1;
-
-        [Range(0.1f, 1f)] public float darknessDamageFilter = 1;
-        [Range(1, 5f)] public float darknessDamageBonus = 1;
-
-        [Range(0.1f, 1f)] public float waterDamageFilter = 1;
-        [Range(1, 5f)] public float waterDamageBonus = 1;
+        Combatant combatant;
 
         public float loweredDamageBonusMultiplier = 1;
 
         private void Awake()
         {
             damageReceiver.onDamageEvent += OnDamageEvent;
+            combatant = damageReceiver.character.combatant;
         }
-
 
         public Damage OnDamageEvent(CharacterBaseManager attacker, CharacterBaseManager receiver, Damage damage)
         {
@@ -54,20 +25,60 @@ namespace AF
                 return null;
             }
 
+            if (combatant == null)
+            {
+                return damage;
+            }
+
             return FilterIncomingDamage(damage);
+        }
+
+        float GetPhysicalDamageMultiplier(Damage incomingDamage)
+        {
+            float physicalMultiplier = 1f;
+
+            if (incomingDamage.weaponAttackType == WeaponAttackType.Slash)
+            {
+                physicalMultiplier *= combatant.slashAbsorption;
+                physicalMultiplier *= combatant.slashBonus;
+            }
+            else if (incomingDamage.weaponAttackType == WeaponAttackType.Blunt)
+            {
+                physicalMultiplier *= combatant.bluntAbsorption;
+                physicalMultiplier *= combatant.bluntBonus;
+            }
+            else if (incomingDamage.weaponAttackType == WeaponAttackType.Pierce)
+            {
+                physicalMultiplier *= combatant.pierceAbsorption;
+                physicalMultiplier *= combatant.pierceBonus;
+            }
+            else if (incomingDamage.weaponAttackType == WeaponAttackType.Range)
+            {
+                physicalMultiplier *= combatant.rangeWeaponsAbsorption;
+                physicalMultiplier *= combatant.rangeWeaponsBonus;
+            }
+            else if (incomingDamage.weaponAttackType == WeaponAttackType.Staff)
+            {
+                physicalMultiplier *= combatant.magicSpellsAbsorption;
+                physicalMultiplier *= combatant.magicSpellsBonus;
+            }
+
+            return physicalMultiplier;
         }
 
         public virtual Damage FilterIncomingDamage(Damage incomingDamage)
         {
+            float physicalDamageMultiplier = GetPhysicalDamageMultiplier(incomingDamage);
+
             Damage filteredDamage = new()
             {
-                physical = incomingDamage.physical,
-                fire = incomingDamage.fire,
-                frost = incomingDamage.frost,
-                magic = incomingDamage.magic,
-                lightning = incomingDamage.lightning,
-                darkness = incomingDamage.darkness,
-                water = incomingDamage.water,
+                physical = (int)(incomingDamage.physical * physicalDamageMultiplier),
+                fire = (int)(incomingDamage.fire * combatant.fireAbsorption * combatant.fireBonus),
+                frost = (int)(incomingDamage.frost * combatant.frostAbsorption * combatant.frostBonus),
+                magic = (int)(incomingDamage.magic * combatant.magicAbsorption * combatant.magicBonus),
+                lightning = (int)(incomingDamage.lightning * combatant.lightningAbsorption * combatant.lightningBonus),
+                darkness = (int)(incomingDamage.darkness * combatant.darknessAbsorption * combatant.darknessBonus),
+                water = (int)(incomingDamage.water * combatant.waterAbsorption * combatant.waterBonus),
                 postureDamage = incomingDamage.postureDamage,
                 poiseDamage = incomingDamage.poiseDamage,
                 pushForce = incomingDamage.pushForce,
@@ -76,42 +87,14 @@ namespace AF
                 damageType = incomingDamage.damageType
             };
 
-            filteredDamage.physical = (int)((filteredDamage.physical
-                * GetDamageMultiplier(incomingDamage.weaponAttackType, weaponTypeResistances, r => r.damageResistance)
-                * GetDamageMultiplier(incomingDamage.weaponAttackType, weaponTypeResistances, r => r.damageBonus)) * loweredDamageBonusMultiplier);
-
-
-            filteredDamage.fire = ApplyElementalDamageBonus(filteredDamage.fire, fireDamageBonus, fireDamageFilter);
-            filteredDamage.frost = ApplyElementalDamageBonus(filteredDamage.frost, frostDamageBonus, frostDamageFilter);
-            filteredDamage.magic = ApplyElementalDamageBonus(filteredDamage.magic, magicDamageBonus, magicDamageFilter);
-            filteredDamage.lightning = ApplyElementalDamageBonus(filteredDamage.lightning, lightningDamageBonus, lightningDamageFilter);
-            filteredDamage.darkness = ApplyElementalDamageBonus(filteredDamage.darkness, darknessDamageBonus, darknessDamageFilter);
-            filteredDamage.water = ApplyElementalDamageBonus(filteredDamage.water, waterDamageBonus, waterDamageFilter);
-
             return filteredDamage;
         }
 
-        float GetDamageMultiplier(WeaponAttackType attackType, WeaponTypeResistance[] typeResistances, Func<WeaponTypeResistance, float> selector)
-        {
-            if (typeResistances == null)
-            {
-                return 1f;
-            }
 
-            var match = Array.Find(typeResistances, r => r.weaponAttackType == attackType);
-            if (match == null)
-            {
-                return 1f;
-            }
-
-            return selector(match);
-        }
-
-        int ApplyElementalDamageBonus(int damage, float bonus, float filter)
-        {
-            return (int)(damage * bonus * filter);
-        }
-
+        /// <summary>
+        /// Unity Event
+        /// </summary>
+        /// <param name="value"></param>
         public void SetLoweredDamageBonusMultiplier(float value)
         {
             this.loweredDamageBonusMultiplier = value;

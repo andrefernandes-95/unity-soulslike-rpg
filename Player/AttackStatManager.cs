@@ -59,7 +59,7 @@
                 playerManager.statsBonusController.GetCurrentIntelligence(),
                 weaponInstance);
 
-            return playerManager.playerWeaponsManager.GetBuffedDamage(weaponDamage);
+            return playerManager.playerWeaponsManager.GetBuffedDamage(weaponInstance, weaponDamage);
         }
 
         public int GetCurrentPhysicalAttackForGivenStrengthAndDexterity(int strength, int dexterity)

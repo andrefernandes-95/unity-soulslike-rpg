@@ -11,6 +11,9 @@ namespace AF
         Moment conversation => GetComponent<Moment>();
         private State stateCharacterWasInBeforeConversationStarted;
 
+        [Header("Options")]
+        public bool shouldFacePlayer = true;
+
         private void Awake()
         {
             conversation.onMoment_Start.AddListener(OnStartConversation);
@@ -22,7 +25,10 @@ namespace AF
             // End Greeting If Present
             npc.greetingMessageController.HideGreeting();
 
-            npc.FacePlayer();
+            if (shouldFacePlayer)
+            {
+                npc.FacePlayer();
+            }
 
             // Stop Movement
             npc.StopAgentSpeed();
@@ -48,7 +54,10 @@ namespace AF
         {
             npc.agent.isStopped = false;
 
-            npc.FaceInitialRotation();
+            if (shouldFacePlayer)
+            {
+                npc.FaceInitialRotation();
+            }
 
             ResumeStateMachine();
         }

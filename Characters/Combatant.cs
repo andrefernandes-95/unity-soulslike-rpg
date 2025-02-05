@@ -26,6 +26,33 @@ namespace AF
         [Header("Backstab")]
         public bool allowBackstabs = true;
 
+        [Header("Damage Resistances")]
+        [Range(0.1f, 1f)] public float slashAbsorption = 1f;
+        [Range(0.1f, 1f)] public float bluntAbsorption = 1f;
+        [Range(0.1f, 1f)] public float pierceAbsorption = 1f;
+        [Range(0.1f, 1f)] public float rangeWeaponsAbsorption = 1f;
+        [Range(0.1f, 1f)] public float magicSpellsAbsorption = 1f;
+        [Range(0.1f, 1f)] public float fireAbsorption = 1;
+        [Range(0.1f, 1f)] public float frostAbsorption = 1;
+        [Range(0.1f, 1f)] public float lightningAbsorption = 1;
+        [Range(0.1f, 1f)] public float magicAbsorption = 1;
+        [Range(0.1f, 1f)] public float darknessAbsorption = 1;
+        [Range(0.1f, 1f)] public float waterAbsorption = 1;
+
+        [Header("Weaknesses")]
+        [Range(1f, 5f)] public float slashBonus = 1f;
+        [Range(1f, 5f)] public float bluntBonus = 1f;
+        [Range(1f, 5f)] public float pierceBonus = 1f;
+        [Range(1f, 5f)] public float rangeWeaponsBonus = 1f;
+        [Range(1f, 5f)] public float magicSpellsBonus = 1f;
+        [Range(1f, 5f)] public float fireBonus = 1f;
+        [Range(1f, 5f)] public float frostBonus = 1f;
+        [Range(1, 5f)] public float lightningBonus = 1f;
+        [Range(1f, 5f)] public float magicBonus = 1f;
+        [Range(1f, 5f)] public float darknessBonus = 1f;
+        [Range(1f, 5f)] public float waterBonus = 1f;
+
+
         [Header("Status Effect Resistances")]
         [SerializedDictionary("Status Resistances", "Duration (seconds)")]
         public SerializedDictionary<StatusEffect, float> statusEffectResistances = new();

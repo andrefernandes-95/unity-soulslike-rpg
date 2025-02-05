@@ -37,8 +37,7 @@ namespace AF
 
         // Scene References
         private BGMManager bgmManager;
-        private SceneSettings sceneSettings;
-
+        private SceneSettings _sceneSettings;
 
         public void Start()
         {
@@ -123,7 +122,7 @@ namespace AF
                 if (GetBGMManager().IsPlayingMusicClip(bossMusic.name) == false)
                 {
                     GetBGMManager().PlayMusic(bossMusic);
-                    sceneSettings.StopPlaylist();
+                    GetSceneSettings().StopPlaylist();
                     GetBGMManager().isPlayingBossMusic = true;
                 }
             }
@@ -212,11 +211,11 @@ namespace AF
 
         SceneSettings GetSceneSettings()
         {
-            if (sceneSettings == null)
+            if (_sceneSettings == null)
             {
-                sceneSettings = FindAnyObjectByType<SceneSettings>(FindObjectsInactive.Include);
+                _sceneSettings = FindAnyObjectByType<SceneSettings>(FindObjectsInactive.Include);
             }
-            return sceneSettings;
+            return _sceneSettings;
         }
 
         void LogAnalytic(string eventName)

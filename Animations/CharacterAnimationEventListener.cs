@@ -1,5 +1,6 @@
 namespace AF.Animations
 {
+    using System.Collections.Generic;
     using AYellowpaper.SerializedCollections;
     using UnityEngine;
     using UnityEngine.Events;
@@ -17,6 +18,7 @@ namespace AF.Animations
         public float overrideChaseSpeed = -1f;
 
         [Header("Animation Clip Overrides")]
+        public CharacterAnimationOverridesTemplate characterAnimationOverridesTemplate;
         public SerializedDictionary<string, AnimationClip> clipOverrides;
 
         [Header("Unity Events")]
@@ -47,6 +49,17 @@ namespace AF.Animations
 
         void OverrideAnimatorClips()
         {
+            if (characterAnimationOverridesTemplate != null)
+            {
+                Dictionary<string, AnimationClip> kvp = new();
+                foreach (var keyValuePair in characterAnimationOverridesTemplate.clipOverrides)
+                {
+                    kvp.Add(keyValuePair.Key.name, keyValuePair.Value);
+                }
+
+                characterManager.UpdateAnimatorOverrideControllerClips(kvp);
+            }
+
             characterManager.UpdateAnimatorOverrideControllerClips(clipOverrides);
         }
 

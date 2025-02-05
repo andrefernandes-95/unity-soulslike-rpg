@@ -1,15 +1,13 @@
-using System.Collections;
-using AF.Bonfires;
-using AF.Companions;
-using AF.Loading;
-using AF.Music;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Localization.Settings;
-using UnityEngine.SceneManagement;
-
 namespace AF
 {
+    using AF.Bonfires;
+    using AF.Companions;
+    using AF.Loading;
+    using AF.Music;
+    using UnityEngine;
+    using UnityEngine.Events;
+    using UnityEngine.Localization.Settings;
+
     public class TeleportManager : MonoBehaviour
     {
         [Header("Game Session")]
