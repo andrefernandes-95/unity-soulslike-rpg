@@ -1,7 +1,6 @@
-﻿using UnityEngine;
-
-namespace AF
+﻿namespace AF
 {
+    using UnityEngine;
 
     public class DeactivateRendererOnStart : MonoBehaviour
     {
@@ -11,5 +10,4 @@ namespace AF
             if (TryGetComponent<MeshRenderer>(out var meshRenderer)) meshRenderer.enabled = false;
         }
     }
-
 }

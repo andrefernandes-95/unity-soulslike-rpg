@@ -1,13 +1,13 @@
 namespace AF
 {
+    using System.Collections.Generic;
     using AF.Health;
-    using AYellowpaper.SerializedCollections;
     using UnityEngine;
 
     public class CharacterWeaponBuffs : MonoBehaviour
     {
 
-        public SerializedDictionary<WeaponBuffType, WeaponBuff> weaponBuffs = new();
+        readonly Dictionary<WeaponBuffType, WeaponBuff> weaponBuffs = new();
 
         WeaponBuffType currentAppliedBuff = WeaponBuffType.NONE;
 
@@ -37,6 +37,11 @@ namespace AF
             }
         }
 
+        WeaponBuff GetCurrentWeaponBuff()
+        {
+            return weaponBuffs[currentAppliedBuff];
+        }
+
 
         public void ApplyBuff(WeaponBuffType weaponBuffType)
         {
@@ -46,14 +51,22 @@ namespace AF
             }
 
             currentAppliedBuff = weaponBuffType;
+            WeaponBuff currentWeaponBuff = GetCurrentWeaponBuff();
 
-            weaponBuffs[weaponBuffType].gameObject.SetActive(true);
+            currentWeaponBuff.gameObject.SetActive(true);
 
-            Invoke(nameof(DisableBuff), weaponBuffs[weaponBuffType].appliedDuration);
+            Invoke(nameof(DisableBuff), currentWeaponBuff.appliedDuration);
+
+            currentWeaponBuff.PlaySounds();
         }
 
         void DisableBuff()
         {
+            if (HasOnGoingBuff())
+            {
+                GetCurrentWeaponBuff().StopSounds();
+            }
+
             DisableAllBuffContainers();
 
             currentAppliedBuff = WeaponBuffType.NONE;
@@ -83,5 +96,6 @@ namespace AF
         {
             return baseDamage.Combine(weaponBuffs[currentAppliedBuff].damageModifier);
         }
+
     }
 }

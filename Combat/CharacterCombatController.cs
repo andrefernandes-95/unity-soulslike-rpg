@@ -238,9 +238,10 @@ namespace AF
         {
             if (characterManager.characterWeaponsManager.currentAttackingWeapon != null)
             {
-                Damage attackingWeaponDamage = characterManager.characterWeaponsManager.currentAttackingWeapon.enemyWeaponDamage.Clone();
+                return null;
+                /*                Damage attackingWeaponDamage = characterManager.characterWeaponsManager.currentAttackingWeapon.enemyWeaponDamage.Clone();
 
-                return attackingWeaponDamage.Combine(currentCombatAction?.damage);
+                                return attackingWeaponDamage.Combine(currentCombatAction?.damage);*/
             }
 
             return currentCombatAction?.damage?.Copy();

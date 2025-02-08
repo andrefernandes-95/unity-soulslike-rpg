@@ -4,12 +4,12 @@ namespace AF.Equipment
 
     public class CharacterWeaponsManager : MonoBehaviour
     {
-        public CharacterWeaponHitbox leftHandWeapon, rightHandWeapon, headWeapon, leftFootWeapon, rightFootWeapon;
+        public WeaponHitbox leftHandWeapon, rightHandWeapon, headWeapon, leftFootWeapon, rightFootWeapon;
         public GameObject bow;
         public GameObject shield;
         public bool shouldHideShield = true;
 
-        [HideInInspector] public CharacterWeaponHitbox currentAttackingWeapon;
+        [HideInInspector] public WeaponHitbox currentAttackingWeapon;
 
         public void ResetStates()
         {

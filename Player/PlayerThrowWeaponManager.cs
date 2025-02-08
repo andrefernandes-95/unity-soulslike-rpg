@@ -10,7 +10,8 @@ namespace AF
 
         public void ThrowWeapon()
         {
-            CharacterWeaponHitbox currentWeapon = playerManager.playerWeaponsManager.currentWeaponWorldInstance;
+            return;
+            /*CharacterWeaponHitbox currentWeapon = playerManager.playerWeaponsManager.currentWeaponWorldInstance;
 
             if (currentWeapon == null)
             {
@@ -50,12 +51,12 @@ namespace AF
             }
 
             // Destroy the projectile instance after throwing
-            Destroy(weaponThrowProjectileInstance);
+            Destroy(weaponThrowProjectileInstance);*/
         }
 
         public void ShowCurrentWeapon()
         {
-            CharacterWeaponHitbox currentWeapon = playerManager.playerWeaponsManager.currentWeaponWorldInstance;
+            WeaponHitbox currentWeapon = playerManager.playerWeaponsManager.currentWeaponWorldInstance;
 
             if (currentWeapon == null)
             {

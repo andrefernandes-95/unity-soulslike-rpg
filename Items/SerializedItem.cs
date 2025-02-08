@@ -3,6 +3,9 @@ namespace AF
     [System.Serializable]
     public class SerializedItem
     {
+        public string name;
+
+        // OLD
         public string itemPath;
         public string id;
         public bool wasUsed;

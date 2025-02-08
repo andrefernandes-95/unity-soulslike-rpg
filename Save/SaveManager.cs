@@ -87,22 +87,6 @@
         void SaveRecipes(QuickSaveWriter quickSaveWriter) =>
             quickSaveWriter.Write("craftingRecipes", recipesDatabase.craftingRecipes.Select(craftingRecipe => craftingRecipe.name));
 
-        void SavePlayerStats(QuickSaveWriter quickSaveWriter)
-        {
-            quickSaveWriter.Write("currentHealth", playerStatsDatabase.currentHealth);
-            quickSaveWriter.Write("currentStamina", playerStatsDatabase.currentStamina);
-            quickSaveWriter.Write("currentMana", playerStatsDatabase.currentMana);
-            quickSaveWriter.Write("reputation", playerStatsDatabase.reputation);
-            quickSaveWriter.Write("vitality", playerStatsDatabase.vitality);
-            quickSaveWriter.Write("endurance", playerStatsDatabase.endurance);
-            quickSaveWriter.Write("intelligence", playerStatsDatabase.intelligence);
-            quickSaveWriter.Write("strength", playerStatsDatabase.strength);
-            quickSaveWriter.Write("dexterity", playerStatsDatabase.dexterity);
-            quickSaveWriter.Write("gold", playerStatsDatabase.gold);
-            quickSaveWriter.Write("lostGold", playerStatsDatabase.lostGold);
-            quickSaveWriter.Write("sceneWhereGoldWasLost", playerStatsDatabase.sceneWhereGoldWasLost);
-            quickSaveWriter.Write("positionWhereGoldWasLost", playerStatsDatabase.positionWhereGoldWasLost);
-        }
 
         void SavePlayerEquipment(QuickSaveWriter quickSaveWriter)
         {
@@ -208,54 +192,6 @@
                         recipesDatabase.AddCraftingRecipe(craftingRecipe);
                     }
                 }
-            }
-        }
-
-        void LoadPlayerStats(QuickSaveReader quickSaveReader, bool isFromGameOver)
-        {
-            // Try to read currentHealth using TryRead
-            quickSaveReader.TryRead("currentHealth", out float currentHealth);
-            playerStatsDatabase.currentHealth = currentHealth;
-
-            // Try to read other stats
-            quickSaveReader.TryRead<float>("currentStamina", out float currentStamina);
-            playerStatsDatabase.currentStamina = currentStamina;
-
-            quickSaveReader.TryRead<float>("currentMana", out float currentMana);
-            playerStatsDatabase.currentMana = currentMana;
-
-            quickSaveReader.TryRead<int>("reputation", out int reputation);
-            playerStatsDatabase.reputation = reputation;
-
-            quickSaveReader.TryRead<int>("vitality", out int vitality);
-            playerStatsDatabase.vitality = vitality;
-
-            quickSaveReader.TryRead<int>("endurance", out int endurance);
-            playerStatsDatabase.endurance = endurance;
-
-            quickSaveReader.TryRead<int>("intelligence", out int intelligence);
-            playerStatsDatabase.intelligence = intelligence;
-
-            quickSaveReader.TryRead<int>("strength", out int strength);
-            playerStatsDatabase.strength = strength;
-
-            quickSaveReader.TryRead<int>("dexterity", out int dexterity);
-            playerStatsDatabase.dexterity = dexterity;
-
-            // Read additional stats only if not from game over
-            if (!isFromGameOver)
-            {
-                quickSaveReader.TryRead<int>("gold", out int gold);
-                playerStatsDatabase.gold = gold;
-
-                quickSaveReader.TryRead<int>("lostGold", out int lostGold);
-                playerStatsDatabase.lostGold = lostGold;
-
-                quickSaveReader.TryRead<string>("sceneWhereGoldWasLost", out string sceneWhereGoldWasLost);
-                playerStatsDatabase.sceneWhereGoldWasLost = sceneWhereGoldWasLost;
-
-                quickSaveReader.TryRead<Vector3>("positionWhereGoldWasLost", out Vector3 positionWhereGoldWasLost);
-                playerStatsDatabase.positionWhereGoldWasLost = positionWhereGoldWasLost;
             }
         }
 
@@ -427,7 +363,6 @@
             QuickSaveWriter quickSaveWriter = QuickSaveWriter.Create(saveFileName);
             SaveBonfires(quickSaveWriter);
             SaveCompanions(quickSaveWriter);
-            SavePlayerStats(quickSaveWriter);
             SavePlayerEquipment(quickSaveWriter);
             SavePlayerInventory(quickSaveWriter);
             SavePickups(quickSaveWriter);
@@ -497,7 +432,6 @@
             {
                 LoadBonfires(quickSaveReader);
                 LoadCompanions(quickSaveReader);
-                LoadPlayerStats(quickSaveReader, isFromGameOver);
                 LoadPlayerInventory(quickSaveReader);
                 LoadPlayerEquipment(quickSaveReader);
                 LoadPickups(quickSaveReader);

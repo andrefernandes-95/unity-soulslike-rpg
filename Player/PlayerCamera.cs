@@ -9,7 +9,6 @@ namespace AF
         private CinemachineCamera cinemachineVirtualCamera;
         public GameSettings gameSettings;
 
-
         void Start()
         {
             cinemachineVirtualCamera = GetComponent<CinemachineCamera>();

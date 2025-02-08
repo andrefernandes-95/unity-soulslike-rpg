@@ -88,6 +88,8 @@ namespace AF
 		{
 			move = value.Get<Vector2>();
 
+			Debug.Log(move);
+
 			onMoveInput?.Invoke();
 
 			uIDocumentTutorial?.OnStepComplete(moveAroundEventMessage);

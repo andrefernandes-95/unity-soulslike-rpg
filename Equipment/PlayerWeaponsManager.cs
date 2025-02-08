@@ -12,24 +12,24 @@ namespace AF
     public class PlayerWeaponsManager : MonoBehaviour
     {
         [Header("Unarmed Weapon References In-World")]
-        public CharacterWeaponHitbox leftHandHitbox;
-        public CharacterWeaponHitbox rightHandHitbox;
-        public CharacterWeaponHitbox leftFootHitbox;
-        public CharacterWeaponHitbox rightFootHitbox;
+        public WeaponHitbox leftHandHitbox;
+        public WeaponHitbox rightHandHitbox;
+        public WeaponHitbox leftFootHitbox;
+        public WeaponHitbox rightFootHitbox;
 
         [Header("Weapon References In-World")]
-        public List<CharacterWeaponHitbox> weaponInstances;
-        public List<CharacterWeaponHitbox> secondaryWeaponInstances;
+        public List<WeaponHitbox> weaponInstances;
+        public List<WeaponHitbox> secondaryWeaponInstances;
         public List<ShieldWorldInstance> shieldInstances;
         public List<HolsteredWeapon> holsteredWeapons;
 
         [Header("Current Weapon")]
-        public CharacterWeaponHitbox currentWeaponWorldInstance;
-        public CharacterWeaponHitbox currentSecondaryWeaponInstance;
+        public WeaponHitbox currentWeaponWorldInstance;
+        public WeaponHitbox currentSecondaryWeaponInstance;
         public ShieldWorldInstance currentShieldWorldInstance;
 
         [Header("Dual Wielding")]
-        public CharacterWeaponHitbox secondaryWeaponInstance;
+        public WeaponHitbox secondaryWeaponInstance;
 
         [Header("Database")]
         public EquipmentDatabase equipmentDatabase;
@@ -102,11 +102,11 @@ namespace AF
             if (currentWeaponWorldInstance != null) currentWeaponWorldInstance = null;
             if (currentSecondaryWeaponInstance != null) currentSecondaryWeaponInstance = null;
 
-            List<CharacterWeaponHitbox> weaponsList = new List<CharacterWeaponHitbox>();
+            List<WeaponHitbox> weaponsList = new List<WeaponHitbox>();
             weaponsList.AddRange(weaponInstances);
             weaponsList.AddRange(secondaryWeaponInstances);
 
-            foreach (CharacterWeaponHitbox weaponHitbox in weaponsList)
+            foreach (WeaponHitbox weaponHitbox in weaponsList)
             {
                 weaponHitbox?.DisableHitbox();
                 weaponHitbox?.gameObject.SetActive(false);
@@ -251,15 +251,15 @@ namespace AF
 
         public void ShowEquipment()
         {
-            currentWeaponWorldInstance?.ShowWeapon();
-            currentSecondaryWeaponInstance?.ShowWeapon();
+            //            currentWeaponWorldInstance?.ShowWeapon();
+            //          currentSecondaryWeaponInstance?.ShowWeapon();
             currentShieldWorldInstance?.ResetStates();
         }
 
         public void HideEquipment()
         {
-            currentWeaponWorldInstance?.HideWeapon();
-            currentSecondaryWeaponInstance?.HideWeapon();
+            //currentWeaponWorldInstance?.HideWeapon();
+            //  currentSecondaryWeaponInstance?.HideWeapon();
             currentShieldWorldInstance?.ShowBackShield();
         }
 
@@ -267,7 +267,7 @@ namespace AF
         public void ShowShield() => currentShieldWorldInstance?.ResetStates();
 
         bool CanApplyBuff()
-        {
+        {/*
             if (currentWeaponWorldInstance == null || currentWeaponWorldInstance.characterWeaponBuffs == null)
             {
                 notificationManager.ShowNotification(
@@ -279,7 +279,7 @@ namespace AF
                 notificationManager.ShowNotification(
                     WeaponIsAlreadyBuffed.GetLocalizedString(), notificationManager.systemError);
                 return false;
-            }
+            }*/
 
             return true;
         }
@@ -290,11 +290,11 @@ namespace AF
                 return;
             }
 
-            currentWeaponWorldInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffType);
-            secondaryWeaponInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffType);
+            //            currentWeaponWorldInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffType);
+            //          secondaryWeaponInstance?.characterWeaponBuffs?.ApplyBuff(weaponBuffType);
         }
 
-        CharacterWeaponHitbox GetCharacterWeaponHitboxFromWeaponInstance(WeaponInstance weaponInstance)
+        WeaponHitbox GetCharacterWeaponHitboxFromWeaponInstance(WeaponInstance weaponInstance)
         {
             if (equipmentDatabase.GetCurrentWeapon() == weaponInstance)
             {
@@ -311,8 +311,9 @@ namespace AF
 
         public Damage GetBuffedDamage(WeaponInstance weaponInstance, Damage weaponDamage)
         {
-            CharacterWeaponHitbox weaponWorldInstance = GetCharacterWeaponHitboxFromWeaponInstance(weaponInstance);
-
+            WeaponHitbox weaponWorldInstance = GetCharacterWeaponHitboxFromWeaponInstance(weaponInstance);
+            return null;
+            /*
             if (weaponWorldInstance == null
                 || weaponWorldInstance.characterWeaponBuffs == null
                 || weaponWorldInstance.characterWeaponBuffs.HasOnGoingBuff() == false)
@@ -320,7 +321,7 @@ namespace AF
                 return weaponDamage;
             }
 
-            return weaponWorldInstance.characterWeaponBuffs.CombineBuffDamage(weaponDamage);
+            return weaponWorldInstance.characterWeaponBuffs.CombineBuffDamage(weaponDamage);*/
         }
 
         public int GetCurrentBlockStaminaCost()
@@ -372,7 +373,7 @@ namespace AF
         {
             if (
                 playerManager.playerWeaponsManager.currentWeaponWorldInstance == null
-                || playerManager.playerWeaponsManager.currentWeaponWorldInstance.onWeaponSpecial == null
+                || false //playerManager.playerWeaponsManager.currentWeaponWorldInstance.onWeaponSpecial == null
                 || playerManager.playerWeaponsManager.currentWeaponWorldInstance.weapon == null
                 )
             {
@@ -389,7 +390,7 @@ namespace AF
                 playerManager.playerWeaponsManager.currentWeaponWorldInstance.weapon.manaCostToUseWeaponSpecialAttack
             );
 
-            playerManager.playerWeaponsManager.currentWeaponWorldInstance.onWeaponSpecial?.Invoke();
+            //playerManager.playerWeaponsManager.currentWeaponWorldInstance.onWeaponSpecial?.Invoke();
         }
 
         /// <summary>
