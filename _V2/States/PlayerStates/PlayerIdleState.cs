@@ -9,6 +9,7 @@ namespace AFV2
         [Header("Transition States")]
         public PlayerRunState runState;
         public JumpState jumpState;
+        public AttackState attackState;
 
         public override State Tick()
         {
@@ -17,6 +18,9 @@ namespace AFV2
 
             if (playerController.IsJumping())
                 return jumpState;
+
+            if (playerController.IsLightAttacking())
+                return attackState;
 
             return this;
         }

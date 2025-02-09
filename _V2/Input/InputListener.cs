@@ -33,6 +33,12 @@ namespace AFV2
             get { return jump; }
         }
 
+        bool lightAttack;
+        public bool LightAttack
+        {
+            get { return lightAttack; }
+        }
+
         [Header("Components")]
         [SerializeField] GameSettings gameSettings;
         [SerializeField] PlayerCamera playerCamera;
@@ -88,5 +94,12 @@ namespace AFV2
                 playerCamera.ZoomIn(scrollDelta);
             }
         }
+
+        public void OnLightAttack(InputValue value)
+        {
+            lightAttack = value.isPressed;
+        }
+        void ResetLightAttack() => lightAttack = false;
+
     }
 }

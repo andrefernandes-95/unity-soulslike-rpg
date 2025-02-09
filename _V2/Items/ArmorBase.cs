@@ -14,8 +14,6 @@ namespace AFV2
         {
             base.OnInspectorGUI();
 
-            GUI.enabled = Application.isPlaying;
-
             ArmorBase armorBase = target as ArmorBase;
 
             if (GUILayout.Button("Equip"))

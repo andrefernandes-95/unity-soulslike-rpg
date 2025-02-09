@@ -21,5 +21,6 @@ namespace AFV2
         public bool IsMoving() => inputListener.Move != Vector2.zero;
         public bool IsSprinting() => IsMoving() && inputListener.Sprint;
         public bool IsJumping() => inputListener.Jump && characterApi.characterGravity.Grounded;
+        public bool IsLightAttacking() => inputListener.LightAttack && characterApi.characterGravity.Grounded;
     }
 }

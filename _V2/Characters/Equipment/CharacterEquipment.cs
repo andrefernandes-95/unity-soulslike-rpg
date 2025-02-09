@@ -15,6 +15,10 @@ namespace AFV2
         [SerializeField] private Armor armor;
         [SerializeField] private Boot boots;
 
+        [Header("Body Parts")]
+        public Transform rightHand;
+        public Transform leftHand;
+
         [Header("Components")]
         public CharacterInventory characterInventory;
 
@@ -49,5 +53,35 @@ namespace AFV2
             if (armor != null) armor.OnEquip.Invoke();
             if (boots != null) boots.OnEquip.Invoke();
         }
+
+        public void EquipRightWeapon(Weapon weapon, int slot = 0)
+        {
+            rightWeapons[slot] = weapon;
+
+            weapon.Equip(rightHand, true);
+        }
+
+        public void EquipLeftWeapon(Weapon weapon, int slot = 0)
+        {
+            leftWeapons[slot] = weapon;
+            weapon.Equip(leftHand, false);
+        }
+
+        public void UnequipRightWeapon(int slot = 0)
+        {
+            if (rightWeapons[slot] == null) return;
+
+            rightWeapons[slot].Unequip(rightHand);
+            rightWeapons[slot] = null;
+
+        }
+        public void UnequipLeftWeapon(int slot = 0)
+        {
+            if (leftWeapons[slot] == null) return;
+
+            leftWeapons[slot].Unequip(leftHand);
+            leftWeapons[slot] = null;
+        }
+
     }
 }

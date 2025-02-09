@@ -19,6 +19,7 @@ namespace AFV2
         public PlayerRunState runState;
         public FallState fallState;
         public JumpState jumpState;
+        public AttackState attackState;
 
         public override void OnStateEnter()
         {
@@ -40,6 +41,9 @@ namespace AFV2
 
             if (playerController.IsJumping())
                 return jumpState;
+
+            if (playerController.IsLightAttacking())
+                return attackState;
 
             playerController.Move(sprintSpeed);
             return this;

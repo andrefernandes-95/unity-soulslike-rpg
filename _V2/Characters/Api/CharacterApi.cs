@@ -9,5 +9,6 @@ namespace AFV2
         public CharacterController characterController;
 
         public CharacterGravity characterGravity;
+        public CharacterEquipment characterEquipment;
     }
 }
