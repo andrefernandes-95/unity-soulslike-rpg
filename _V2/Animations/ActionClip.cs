@@ -6,8 +6,7 @@ namespace AFV2
 
     public class ActionClip : MonoBehaviour
     {
-        [SerializeField] private string animationHash = "";
-        public string AnimationHash => animationHash;
+        public string AnimationHash => this.gameObject.name;
 
         [Range(0, 1f)][SerializeField] private float previewTime = 0;
         public float PreviewTime => previewTime;
@@ -22,10 +21,10 @@ namespace AFV2
 
         public async Task Play(AnimatorManager animatorManager, float blend = 0.2f)
         {
-            animatorManager.BlendTo(animationHash, blend);
+            animatorManager.BlendTo(AnimationHash, blend);
             animatorManager.EnableRootMotion();
 
-            await animatorManager.RunActionClip(this);
+            await animatorManager.WaitForAnimationToFinish(AnimationHash);
 
             animatorManager.DisableRootMotion();
         }

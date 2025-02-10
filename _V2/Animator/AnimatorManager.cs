@@ -1,14 +1,16 @@
 namespace AFV2
 {
-    using System.Collections.Generic;
     using System.Threading.Tasks;
     using UnityEngine;
-    using UnityEngine.Events;
 
     [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(AnimatorOverrideManager))]
     public class AnimatorManager : MonoBehaviour
     {
         public CharacterApi characterApi;
+
+        [Header("Components")]
+        [HideInInspector] public AnimatorOverrideManager animatorOverrideManager => GetComponent<AnimatorOverrideManager>();
 
         Animator animator => GetComponent<Animator>();
 
@@ -49,50 +51,11 @@ namespace AFV2
             }
         }
 
-        public async Task RunActionClip(ActionClip actionClip, float end = .9f)
-        {
-            // Ensure the animator exists
-            if (animator == null)
-                return;
-
-            // Wait until the new animation is fully playing
-            while (!IsAnimationPlaying(actionClip.name))
-            {
-                await Task.Yield(); // Wait for next frame
-            }
-
-            Dictionary<float, UnityEvent> events = new();
-            foreach (var actionClipEvent in actionClip.Events)
-            {
-                events.Add(actionClipEvent.triggerTime, actionClipEvent.OnEvent);
-            }
-
-            HashSet<float> triggeredEvents = new(); // Keep track of triggered events
-
-            // Now wait until the animation reaches the end
-            while (!HasAnimationEnded(end))
-            {
-                float currentTime = animator.GetCurrentAnimatorStateInfo(0).normalizedTime % 1f;
-
-                foreach (var kvp in events)
-                {
-                    float eventTime = kvp.Key;
-                    UnityEvent unityEvent = kvp.Value;
-
-                    if (currentTime >= eventTime && !triggeredEvents.Contains(eventTime))
-                    {
-                        unityEvent?.Invoke();
-                        triggeredEvents.Add(eventTime);
-                    }
-                }
-
-                await Task.Yield(); // Wait for next frame
-            }
-        }
+        public bool IsInTransition() => animator.IsInTransition(0);
 
         public bool IsAnimationPlaying(string animationName)
         {
-            if (animator.IsInTransition(0))
+            if (IsInTransition())
             {
                 return false;
             }

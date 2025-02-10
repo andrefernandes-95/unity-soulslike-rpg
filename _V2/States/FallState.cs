@@ -42,7 +42,6 @@ namespace AFV2
             // Wait until the animation fully plays out
             await characterApi.animatorManager.WaitForAnimationToFinish(HASH_LAND);
         }
-
         public override State Tick()
         {
             if (characterApi.characterGravity.Grounded)

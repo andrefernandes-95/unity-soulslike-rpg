@@ -2,6 +2,7 @@ namespace AFV2
 {
     using AF;
     using UnityEngine;
+    using UnityEngine.Events;
     using UnityEngine.InputSystem;
 
     public class InputListener : MonoBehaviour
@@ -38,6 +39,9 @@ namespace AFV2
         {
             get { return lightAttack; }
         }
+
+        [Header("Events")]
+        public UnityEvent onChangeCombatStance;
 
         [Header("Components")]
         [SerializeField] GameSettings gameSettings;
@@ -100,6 +104,12 @@ namespace AFV2
             lightAttack = value.isPressed;
         }
         void ResetLightAttack() => lightAttack = false;
+
+
+        public void OnChangeCombatStance(InputValue value)
+        {
+            onChangeCombatStance?.Invoke();
+        }
 
     }
 }

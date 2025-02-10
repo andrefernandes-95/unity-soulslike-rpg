@@ -6,6 +6,7 @@ namespace AFV2
     {
         [Header("Movement While Jumping")]
         public float AirMoveSpeed = 6f;
+        public float SprintSpeedMultiplier = 1.2f;
 
         [Header("Components")]
         [SerializeField] PlayerController playerController;
@@ -13,7 +14,8 @@ namespace AFV2
         public override State Tick()
         {
             if (playerController.IsMoving())
-                playerController.Move(AirMoveSpeed * (playerController.IsSprinting() ? 1.5f : 1));
+                characterApi.characterMovement.Move(
+                    AirMoveSpeed * (playerController.IsSprinting() ? SprintSpeedMultiplier : 1), playerController.GetPlayerRotation());
 
             return base.Tick();
         }

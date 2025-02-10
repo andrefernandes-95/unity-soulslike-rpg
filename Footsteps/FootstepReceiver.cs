@@ -1,49 +1,50 @@
-using AYellowpaper.SerializedCollections;
-using UnityEngine;
-
 namespace AF.Footsteps
 {
+    using AYellowpaper.SerializedCollections;
+    using UnityEngine;
+
     public class FootstepReceiver : MonoBehaviour
     {
 
-        [Header("Effect Instances")]
-        [SerializedDictionary("Tag", "FX Game Object")]
-        public SerializedDictionary<string, GameObject> footstepEffectsDictionary = new();
+        SerializedDictionary<string, AudioClip[]> footstepClips = new();
 
         [Header("Raycast Settings")]
-        public Transform transformRef;
-        public LayerMask detectionLayer;
-        public float rayDistanceDownwards = 0.5f;
+        LayerMask detectionLayer;
+        [SerializeField] float rayDistanceDownwards = 1f;
+        [SerializeField] float footstepCooldown = 0.25f;
+        AudioSource audioSource;
 
-        [Header("Cooldown Settings")]
-        public float footstepCooldown = 0.25f;
-        bool isTriggering = false;
+        private float nextFootstepTime = 0f; // Time when the next footstep can be played
 
+        public void SetupFootstepReceiver(
+            SerializedDictionary<string, AudioClip[]> footstepClips,
+            LayerMask detectionLayer,
+            AudioSource audioSource,
+            float rayDistanceDownwards
+        )
+        {
+            this.footstepClips = footstepClips;
+            this.detectionLayer = detectionLayer;
+            this.audioSource = audioSource;
+            this.rayDistanceDownwards = rayDistanceDownwards;
+        }
 
         public void Trigger()
         {
-            if (isTriggering)
-            {
-                return;
-            }
+            if (Time.time < nextFootstepTime) return; // Ensures proper cooldown timing
 
-            if (Physics.Raycast(transformRef.position, Vector3.down, out RaycastHit hit, rayDistanceDownwards, detectionLayer))
+            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, rayDistanceDownwards, detectionLayer))
             {
-                if (hit.transform != null && footstepEffectsDictionary.ContainsKey(hit.transform.gameObject.tag))
+                if (footstepClips.TryGetValue(hit.transform.gameObject.tag, out AudioClip[] clips))
                 {
-                    isTriggering = true;
-
-                    footstepEffectsDictionary[hit.transform.gameObject.tag].SetActive(false);
-                    footstepEffectsDictionary[hit.transform.gameObject.tag].SetActive(true);
-
-                    Invoke(nameof(ResetIsTriggering), footstepCooldown);
+                    if (clips != null && clips.Length > 0)
+                    {
+                        audioSource.pitch = Random.Range(0.95f, 1.05f);
+                        audioSource.PlayOneShot(clips[Random.Range(0, clips.Length)]);
+                        nextFootstepTime = Time.time + footstepCooldown; // Set next available time
+                    }
                 }
             }
-        }
-
-        void ResetIsTriggering()
-        {
-            isTriggering = false;
         }
     }
 }

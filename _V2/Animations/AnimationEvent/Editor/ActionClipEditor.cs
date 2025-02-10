@@ -18,9 +18,11 @@ namespace AFV2
             ActionClip actionClip = (ActionClip)target;
             if (actionClip == null)
             {
-                EditorGUILayout.HelpBox("Error previewing action clip.", MessageType.Info);
+                EditorGUILayout.HelpBox("Error previewing action clip.", MessageType.Error);
                 return;
             }
+
+            EditorGUILayout.HelpBox("Game Object name must match animation hash", MessageType.Info);
 
             GUILayout.Space(10);
 
@@ -117,6 +119,5 @@ namespace AFV2
                 boneTransform.localRotation = skeletonBone.rotation;
             }
         }
-
     }
 }

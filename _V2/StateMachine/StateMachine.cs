@@ -59,10 +59,13 @@ namespace AFV2
             currentState = scheduledState;
             scheduledState = null; // Clear after transition
 
-            Task onExitTask = oldState.OnStateExit();
-            if (onExitTask != null)
+            if (currentState.priority <= oldState.priority)
             {
-                await onExitTask; // Properly wait for the async method to finish
+                Task onExitTask = oldState.OnStateExit();
+                if (onExitTask != null)
+                {
+                    await onExitTask; // Properly wait for the async method to finish
+                }
             }
 
             currentState.OnStateEnter();

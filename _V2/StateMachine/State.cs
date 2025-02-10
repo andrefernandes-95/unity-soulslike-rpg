@@ -5,6 +5,7 @@ namespace AFV2
 
     public abstract class State : MonoBehaviour
     {
+        public int priority = 1;
         public abstract void OnStateEnter();
         public abstract Task OnStateExit();
 

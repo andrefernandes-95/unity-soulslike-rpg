@@ -66,14 +66,14 @@ namespace AFV2
             }
             else if (inputListener.Move != Vector2.zero)
             {
-
                 if (IsLockedOn())
                 {
                     HandleLockOnRotation();
                     return;
                 }
 
-                HandleRotation();
+                if (characterApi.characterMovement.CanRotate)
+                    HandleRotation();
             }
         }
 

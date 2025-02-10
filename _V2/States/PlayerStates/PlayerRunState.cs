@@ -45,7 +45,7 @@ namespace AFV2
             if (playerController.IsLightAttacking())
                 return attackState;
 
-            playerController.Move(moveSpeed);
+            characterApi.characterMovement.Move(moveSpeed, playerController.GetPlayerRotation());
             return this;
         }
     }

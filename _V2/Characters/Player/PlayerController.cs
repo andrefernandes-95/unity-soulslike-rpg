@@ -10,13 +10,12 @@ namespace AFV2
         [SerializeField] InputListener inputListener;
         [SerializeField] CameraController cameraController;
 
-        public void Move(float targetSpeed)
+        private void Awake()
         {
-            Vector3 targetDirection = Quaternion.Euler(0.0f, cameraController.TargetRotation, 0.0f) * Vector3.forward;
-
-            characterApi.characterController.Move(
-                            targetDirection.normalized * (targetSpeed * Time.deltaTime));
+            inputListener.onChangeCombatStance.AddListener(characterApi.characterEquipment.characterWeapons.ToggleTwoHanding);
         }
+
+        public Quaternion GetPlayerRotation() => Quaternion.Euler(0.0f, cameraController.TargetRotation, 0.0f);
 
         public bool IsMoving() => inputListener.Move != Vector2.zero;
         public bool IsSprinting() => IsMoving() && inputListener.Sprint;
