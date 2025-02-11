@@ -1,12 +1,18 @@
 namespace AFV2
 {
+    using System.Collections.Generic;
     using System.Linq;
     using UnityEngine;
 
     public class CharacterWeapons : MonoBehaviour
     {
+        [SerializeField] Weapon fallbackWeapon;
+        public Weapon FallbackWeapon => fallbackWeapon;
+
         [SerializeField] private Weapon[] rightWeapons = new Weapon[3];
+        public Weapon[] RightWeapons => rightWeapons;
         [SerializeField] private Weapon[] leftWeapons = new Weapon[3];
+        public Weapon[] LeftWeapons => leftWeapons;
 
         [Header("Body Parts")]
         public Transform rightHand;
@@ -51,8 +57,8 @@ namespace AFV2
 
             rightWeapons[slot].Unequip(rightHand);
             rightWeapons[slot] = null;
-
         }
+
         public void UnequipLeftWeapon(int slot = 0)
         {
             if (leftWeapons[slot] == null) return;
@@ -65,8 +71,8 @@ namespace AFV2
         {
             isTwoHanding = !isTwoHanding;
 
-            Weapon rightHandWeapon = GetActiveRightWeapon();
-            Weapon leftHandWeapon = GetActiveLeftWeapon();
+            TryGetActiveRightWeapon(out Weapon rightHandWeapon);
+            TryGetActiveLeftWeapon(out Weapon leftHandWeapon);
 
             if (isTwoHanding)
             {
@@ -85,13 +91,51 @@ namespace AFV2
             }
         }
 
-        Weapon GetActiveRightWeapon()
+        public bool TryGetActiveRightWeapon(out Weapon weapon)
         {
-            return rightHand.GetComponentInChildren<Weapon>();
+            weapon = rightHand.GetComponentInChildren<Weapon>();
+
+            return weapon != null;
         }
-        Weapon GetActiveLeftWeapon()
+        public bool TryGetActiveLeftWeapon(out Weapon weapon)
         {
-            return leftHand.GetComponentInChildren<Weapon>();
+            weapon = leftHand.GetComponentInChildren<Weapon>();
+
+            return weapon != null;
         }
+
+        public bool HasRightAndLeftWeapon() => TryGetActiveRightWeapon(out _) && TryGetActiveRightWeapon(out _);
+        public bool IsPowerStancing() =>
+            isTwoHanding == false
+            && TryGetActiveRightWeapon(out Weapon rightWeapon)
+            && TryGetActiveLeftWeapon(out Weapon leftWeapon)
+            && rightWeapon == leftWeapon;
+
+        public void EnableLeftWeaponHitbox()
+        {
+            if (TryGetActiveLeftWeapon(out Weapon weapon)) weapon.EnableHitbox();
+        }
+
+        public void DisableLeftWeaponHitbox()
+        {
+            if (TryGetActiveLeftWeapon(out Weapon weapon)) weapon.DisableHitbox();
+        }
+
+        public void EnableRightWeaponHitbox()
+        {
+            if (TryGetActiveRightWeapon(out Weapon weapon)) weapon.EnableHitbox();
+        }
+
+        public void DisableRightWeaponHitbox()
+        {
+            if (TryGetActiveRightWeapon(out Weapon weapon)) weapon.DisableHitbox();
+        }
+
+        public void DisableAllHitboxes()
+        {
+            DisableLeftWeaponHitbox();
+            DisableRightWeaponHitbox();
+        }
+
     }
 }

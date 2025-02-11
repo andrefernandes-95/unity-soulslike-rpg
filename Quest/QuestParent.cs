@@ -1,6 +1,5 @@
 using System;
 using AF.Events;
-using GameAnalyticsSDK;
 using TigerForge;
 using UnityEditor;
 using UnityEngine;
@@ -114,12 +113,6 @@ namespace AF
 
         void LogAnalytic(string eventName)
         {
-            if (!GameAnalytics.Initialized)
-            {
-                GameAnalytics.Initialize();
-            }
-
-            GameAnalytics.NewDesignEvent(eventName);
         }
     }
 }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GameAnalyticsSDK;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
@@ -282,12 +281,6 @@ namespace AF
 
         void LogAnalytic(string eventName)
         {
-            if (!GameAnalytics.Initialized)
-            {
-                GameAnalytics.Initialize();
-            }
-
-            GameAnalytics.NewDesignEvent(eventName);
         }
     }
 }

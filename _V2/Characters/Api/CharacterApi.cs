@@ -8,6 +8,9 @@ namespace AFV2
         public StateMachine stateMachine;
         public CharacterController characterController;
 
+
+        public CharacterStats characterStats;
+
         public CharacterMovement characterMovement;
         public CharacterGravity characterGravity;
         public CharacterEquipment characterEquipment;

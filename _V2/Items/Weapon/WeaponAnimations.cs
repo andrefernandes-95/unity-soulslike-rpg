@@ -1,6 +1,7 @@
 namespace AFV2
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using UnityEngine;
 
@@ -11,6 +12,14 @@ namespace AFV2
         [SerializeField] Transform twoHandActionClipsContainer;
         Dictionary<string, ActionClip> oneHandActionClips = new();
         Dictionary<string, ActionClip> twoHandActionClips = new();
+
+        [Header("Available Animations")]
+        [SerializeField] protected List<string> rightLightAttacks = new() { "Right Attack A", "Right Attack B", "Right Attack C" };
+        public List<string> RightLightAttacks => rightLightAttacks.ToList();
+        [SerializeField] protected List<string> leftLightAttacks = new() { "Left Attack A", "Left Attack B", "Left Attack C" };
+        public List<string> LeftLightAttacks => leftLightAttacks.ToList();
+        [SerializeField] protected List<string> heavyAttacks = new() { "Heavy Attack A", "Heavy Attack B", "Heavy Attack C" };
+        public List<string> HeavyAttacks => heavyAttacks.ToList();
 
         CharacterApi characterApi;
 
@@ -43,7 +52,6 @@ namespace AFV2
             {
                 twoHandActionClips.Add(twoHandActionClip.name, twoHandActionClip);
             }
-
         }
 
         public async void ApplyAnimations()
@@ -54,8 +62,8 @@ namespace AFV2
             characterApi.animatorManager.animatorOverrideManager.UpdateClips(
                 characterApi.characterEquipment.characterWeapons.IsTwoHanding ? twoHandActionClips : oneHandActionClips
             );
-
         }
+
 
     }
 }

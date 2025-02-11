@@ -1,39 +1,29 @@
 namespace AFV2
 {
     using System.Collections.Generic;
+    using System.Linq;
     using AF;
     using UnityEngine;
 
     [RequireComponent(typeof(Animator))]
-    [RequireComponent(typeof(AnimatorManager))]
     public class AnimatorOverrideManager : MonoBehaviour
     {
-        AnimatorManager animatorManager => GetComponent<AnimatorManager>();
         Animator animator => GetComponent<Animator>();
         AnimatorOverrideController animatorOverrideController;
 
         [SerializeField] AnimationEventDispatcher animationEventDispatcher;
 
-        private void Awake()
-        {
-            SetupAnimatorOverrides();
-        }
-
-
         void SetupAnimatorOverrides()
         {
-            animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
-            animator.runtimeAnimatorController = animatorOverrideController;
+            if (animatorOverrideController == null)
+                animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
         }
 
         public void UpdateClips(Dictionary<string, ActionClip> animationUpdates)
         {
-            if (animatorOverrideController == null)
-            {
-                SetupAnimatorOverrides();
-            }
+            SetupAnimatorOverrides();
 
-            AnimationClipOverrides clipOverrides = new AnimationClipOverrides(animatorOverrideController.overridesCount);
+            var clipOverrides = new AnimationClipOverrides(animatorOverrideController.overridesCount);
             animatorOverrideController.GetOverrides(clipOverrides);
 
             animationEventDispatcher.ClearAll();
@@ -50,25 +40,32 @@ namespace AFV2
 
                 clipOverrides[animationName] = actionClip.animationClip;
 
-                foreach (var actionClipEvents in actionClip.Events)
+                foreach (var actionClipEvent in actionClip.Events)
                 {
-                    string eventName = $"{animationName}_{actionClipEvents.triggerTime}";
+                    string eventName = $"{animationName}_{actionClipEvent.triggerTime}";
 
                     // Register event in dispatcher
-                    animationEventDispatcher.RegisterEvent(eventName, actionClipEvents.OnEvent);
+                    animationEventDispatcher.RegisterEvent(eventName, actionClipEvent.OnEvent);
 
                     // Create and assign AnimationEvent
-                    UnityEngine.AnimationEvent animationEvent = new();
-                    animationEvent.functionName = "TriggerEvent";
-                    animationEvent.stringParameter = eventName;
-                    animationEvent.time = actionClipEvents.triggerTime;
+                    var animationEvent = new UnityEngine.AnimationEvent
+                    {
+                        functionName = "TriggerEvent",
+                        stringParameter = eventName,
+                        time = actionClipEvent.triggerTime
+                    };
 
                     clipOverrides[animationName].AddEvent(animationEvent);
                 }
             }
 
-            animatorOverrideController.ApplyOverrides(clipOverrides);
-        }
+            var filtered = clipOverrides
+            .Where(clipOverride => clipOverride.Value != null)
+            .ToDictionary(clipOverride => clipOverride.Key, clipOverride => clipOverride.Value);
 
+            animatorOverrideController.ApplyOverrides(filtered.ToList());
+
+            animator.runtimeAnimatorController = animatorOverrideController;
+        }
     }
 }

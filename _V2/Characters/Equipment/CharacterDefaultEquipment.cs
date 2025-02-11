@@ -4,16 +4,16 @@ namespace AFV2
 
     public class CharacterDefaultEquipment : MonoBehaviour
     {
-        public Weapon defaultRightWeapon;
-
+        [SerializeField] Weapon defaultLeftWeapon;
+        [SerializeField] Weapon defaultRightWeapon;
 
         [Header("Components")]
-        public CharacterWeapons characterWeapons;
-        public CharacterEquipment characterEquipment;
+        [SerializeField] CharacterWeapons characterWeapons;
 
         private void Awake()
         {
-            if (defaultRightWeapon != null) characterWeapons.EquipRightWeapon(defaultRightWeapon, 0);
+            characterWeapons.EquipRightWeapon(defaultRightWeapon ?? characterWeapons.FallbackWeapon, 0);
+            characterWeapons.EquipLeftWeapon(defaultLeftWeapon ?? characterWeapons.FallbackWeapon, 0);
         }
     }
 }

@@ -2,12 +2,9 @@ namespace AFV2
 {
     using UnityEngine;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
 
     public class ActionClip : MonoBehaviour
     {
-        public string AnimationHash => this.gameObject.name;
-
         [Range(0, 1f)][SerializeField] private float previewTime = 0;
         public float PreviewTime => previewTime;
 
@@ -18,16 +15,6 @@ namespace AFV2
 
         private Dictionary<int, float> previousEventTimes = new Dictionary<int, float>(); // Track previous event times
 
-
-        public async Task Play(AnimatorManager animatorManager, float blend = 0.2f)
-        {
-            animatorManager.BlendTo(AnimationHash, blend);
-            animatorManager.EnableRootMotion();
-
-            await animatorManager.WaitForAnimationToFinish(AnimationHash);
-
-            animatorManager.DisableRootMotion();
-        }
 
         private void OnValidate()
         {

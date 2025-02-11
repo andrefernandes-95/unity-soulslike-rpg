@@ -6,12 +6,13 @@ namespace AFV2
     public class IdleState : State
     {
         [SerializeField] private string HASH_IDLE = "Idle";
+        [SerializeField] private float blendTime = .05f;
 
         public CharacterApi characterApi;
 
         public override void OnStateEnter()
         {
-            characterApi.animatorManager.BlendTo(HASH_IDLE, 0.2f);
+            characterApi.animatorManager.BlendTo(HASH_IDLE, blendTime);
         }
 
         public override Task OnStateExit()

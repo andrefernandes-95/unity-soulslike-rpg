@@ -34,14 +34,11 @@ namespace AFV2
             get { return jump; }
         }
 
-        bool lightAttack;
-        public bool LightAttack
-        {
-            get { return lightAttack; }
-        }
-
         [Header("Events")]
+        public UnityEvent onRightAttack;
+        public UnityEvent onLeftAttack;
         public UnityEvent onChangeCombatStance;
+        public UnityEvent onMenu;
 
         [Header("Components")]
         [SerializeField] GameSettings gameSettings;
@@ -101,14 +98,28 @@ namespace AFV2
 
         public void OnLightAttack(InputValue value)
         {
-            lightAttack = value.isPressed;
+            if (value.isPressed)
+                onRightAttack.Invoke();
         }
-        void ResetLightAttack() => lightAttack = false;
+
+        public void OnBlock(InputValue value)
+        {
+            if (value.isPressed)
+                onLeftAttack.Invoke();
+        }
 
 
         public void OnChangeCombatStance(InputValue value)
         {
             onChangeCombatStance?.Invoke();
+        }
+
+        public void OnMenu(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                onMenu?.Invoke();
+            }
         }
 
     }

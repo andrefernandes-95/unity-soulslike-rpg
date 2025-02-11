@@ -4,7 +4,6 @@ namespace AF
     using AF.Events;
     using AF.Flags;
     using AF.Music;
-    using GameAnalyticsSDK;
     using TigerForge;
     using UnityEngine;
     using UnityEngine.Events;
@@ -220,12 +219,6 @@ namespace AF
 
         void LogAnalytic(string eventName)
         {
-            if (!GameAnalytics.Initialized)
-            {
-                GameAnalytics.Initialize();
-            }
-
-            GameAnalytics.NewDesignEvent(eventName);
         }
     }
 }

@@ -16,11 +16,9 @@ namespace AFV2
                             targetDirection.normalized * (targetSpeed * Time.deltaTime));
         }
 
+        public void EnableRotation() => canRotate = true;
         public void DisableRotation() => canRotate = false;
 
-        public void ResetStates()
-        {
-            canRotate = true;
-        }
+        public void ResetStates() => EnableRotation();
     }
 }

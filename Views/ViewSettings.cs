@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using AF.UI;
-using GameAnalyticsSDK;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.UIElements;
@@ -52,12 +51,6 @@ namespace AF
 
         void LogAnalytic(string eventName)
         {
-            if (!GameAnalytics.Initialized)
-            {
-                GameAnalytics.Initialize();
-            }
-
-            GameAnalytics.NewDesignEvent(eventName);
         }
         void SetupRefs()
         {

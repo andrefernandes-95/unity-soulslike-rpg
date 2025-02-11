@@ -42,9 +42,22 @@ namespace AFV2
         public void TakeDamage(float damage) => Health -= damage;
         public void Heal(float amount) => Health += amount;
 
+        /// <summary>
+        /// Normalize stamina between 0 and 1
+        /// </summary>
+        /// <returns></returns>
+        public float GetNormalizedHealth() => health / maxHealth;
+
         public void SetStamina(float value) => Stamina = value;
         public void UseStamina(float amount) => Stamina -= amount;
         public void RecoverStamina(float amount) => Stamina += amount;
+        public bool HasEnoughStamina(float amount) => Stamina >= amount;
+
+        /// <summary>
+        /// Normalize stamina between 0 and 1
+        /// </summary>
+        /// <returns></returns>
+        public float GetNormalizedStamina() => stamina / maxStamina;
 
         public void SetMana(float value) => Mana = value;
         public void UseMana(float amount) => Mana -= amount;

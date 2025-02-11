@@ -3,7 +3,6 @@ namespace AF
     using System.Linq;
     using AF.Inventory;
     using AF.Ladders;
-    using GameAnalyticsSDK;
     using UnityEngine;
     using UnityEngine.Events;
     using UnityEngine.Localization.Settings;
@@ -77,12 +76,6 @@ namespace AF
 
         void LogAnalytic(string eventName)
         {
-            if (!GameAnalytics.Initialized)
-            {
-                GameAnalytics.Initialize();
-            }
-
-            GameAnalytics.NewDesignEvent(eventName);
         }
 
         public void AddItem(Item item, int quantity)

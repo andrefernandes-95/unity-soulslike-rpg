@@ -1,6 +1,5 @@
 using AF.Companions;
 using AF.Events;
-using GameAnalyticsSDK;
 using TigerForge;
 using UnityEngine;
 using UnityEngine.Events;
@@ -42,12 +41,6 @@ namespace AF.Bonfires
 
         void LogAnalytic(string eventName)
         {
-            if (!GameAnalytics.Initialized)
-            {
-                GameAnalytics.Initialize();
-            }
-
-            GameAnalytics.NewDesignEvent(eventName);
         }
 
         public void UnlockBonfire(string bonfireName)

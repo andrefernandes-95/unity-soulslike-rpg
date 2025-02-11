@@ -144,6 +144,7 @@ namespace AF
             }
 
             animatorOverrideController.ApplyOverrides(clipOverrides);
+
         }
 
         private void OnAnimatorMove()

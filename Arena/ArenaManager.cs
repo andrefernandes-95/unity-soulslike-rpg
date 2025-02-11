@@ -4,7 +4,6 @@ using System.Linq;
 using AF.Events;
 using AF.Music;
 using AYellowpaper.SerializedCollections;
-using GameAnalyticsSDK;
 using TigerForge;
 using UnityEngine;
 using UnityEngine.AI;
@@ -127,12 +126,6 @@ namespace AF.Arena
 
         void LogAnalytic(string eventName)
         {
-            if (!GameAnalytics.Initialized)
-            {
-                GameAnalytics.Initialize();
-            }
-
-            GameAnalytics.NewDesignEvent(eventName);
         }
 
         public void EndArena(bool hasWon)

@@ -3,7 +3,6 @@ namespace AF
     using System.Collections.Generic;
     using System.Linq;
     using AF.Music;
-    using GameAnalyticsSDK;
     using UnityEngine;
     using UnityEngine.Events;
     using UnityEngine.Localization.Settings;
@@ -193,22 +192,10 @@ namespace AF
 
         void LogAnalytic(string eventName)
         {
-            if (!GameAnalytics.Initialized)
-            {
-                GameAnalytics.Initialize();
-            }
-
-            GameAnalytics.NewDesignEvent(eventName);
         }
 
         void LogAnalytic(string eventName, Dictionary<string, object> values)
         {
-            if (!GameAnalytics.Initialized)
-            {
-                GameAnalytics.Initialize();
-            }
-
-            GameAnalytics.NewDesignEvent(eventName, values);
         }
 
         CreatedItemThumbnail[] GetCreatedItemThumbnails()

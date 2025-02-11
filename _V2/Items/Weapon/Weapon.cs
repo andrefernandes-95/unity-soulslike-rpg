@@ -43,6 +43,7 @@ namespace AFV2
     [RequireComponent(typeof(WeaponRenderer))]
     [RequireComponent(typeof(OneHandPivots))]
     [RequireComponent(typeof(TwoHandPivots))]
+    [RequireComponent(typeof(WeaponHitbox))]
     public class Weapon : Item
     {
         [Header("Scaling")]
@@ -59,6 +60,7 @@ namespace AFV2
         TwoHandPivots twoHandPivots => GetComponent<TwoHandPivots>();
         WeaponRenderer weaponRenderer => GetComponent<WeaponRenderer>();
         WeaponAnimations weaponAnimations => GetComponent<WeaponAnimations>();
+        WeaponHitbox weaponHitbox => GetComponent<WeaponHitbox>();
 
         Dictionary<Transform, Weapon> instances = new();
 
@@ -79,6 +81,8 @@ namespace AFV2
             ApplyAnimations(instances[parent]);
 
             instances[parent].weaponRenderer.EnableRenderer();
+
+            DisableHitbox();
         }
 
         public void Unequip(Transform parent)
@@ -101,5 +105,20 @@ namespace AFV2
         }
 
         public void ApplyAnimations(Weapon instance) => instance.weaponAnimations.ApplyAnimations();
+
+        public void EnableHitbox() => weaponHitbox.EnableHitbox();
+        public void DisableHitbox() => weaponHitbox.DisableHitbox();
+
+
+        public List<string> GetAttacksForCombatDecision(CombatDecision combatDecision)
+        {
+            if (combatDecision == CombatDecision.RIGHT_LIGHT_ATTACK)
+                return weaponAnimations.RightLightAttacks;
+            if (combatDecision == CombatDecision.LEFT_LIGHT_ATTACK)
+                return weaponAnimations.LeftLightAttacks;
+            if (combatDecision == CombatDecision.HEAVY_ATTACK)
+                return weaponAnimations.HeavyAttacks;
+            return new();
+        }
     }
 }

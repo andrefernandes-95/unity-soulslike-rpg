@@ -11,7 +11,7 @@ namespace AFV2
 
         [SerializeField] private string HASH_LAND = "Land";
         [SerializeField] private float landBlendTime = 0.15f;
-        [SerializeField] private float minimumFallHeightToPlayLandAnimation = 1.5f;
+        [SerializeField] private float minimumFallHeightToPlayLandAnimation = 3f;
 
         [Header("Components")]
         public CharacterApi characterApi;

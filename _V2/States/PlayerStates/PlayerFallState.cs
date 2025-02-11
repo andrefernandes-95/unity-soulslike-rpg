@@ -1,6 +1,5 @@
 namespace AFV2
 {
-    using EditorAttributes;
     using UnityEngine;
 
     public class PlayerFallState : FallState
@@ -12,7 +11,6 @@ namespace AFV2
         [Header("Player Grounded States")]
         public PlayerIdleState playerIdleState;
         public PlayerRunState playerRunState;
-        [HideField("groundedState")]
 
         [Header("Components")]
         [SerializeField] PlayerController playerController;

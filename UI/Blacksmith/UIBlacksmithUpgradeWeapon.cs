@@ -4,7 +4,6 @@ namespace AF
     using System.Collections.Generic;
     using AF.Health;
     using AF.Inventory;
-    using GameAnalyticsSDK;
     using UnityEngine;
     using UnityEngine.Localization.Settings;
     using UnityEngine.UIElements;
@@ -192,12 +191,6 @@ namespace AF
 
         void LogAnalytic(string eventName, Dictionary<string, object> values)
         {
-            if (!GameAnalytics.Initialized)
-            {
-                GameAnalytics.Initialize();
-            }
-
-            GameAnalytics.NewDesignEvent(eventName, values);
         }
     }
 }

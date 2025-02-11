@@ -3,7 +3,6 @@ namespace AF
     using AF.Inventory;
     using AF.Music;
     using AF.UI;
-    using GameAnalyticsSDK;
     using UnityEngine;
     using UnityEngine.UIElements;
 
@@ -327,12 +326,6 @@ namespace AF
 
         void LogAnalytic(string eventName)
         {
-            if (!GameAnalytics.Initialized)
-            {
-                GameAnalytics.Initialize();
-            }
-
-            GameAnalytics.NewDesignEvent(eventName);
         }
 
 

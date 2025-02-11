@@ -1,7 +1,6 @@
 using System;
 using Steamworks;
 using UnityEngine;
-using GameAnalyticsSDK;
 using UnityEngine.SceneManagement;
 
 namespace AF
@@ -12,20 +11,6 @@ namespace AF
     {
         public void UpdateStat()
         {
-            try
-            {
-                if (!GameAnalytics.Initialized)
-                {
-                    GameAnalytics.Initialize();
-                }
-
-                GameAnalytics.NewDesignEvent(
-                    $"Achievement:{name}");
-            }
-            catch (Exception e)
-            {
-                Debug.Log("An error occurred while sending stat '" + name + "': " + e.Message);
-            }
         }
     }
 }
