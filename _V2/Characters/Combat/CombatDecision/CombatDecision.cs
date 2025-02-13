@@ -6,7 +6,8 @@ namespace AFV2
         RIGHT_LIGHT_ATTACK,
         LEFT_LIGHT_ATTACK,
         HEAVY_ATTACK,
-        AIR_ATTACK,
+        RIGHT_AIR_ATTACK,
+        LEFT_AIR_ATTACK,
 
         // AI Related, Player will be able to perform these on demand
         DODGE,

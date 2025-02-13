@@ -13,6 +13,8 @@ namespace AFV2
             get { return move; }
         }
 
+        public UnityEvent onNavigate;
+
         Vector2 look;
         public Vector2 Look
         {
@@ -44,7 +46,10 @@ namespace AFV2
         [SerializeField] GameSettings gameSettings;
         [SerializeField] PlayerCamera playerCamera;
 
-        public void OnMove(InputValue value) => move = value.Get<Vector2>();
+        public void OnMove(InputValue value)
+        {
+            move = value.Get<Vector2>();
+        }
 
         public void OnLook(InputValue value)
         {
@@ -122,5 +127,36 @@ namespace AFV2
             }
         }
 
+        public void OnSwitchSpell(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                onNavigate?.Invoke();
+            }
+        }
+
+        public void OnSwitchConsumable(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                onNavigate?.Invoke();
+            }
+        }
+
+        public void OnSwitchWeapon(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                onNavigate?.Invoke();
+            }
+        }
+
+        public void OnSwitchShield(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                onNavigate?.Invoke();
+            }
+        }
     }
 }

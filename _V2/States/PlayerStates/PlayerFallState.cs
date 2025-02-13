@@ -17,6 +17,11 @@ namespace AFV2
 
         public override State Tick()
         {
+            if (playerController.IsJumpAttacking())
+            {
+                return airAttackState;
+            }
+
             if (playerController.IsMoving())
                 characterApi.characterMovement.Move(
                     FallMoveSpeed * (playerController.IsSprinting() ? SprintSpeedMultiplier : 1), playerController.GetPlayerRotation());

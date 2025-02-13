@@ -18,12 +18,11 @@ namespace AFV2
 
         [Header("Transition State")]
         public State groundedState;
-
-        float fallBegin;
+        public AirAttackState airAttackState;
 
         public override void OnStateEnter()
         {
-            fallBegin = characterApi.transform.position.y;
+            characterApi.characterGravity.UpdateFallBegin();
 
             characterApi.animatorManager.BlendTo(HASH_FALL, fallBlendTime);
         }
@@ -31,7 +30,7 @@ namespace AFV2
         public override async Task OnStateExit()
         {
             // If fall height is too small, skip the landing animation entirely
-            if (fallBegin - transform.position.y < minimumFallHeightToPlayLandAnimation)
+            if (characterApi.characterGravity.GetFallHeight() < minimumFallHeightToPlayLandAnimation)
             {
                 return; // Just return without waiting for animation
             }
@@ -42,6 +41,7 @@ namespace AFV2
             // Wait until the animation fully plays out
             await characterApi.animatorManager.WaitForAnimationToFinish(HASH_LAND);
         }
+
         public override State Tick()
         {
             if (characterApi.characterGravity.Grounded)
@@ -49,5 +49,6 @@ namespace AFV2
 
             return this;
         }
+
     }
 }

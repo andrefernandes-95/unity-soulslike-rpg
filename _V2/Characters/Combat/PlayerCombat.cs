@@ -24,10 +24,10 @@ namespace AFV2
             if (!characterApi.characterStats.HasEnoughStamina(staminaCost))
                 return false;
 
-            if (combatDecision == CombatDecision.RIGHT_LIGHT_ATTACK)
+            if (combatDecision == CombatDecision.RIGHT_LIGHT_ATTACK || combatDecision == CombatDecision.RIGHT_AIR_ATTACK)
                 return playerController.HasRightAttackQueued;
 
-            if (combatDecision == CombatDecision.LEFT_LIGHT_ATTACK)
+            if (combatDecision == CombatDecision.LEFT_LIGHT_ATTACK || combatDecision == CombatDecision.LEFT_AIR_ATTACK)
                 return playerController.HasLeftAttackQueued;
 
             return false;

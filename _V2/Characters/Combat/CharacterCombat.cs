@@ -11,6 +11,7 @@ namespace AFV2
         [Header("Components")]
         [SerializeField] protected CharacterApi characterApi;
         [SerializeField] CharacterCombatDecision characterCombatDecision => GetComponent<CharacterCombatDecision>();
+        public CharacterCombatDecision CharacterCombatDecision => characterCombatDecision;
 
         [Header("Light Attacks")]
         [SerializeField] float lightAttackStaminaCost = 10f;
@@ -28,58 +29,9 @@ namespace AFV2
             onAttackEnd.AddListener(characterApi.characterEquipment.characterWeapons.DisableAllHitboxes);
         }
 
-        protected virtual (List<string> availableAttacks, float staminaCost, CombatDecision combatDecision1) GetNextAttack()
+        public async virtual Task Attack(
+            List<string> availableAttacks, float staminaCost, CombatDecision combatDecision)
         {
-            CombatDecision combatDecision = characterCombatDecision.GetCombatDecision();
-            float staminaCost = 0f;
-
-            List<string> availableAttacks = new();
-
-            characterApi.characterEquipment.characterWeapons.TryGetActiveRightWeapon(out Weapon rightHandWeapon);
-            characterApi.characterEquipment.characterWeapons.TryGetActiveLeftWeapon(out Weapon leftHandWeapon);
-
-            if (combatDecision == CombatDecision.RIGHT_LIGHT_ATTACK)
-            {
-                if (rightHandWeapon != null)
-                {
-                    availableAttacks = rightHandWeapon.GetAttacksForCombatDecision(combatDecision);
-                }
-
-                staminaCost = lightAttackStaminaCost;
-            }
-            else if (combatDecision == CombatDecision.LEFT_LIGHT_ATTACK)
-            {
-                if (leftHandWeapon != null)
-                {
-                    availableAttacks = leftHandWeapon.GetAttacksForCombatDecision(combatDecision);
-                }
-
-                staminaCost = lightAttackStaminaCost;
-            }
-            else if (combatDecision == CombatDecision.HEAVY_ATTACK)
-            {
-                List<string> heavyAttacks = new();
-
-                if (rightHandWeapon != null)
-                {
-                    heavyAttacks = rightHandWeapon.GetAttacksForCombatDecision(combatDecision);
-                }
-                else if (leftHandWeapon != null)
-                {
-                    heavyAttacks = leftHandWeapon.GetAttacksForCombatDecision(combatDecision);
-                }
-
-                availableAttacks = heavyAttacks;
-                staminaCost = heavyAttackStaminaCost;
-            }
-
-            return (availableAttacks, staminaCost, combatDecision);
-        }
-
-        public async virtual Task Attack()
-        {
-            (List<string> availableAttacks, float staminaCost, CombatDecision combatDecision) = GetNextAttack();
-
             if (combatDecision == CombatDecision.NONE)
             {
                 onNoDecisionMade?.Invoke();
@@ -106,8 +58,6 @@ namespace AFV2
             CombatDecision combatDecision
             )
         {
-            bool isFirst = true;
-
             while (CanCombo(staminaCost, combatDecision) && attacks.Count > 0)
             {
                 string nextAttack = attacks[0]; // Get the first attack in the list
@@ -115,18 +65,17 @@ namespace AFV2
 
                 onAttackBegin?.Invoke();
 
-                characterApi.animatorManager.EnableRootMotion();
+                if (characterApi.characterGravity.Grounded)
+                    characterApi.animatorManager.EnableRootMotion();
 
                 // Play the attack animation
-                characterApi.animatorManager.BlendTo(nextAttack);
+                characterApi.animatorManager.BlendTo(nextAttack, 0.05f);
 
-                await characterApi.animatorManager.WaitForAnimationToFinish(nextAttack, isFirst ? 1f : 0.85f);
+                await characterApi.animatorManager.WaitForAnimationToFinish(nextAttack);
 
                 characterApi.animatorManager.DisableRootMotion();
 
                 onAttackEnd?.Invoke();
-
-                isFirst = false;
             }
 
             return Task.CompletedTask;

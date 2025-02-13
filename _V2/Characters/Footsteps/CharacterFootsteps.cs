@@ -9,6 +9,7 @@ namespace AFV2
     {
         [Header("Settings")]
         [SerializeField] float rayDistanceDownwards = 1f;
+        [SerializeField] float audioSourceVolume = 0.15f;
 
         [Header("Components")]
         public CharacterGravity characterGravity;
@@ -36,6 +37,8 @@ namespace AFV2
 
             FootstepReceiver receiver = footBone.gameObject.AddComponent<FootstepReceiver>();
             AudioSource audioSource = footBone.gameObject.AddComponent<AudioSource>();
+
+            audioSource.volume = audioSourceVolume;
             AudioUtils.Setup3DAudioSource(audioSource);
             audioSource.playOnAwake = false;
 

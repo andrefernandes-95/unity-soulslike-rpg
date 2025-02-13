@@ -22,24 +22,33 @@ namespace AFV2
         {
             inputListener.onRightAttack.AddListener(() =>
             {
-                hasRightAttackQueued = true;
+                if (CanControlPlayer())
+                    hasRightAttackQueued = true;
             });
             inputListener.onLeftAttack.AddListener(() =>
             {
-                hasLeftAttackQueued = true;
+                if (CanControlPlayer())
+                    hasLeftAttackQueued = true;
             });
 
-            inputListener.onChangeCombatStance.AddListener(characterApi.characterEquipment.characterWeapons.ToggleTwoHanding);
+            inputListener.onChangeCombatStance.AddListener(() =>
+            {
+                if (CanControlPlayer())
+                    characterApi.characterEquipment.characterWeapons.ToggleTwoHanding();
+            });
 
             inputListener.onMenu.AddListener(ToggleMenu);
         }
 
         public Quaternion GetPlayerRotation() => Quaternion.Euler(0.0f, cameraController.TargetRotation, 0.0f);
 
-        public bool IsMoving() => inputListener.Move != Vector2.zero;
+        public bool CanRotatePlayer() => CanControlPlayer();
+
+        public bool IsMoving() => CanControlPlayer() && inputListener.Move != Vector2.zero;
         public bool IsSprinting() => IsMoving() && inputListener.Sprint;
-        public bool IsJumping() => inputListener.Jump && characterApi.characterGravity.Grounded;
-        public bool IsLightAttacking() => (hasLeftAttackQueued || hasRightAttackQueued) && characterApi.characterGravity.Grounded;
+        public bool IsJumping() => CanControlPlayer() && inputListener.Jump && characterApi.characterGravity.Grounded;
+        public bool IsLightAttacking() => CanControlPlayer() && (hasLeftAttackQueued || hasRightAttackQueued) && characterApi.characterGravity.Grounded;
+        public bool IsJumpAttacking() => CanControlPlayer() && (hasLeftAttackQueued || hasRightAttackQueued) && !characterApi.characterGravity.Grounded;
 
         public void ResetCombatFlags()
         {
@@ -51,14 +60,10 @@ namespace AFV2
         {
             if (TryGetMainMenu(out MainMenu menu))
             {
-                if (menu.IsActive())
-                {
+                if (menu.IsActive)
                     menu.Hide();
-                }
                 else
-                {
-                    menu.Show(characterApi);
-                }
+                    menu.Show();
             }
         }
 
@@ -71,5 +76,7 @@ namespace AFV2
 
             return localValue != null;
         }
+
+        bool CanControlPlayer() => TryGetMainMenu(out MainMenu mainMenu) && mainMenu.IsActive == false;
     }
 }

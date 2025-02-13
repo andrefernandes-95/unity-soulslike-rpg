@@ -6,35 +6,17 @@ namespace AFV2
     {
         [SerializeField] PlayerController playerController;
 
-        public override CombatDecision GetCombatDecision()
-        {
-            // Reactions should go first
-            if (ShouldLightAttack(out CombatDecision combatDecision))
-                return combatDecision;
+        protected override bool CanRightAttack() =>
+            playerController.HasRightAttackQueued && base.CanRightAttack();
 
-            return CombatDecision.NONE;
-        }
+        protected override bool CanLeftAttack() =>
+            playerController.HasLeftAttackQueued && base.CanLeftAttack();
 
-        bool ShouldLightAttack(out CombatDecision combatDecision)
+        // Override this method since it's not applicable to player
+        protected override bool TryRightOrLeftAttack(out CombatDecision combatDecision)
         {
             combatDecision = CombatDecision.NONE;
-
-            if (!characterApi.characterStats.HasEnoughStamina(characterCombat.LightAttackStaminaCost))
-                return false;
-
-            if (playerController.HasRightAttackQueued && characterApi.characterEquipment.characterWeapons.TryGetActiveRightWeapon(out _))
-            {
-                combatDecision = CombatDecision.RIGHT_LIGHT_ATTACK;
-                return true;
-            }
-            else if (playerController.HasLeftAttackQueued && characterApi.characterEquipment.characterWeapons.TryGetActiveLeftWeapon(out _))
-            {
-                combatDecision = CombatDecision.LEFT_LIGHT_ATTACK;
-                return true;
-            }
-
             return false;
         }
-
     }
 }

@@ -112,6 +112,10 @@ namespace AFV2
 
         public List<string> GetAttacksForCombatDecision(CombatDecision combatDecision)
         {
+            if (combatDecision == CombatDecision.RIGHT_AIR_ATTACK)
+                return weaponAnimations.RightAirAttacks;
+            if (combatDecision == CombatDecision.LEFT_AIR_ATTACK)
+                return weaponAnimations.LeftAirAttacks;
             if (combatDecision == CombatDecision.RIGHT_LIGHT_ATTACK)
                 return weaponAnimations.RightLightAttacks;
             if (combatDecision == CombatDecision.LEFT_LIGHT_ATTACK)

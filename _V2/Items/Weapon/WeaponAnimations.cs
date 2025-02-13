@@ -20,6 +20,10 @@ namespace AFV2
         public List<string> LeftLightAttacks => leftLightAttacks.ToList();
         [SerializeField] protected List<string> heavyAttacks = new() { "Heavy Attack A", "Heavy Attack B", "Heavy Attack C" };
         public List<string> HeavyAttacks => heavyAttacks.ToList();
+        [SerializeField] protected List<string> rightAirAttacks = new() { "Right Air Attack A" };
+        public List<string> RightAirAttacks => rightAirAttacks.ToList();
+        [SerializeField] protected List<string> leftAirAttacks = new() { "Left Air Attack A" };
+        public List<string> LeftAirAttacks => leftAirAttacks.ToList();
 
         CharacterApi characterApi;
 

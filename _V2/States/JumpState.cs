@@ -12,6 +12,7 @@ namespace AFV2
 
         [Header("Transition State")]
         public FallState fallState;
+        public AirAttackState airAttackState;
 
         public override void OnStateEnter()
         {

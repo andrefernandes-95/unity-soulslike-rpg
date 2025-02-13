@@ -10,6 +10,7 @@ namespace AFV2
         [Header("Components")]
         [SerializeField] LockOnManager lockOnManager;
         [SerializeField] InputListener inputListener;
+        [SerializeField] PlayerController playerController;
 
         [Tooltip("How fast the character turns to face movement direction")]
         [Range(0.0f, 0.3f)]
@@ -51,6 +52,9 @@ namespace AFV2
 
         void Update()
         {
+            if (!playerController.CanRotatePlayer())
+                return;
+
             Rotate();
             CameraRotation();
         }
@@ -151,6 +155,7 @@ namespace AFV2
         bool IsLockedOn() => lockOnManager != null
                     && lockOnManager.nearestLockOnTarget != null
                     && lockOnManager.isLockedOn;
+
         //&& playerManager.dodgeController.isDodging == false;
     }
 }

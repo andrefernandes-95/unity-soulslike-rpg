@@ -19,5 +19,10 @@ namespace AFV2
                 items.Add(instance);
             }
         }
+
+        public void AddItem(Item item)
+        {
+            AddItem(item, 1);
+        }
     }
 }

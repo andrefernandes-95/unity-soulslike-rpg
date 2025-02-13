@@ -1,17 +1,20 @@
 namespace AFV2
 {
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
     using UnityEngine;
 
-    public class AttackState : State
+    public class AirAttackState : State
     {
 
         [Header("Components")]
+        public CharacterGravity characterGravity;
         public CharacterCombat characterCombat;
 
         [Header("Transition State")]
-        public State idleState;
+        public FallState fallState;
+        public State groundedState;
 
         State returnState;
 
@@ -19,10 +22,12 @@ namespace AFV2
         {
             returnState = this;
 
-            (List<string> availableAttacks, float staminaCost, CombatDecision combatDecision) = characterCombat.CharacterCombatDecision.GetNextAttack();
+            (List<string> availableAttacks, float staminaCost, CombatDecision combatDecision) = characterCombat.CharacterCombatDecision.GetNextAirAttack();
+
             await characterCombat.Attack(availableAttacks, staminaCost, combatDecision);
 
-            returnState = idleState;
+
+            returnState = characterGravity.Grounded ? groundedState : fallState;
         }
 
         public override async Task OnStateExit()

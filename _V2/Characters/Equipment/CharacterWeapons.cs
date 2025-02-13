@@ -1,11 +1,13 @@
 namespace AFV2
 {
-    using System.Collections.Generic;
     using System.Linq;
     using UnityEngine;
 
     public class CharacterWeapons : MonoBehaviour
     {
+        [SerializeField] int activeLeftWeaponIndex = 0;
+        [SerializeField] int activRightWeaponIndex = 0;
+
         [SerializeField] Weapon fallbackWeapon;
         public Weapon FallbackWeapon => fallbackWeapon;
 
@@ -42,13 +44,16 @@ namespace AFV2
         {
             rightWeapons[slot] = weapon;
 
-            weapon.Equip(rightHand, true);
+            if (activeLeftWeaponIndex == slot)
+                weapon.Equip(rightHand, true);
         }
 
         public void EquipLeftWeapon(Weapon weapon, int slot = 0)
         {
             leftWeapons[slot] = weapon;
-            weapon.Equip(leftHand, false);
+
+            if (activeLeftWeaponIndex == slot)
+                weapon.Equip(leftHand, false);
         }
 
         public void UnequipRightWeapon(int slot = 0)
