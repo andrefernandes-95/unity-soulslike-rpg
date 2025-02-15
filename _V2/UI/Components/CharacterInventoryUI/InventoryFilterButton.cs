@@ -1,23 +1,21 @@
 namespace AFV2
 {
     using UnityEngine;
-    using UnityEngine.Events;
     using UnityEngine.EventSystems;
     using UnityEngine.UI;
 
-    [RequireComponent(typeof(Button))]
-    public class SlotButton : MonoBehaviour
+    [RequireComponent(typeof(CanvasGroup))]
+    public class InventoryFilterButton : MonoBehaviour
     {
-        [Header("Slot Settings")]
-        public EquipmentSlotType equipmentSlotType;
+        [Header("Filter Settings")]
+        public EquipmentSlotType filter;
 
         [Header("Components")]
         protected Button button => GetComponent<Button>();
         public Button Button => button;
-        public Image itemIcon;
+        public Image activeIcon;
 
-        // Events
-        [HideInInspector] public UnityAction OnSelectEvent, OnDeselectEvent;
+        CanvasGroup canvasGroup => GetComponent<CanvasGroup>();
 
         void Start()
         {
@@ -44,11 +42,20 @@ namespace AFV2
 
         protected virtual void OnSelect(BaseEventData eventData)
         {
-            OnSelectEvent?.Invoke();
         }
         protected virtual void OnDeselect(BaseEventData eventData)
         {
-            OnDeselectEvent?.Invoke();
+        }
+
+        public void SetIsActive(EquipmentSlotType currentFilter)
+        {
+            activeIcon.gameObject.SetActive(currentFilter == filter);
+        }
+
+        public void SetEnabled(bool isEnabled)
+        {
+            Button.interactable = isEnabled;
+            canvasGroup.alpha = isEnabled ? 1 : 0.25f;
         }
     }
 }

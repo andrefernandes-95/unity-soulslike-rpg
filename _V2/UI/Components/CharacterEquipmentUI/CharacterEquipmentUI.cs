@@ -22,6 +22,14 @@ namespace AFV2
 
         void Awake()
         {
+            InitializeEquipmentSlotSetters();
+
+            AssignEventListeners();
+        }
+
+        #region Awake Logic
+        void InitializeEquipmentSlotSetters()
+        {
             EquipmentSlotSetters = new Dictionary<EquipmentSlotType, Action<Item, int>>
             {
                 { EquipmentSlotType.RIGHT_HAND, (item, slotIndex) =>
@@ -43,7 +51,10 @@ namespace AFV2
                 { EquipmentSlotType.BOOTS, (item, slotIndex) =>
                     characterEquipment.EquipBoots(item as Boot) }
             };
+        }
 
+        void AssignEventListeners()
+        {
             characterInventoryUI.OnItemSelect += (Item item, EquipmentSlotType equipmentSlotType, int slotIndex) =>
             {
                 // Equip
@@ -55,6 +66,7 @@ namespace AFV2
                 ShowEquipmentSlots();
             };
         }
+        #endregion
 
         void OnEnable()
         {
@@ -79,21 +91,25 @@ namespace AFV2
             UIUtils.FadeOut(characterEquipmentUI.gameObject);
         }
 
+        #region Slot Click
         public void OnSlotSelect(EquipmentSlotType equipmentSlotType, int slotIndex)
         {
             characterInventoryUI.SetFilter(equipmentSlotType);
             characterInventoryUI.SetSlotFilter(slotIndex);
+            characterInventoryUI.EnableFiltering = false;
 
             ShowItemList();
         }
+        #endregion
 
+        #region Selected Slot Label
         public void UpdateSelectedSlotLabel(string label)
         {
             if (string.IsNullOrEmpty(label)) label = GetDefaultLabel();
             this.selectedSlotLabel.text = label;
         }
 
-
         string GetDefaultLabel() => Glossary.IsPortuguese() ? "Equipamento" : "Equipment";
+        #endregion
     }
 }

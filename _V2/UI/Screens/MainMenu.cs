@@ -15,6 +15,8 @@ namespace AFV2
 
             isActive = true;
 
+            this.gameObject.SetActive(true);
+
             if (childScreens.Length > 0)
                 UIUtils.FadeIn(childScreens[0]);
         }
@@ -29,6 +31,8 @@ namespace AFV2
             {
                 UIUtils.FadeOut(child);
             }
+
+            this.gameObject.SetActive(false);
         }
     }
 }

@@ -1,5 +1,6 @@
 namespace AFV2
 {
+    using System.Threading.Tasks;
     using UnityEngine;
 
     public class PlayerAirAttackState : AirAttackState
@@ -11,6 +12,12 @@ namespace AFV2
         [Header("Components")]
         [SerializeField] CharacterApi characterApi;
         [SerializeField] PlayerController playerController;
+
+        public override Task OnStateExit()
+        {
+            playerController.ResetCombatFlags();
+            return Task.CompletedTask;
+        }
 
         public override State Tick()
         {

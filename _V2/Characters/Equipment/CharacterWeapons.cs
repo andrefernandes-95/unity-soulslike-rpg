@@ -40,23 +40,27 @@ namespace AFV2
                 characterInventory.AddItem(weapon, 1);
         }
 
-        public void EquipRightWeapon(Weapon weapon, int slot = 0)
+        public void EquipRightWeapon(Weapon weapon, int slot)
         {
+            UnequipRightWeapon(slot);
+
             rightWeapons[slot] = weapon;
 
-            if (activeLeftWeaponIndex == slot)
+            if (activRightWeaponIndex == slot)
                 weapon.Equip(rightHand, true);
         }
 
-        public void EquipLeftWeapon(Weapon weapon, int slot = 0)
+        public void EquipLeftWeapon(Weapon weapon, int slot)
         {
+            UnequipLeftWeapon(slot);
+
             leftWeapons[slot] = weapon;
 
             if (activeLeftWeaponIndex == slot)
                 weapon.Equip(leftHand, false);
         }
 
-        public void UnequipRightWeapon(int slot = 0)
+        public void UnequipRightWeapon(int slot)
         {
             if (rightWeapons[slot] == null) return;
 
@@ -64,7 +68,7 @@ namespace AFV2
             rightWeapons[slot] = null;
         }
 
-        public void UnequipLeftWeapon(int slot = 0)
+        public void UnequipLeftWeapon(int slot)
         {
             if (leftWeapons[slot] == null) return;
 

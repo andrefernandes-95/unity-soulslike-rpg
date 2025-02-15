@@ -41,6 +41,7 @@ namespace AFV2
         public UnityEvent onLeftAttack;
         public UnityEvent onChangeCombatStance;
         public UnityEvent onMenu;
+        public UnityEvent onInteract;
 
         [Header("Components")]
         [SerializeField] GameSettings gameSettings;
@@ -156,6 +157,14 @@ namespace AFV2
             if (value.isPressed)
             {
                 onNavigate?.Invoke();
+            }
+        }
+
+        public void OnInteract(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                onInteract?.Invoke();
             }
         }
     }

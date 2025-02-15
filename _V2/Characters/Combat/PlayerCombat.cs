@@ -21,7 +21,7 @@ namespace AFV2
 
         protected override bool CanCombo(float staminaCost, CombatDecision combatDecision)
         {
-            if (!characterApi.characterStats.HasEnoughStamina(staminaCost))
+            if (!characterApi.characterStats.CharacterStamina.HasEnoughStamina(staminaCost))
                 return false;
 
             if (combatDecision == CombatDecision.RIGHT_LIGHT_ATTACK || combatDecision == CombatDecision.RIGHT_AIR_ATTACK)

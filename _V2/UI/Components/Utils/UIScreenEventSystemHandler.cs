@@ -12,11 +12,9 @@ namespace AFV2
 
         Selectable lastSelectable;
 
-
-        void Awake()
+        void Start()
         {
             AssignSelectables();
-
             AttachToInputListener();
         }
 
@@ -26,6 +24,11 @@ namespace AFV2
             if (inputListener == null) return;
 
             inputListener.onNavigate.AddListener(OnNavigate);
+        }
+
+        void OnEnable()
+        {
+            Invoke(nameof(SelectFirstGameObject), 0f);
         }
 
         void AssignSelectables()
@@ -83,15 +86,13 @@ namespace AFV2
             pointerEventData.selectedObject = null;
         }
 
-        void OnEnable()
-        {
-            Invoke(nameof(SelectFirstGameObject), 0f);
-        }
-
         void SelectFirstGameObject()
         {
             if (selectables.Count > 0)
-                selectables[0].Select();
+            {
+                Selectable match = selectables.FirstOrDefault(selectable => selectable != null);
+                if (match != null) match.Select();
+            }
         }
 
         void OnNavigate()

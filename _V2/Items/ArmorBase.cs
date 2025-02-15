@@ -17,10 +17,10 @@ namespace AFV2
             ArmorBase armorBase = target as ArmorBase;
 
             if (GUILayout.Button("Equip"))
-                armorBase.OnEquip.Invoke();
+                armorBase.Equip();
 
             if (GUILayout.Button("Unequip"))
-                armorBase.OnUnequip.Invoke();
+                armorBase.Unequip();
         }
     }
 #endif
@@ -33,6 +33,26 @@ namespace AFV2
         [Header("Events")]
         public UnityEvent OnEquip;
         public UnityEvent OnUnequip;
+
+        [Header("Sounds")]
+        public AudioClip equipSound;
+
+        CharacterApi characterApi => GetComponentInParent<CharacterApi>();
+
+        public void Equip()
+        {
+            if (equipSound != null)
+                characterApi.characterSound.PlaySound(equipSound);
+
+            OnEquip?.Invoke();
+        }
+
+        public void Unequip()
+        {
+            OnUnequip?.Invoke();
+        }
+
+
 
     }
 }

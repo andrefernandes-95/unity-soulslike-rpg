@@ -8,7 +8,7 @@ namespace AFV2
         [SerializeField] Image equippedIcon;
 
         public void ShowEquippedIcon() => equippedIcon.gameObject.SetActive(true);
-        public void HideEquippedIcon() => equippedIcon.gameObject.SetActive(true);
+        public void HideEquippedIcon() => equippedIcon.gameObject.SetActive(false);
 
         void Awake()
         {

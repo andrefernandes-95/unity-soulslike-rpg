@@ -1,6 +1,7 @@
 namespace AFV2
 {
     using UnityEngine;
+    using UnityEngine.Events;
 
     public class PlayerController : MonoBehaviour
     {
@@ -19,6 +20,12 @@ namespace AFV2
         MainMenu cachedMainMenu;
 
         private void Awake()
+        {
+            AttachListeners();
+        }
+
+        #region Attach Listeners to Input Actions
+        void AttachListeners()
         {
             inputListener.onRightAttack.AddListener(() =>
             {
@@ -39,23 +46,29 @@ namespace AFV2
 
             inputListener.onMenu.AddListener(ToggleMenu);
         }
+        #endregion
 
+
+        #region Getters
         public Quaternion GetPlayerRotation() => Quaternion.Euler(0.0f, cameraController.TargetRotation, 0.0f);
+        #endregion
 
-        public bool CanRotatePlayer() => CanControlPlayer();
-
+        #region Is Booleans
         public bool IsMoving() => CanControlPlayer() && inputListener.Move != Vector2.zero;
-        public bool IsSprinting() => IsMoving() && inputListener.Sprint;
+        public bool IsSprinting() => IsMoving() && inputListener.Sprint && characterApi.characterStats.CharacterStamina.CanSprint();
         public bool IsJumping() => CanControlPlayer() && inputListener.Jump && characterApi.characterGravity.Grounded;
         public bool IsLightAttacking() => CanControlPlayer() && (hasLeftAttackQueued || hasRightAttackQueued) && characterApi.characterGravity.Grounded;
         public bool IsJumpAttacking() => CanControlPlayer() && (hasLeftAttackQueued || hasRightAttackQueued) && !characterApi.characterGravity.Grounded;
+        #endregion
 
-        public void ResetCombatFlags()
-        {
-            hasRightAttackQueued = false;
-            hasLeftAttackQueued = false;
-        }
+        #region Can Booleans
+        public bool CanRotatePlayer() => CanControlPlayer();
 
+        public bool CanControlPlayer() => TryGetMainMenu(out MainMenu mainMenu) && mainMenu.IsActive == false;
+        #endregion
+
+
+        #region Main Menu
         void ToggleMenu()
         {
             if (TryGetMainMenu(out MainMenu menu))
@@ -76,7 +89,14 @@ namespace AFV2
 
             return localValue != null;
         }
+        #endregion
 
-        bool CanControlPlayer() => TryGetMainMenu(out MainMenu mainMenu) && mainMenu.IsActive == false;
+        #region Combat Flags
+        public void ResetCombatFlags()
+        {
+            hasRightAttackQueued = false;
+            hasLeftAttackQueued = false;
+        }
+        #endregion
     }
 }

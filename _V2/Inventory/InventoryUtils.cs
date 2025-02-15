@@ -11,7 +11,7 @@ namespace AFV2
             InventoryBank inventoryBank
         )
         {
-            Item item = inventoryBank.FindByGameObjectName(serializedItem.id);
+            Item item = inventoryBank.Items[serializedItem.id];
 
             if (item != null)
             {

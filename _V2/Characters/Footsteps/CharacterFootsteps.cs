@@ -12,7 +12,7 @@ namespace AFV2
         [SerializeField] float audioSourceVolume = 0.15f;
 
         [Header("Components")]
-        public CharacterGravity characterGravity;
+        [SerializeField] CharacterApi characterApi;
 
         [Header("Bone References")]
         public Transform leftFootBone;
@@ -42,7 +42,7 @@ namespace AFV2
             AudioUtils.Setup3DAudioSource(audioSource);
             audioSource.playOnAwake = false;
 
-            receiver.SetupFootstepReceiver(footstepClips, characterGravity.GroundLayers, audioSource, rayDistanceDownwards);
+            receiver.SetupFootstepReceiver(footstepClips, characterApi.characterGravity.GroundLayers, audioSource, rayDistanceDownwards);
 
             return receiver;
         }
@@ -57,6 +57,7 @@ namespace AFV2
 
             receiver.Trigger();
         }
+
 
     }
 }

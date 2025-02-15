@@ -1,40 +1,48 @@
 namespace AFV2
 {
     using UnityEngine;
+    using UnityEngine.Events;
 
     public class CharacterStats : MonoBehaviour
     {
         private float health;
         [SerializeField] private int maxHealth = 300;
-        private float stamina;
-        [SerializeField] private int maxStamina = 200;
+        public int MaxHealth => maxHealth;
+
+        [SerializeField] CharacterStamina characterStamina;
+        public CharacterStamina CharacterStamina => characterStamina;
+
         private float mana;
         [SerializeField] private int maxMana = 100;
+        public int MaxMana => maxMana;
 
         public int Reputation { get; private set; } = 1;
+
+        [HideInInspector] public UnityEvent onHealthChange, onManaChange;
 
         public float Health
         {
             get => health;
-            private set => health = Mathf.Clamp(value, 0, maxHealth);
-        }
-
-        public float Stamina
-        {
-            get => stamina;
-            private set => stamina = Mathf.Clamp(value, 0, maxStamina);
+            private set
+            {
+                health = Mathf.Clamp(value, 0, maxHealth);
+                onHealthChange?.Invoke();
+            }
         }
 
         public float Mana
         {
             get => mana;
-            private set => mana = Mathf.Clamp(value, 0, maxMana);
+            private set
+            {
+                mana = Mathf.Clamp(value, 0, maxMana);
+                onManaChange?.Invoke();
+            }
         }
 
         private void Start()
         {
             Health = maxHealth;
-            Stamina = maxStamina;
             Mana = maxMana;
         }
 
@@ -47,17 +55,6 @@ namespace AFV2
         /// </summary>
         /// <returns></returns>
         public float GetNormalizedHealth() => health / maxHealth;
-
-        public void SetStamina(float value) => Stamina = value;
-        public void UseStamina(float amount) => Stamina -= amount;
-        public void RecoverStamina(float amount) => Stamina += amount;
-        public bool HasEnoughStamina(float amount) => Stamina >= amount;
-
-        /// <summary>
-        /// Normalize stamina between 0 and 1
-        /// </summary>
-        /// <returns></returns>
-        public float GetNormalizedStamina() => stamina / maxStamina;
 
         public void SetMana(float value) => Mana = value;
         public void UseMana(float amount) => Mana -= amount;

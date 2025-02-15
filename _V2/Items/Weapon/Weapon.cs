@@ -25,16 +25,16 @@ namespace AFV2
             if (characterEquipment == null) return;
 
             if (GUILayout.Button("Equip Right Weapon (Slot 0)"))
-                characterEquipment.characterWeapons.EquipRightWeapon(weapon);
+                characterEquipment.characterWeapons.EquipRightWeapon(weapon, 0);
 
             if (GUILayout.Button("Unequip Right Weapon (Slot 0)"))
-                characterEquipment.characterWeapons.UnequipRightWeapon();
+                characterEquipment.characterWeapons.UnequipRightWeapon(0);
 
             if (GUILayout.Button("Equip Left Weapon (Slot 0)"))
-                characterEquipment.characterWeapons.EquipLeftWeapon(weapon);
+                characterEquipment.characterWeapons.EquipLeftWeapon(weapon, 0);
 
             if (GUILayout.Button("Unequip Left Weapon (Slot 0)"))
-                characterEquipment.characterWeapons.UnequipLeftWeapon();
+                characterEquipment.characterWeapons.UnequipLeftWeapon(0);
         }
     }
 #endif
@@ -46,30 +46,51 @@ namespace AFV2
     [RequireComponent(typeof(WeaponHitbox))]
     public class Weapon : Item
     {
+        #region Scaling
         [Header("Scaling")]
         public WeaponScaling strengthScaling = WeaponScaling.E;
         public WeaponScaling dexterityScaling = WeaponScaling.E;
         public WeaponScaling intelligenceScalling = WeaponScaling.E;
+        #endregion
 
+        #region Stamina
+        [Header("Stamina")]
+        public float lightAttackStaminaCost = 10f;
+        public float heavyAttackStaminaCost = 30f;
+        #endregion
+
+        #region Events
         [Header("Events")]
         public UnityEvent OnEquip;
         public UnityEvent OnUnequip;
+        #endregion
 
+        #region  Components
         [Header("Components")]
         OneHandPivots oneHandPivots => GetComponent<OneHandPivots>();
         TwoHandPivots twoHandPivots => GetComponent<TwoHandPivots>();
         WeaponRenderer weaponRenderer => GetComponent<WeaponRenderer>();
         WeaponAnimations weaponAnimations => GetComponent<WeaponAnimations>();
         WeaponHitbox weaponHitbox => GetComponent<WeaponHitbox>();
+        #endregion
 
+        #region Private
         Dictionary<Transform, Weapon> instances = new();
 
-        CharacterApi characterApi;
+        CharacterApi _characterApi;
+        #endregion
 
         private void OnEnable()
         {
-            if (characterApi == null)
-                characterApi = GetComponentInParent<CharacterApi>();
+            GetCharacterApi();
+        }
+
+        CharacterApi GetCharacterApi()
+        {
+            if (_characterApi == null)
+                _characterApi = GetComponentInParent<CharacterApi>();
+
+            return _characterApi;
         }
 
         public void Equip(Transform parent, bool isRightHand)
@@ -83,17 +104,23 @@ namespace AFV2
             instances[parent].weaponRenderer.EnableRenderer();
 
             DisableHitbox();
+
+            instances[parent].OnEquip.Invoke();
         }
 
         public void Unequip(Transform parent)
         {
-            if (instances[parent] != null)
+            if (instances.ContainsKey(parent) && instances[parent] != null)
+            {
+                instances[parent].OnUnequip.Invoke();
                 Destroy(instances[parent].gameObject);
+            }
         }
 
+        #region Pivots
         public void ApplyPivots(Weapon instance, bool isRightHand)
         {
-            if (characterApi.characterEquipment.characterWeapons.IsTwoHanding)
+            if (GetCharacterApi().characterEquipment.characterWeapons.IsTwoHanding)
             {
                 instance.transform.localPosition = twoHandPivots.rightHandPivot;
                 instance.transform.localEulerAngles = twoHandPivots.rightHandRotation;
@@ -103,12 +130,15 @@ namespace AFV2
             instance.transform.localPosition = isRightHand ? oneHandPivots.rightHandPivot : oneHandPivots.leftHandPivot;
             instance.transform.localEulerAngles = isRightHand ? oneHandPivots.rightHandRotation : oneHandPivots.leftHandRotation;
         }
+        #endregion
 
-        public void ApplyAnimations(Weapon instance) => instance.weaponAnimations.ApplyAnimations();
-
+        #region Hitboxes
         public void EnableHitbox() => weaponHitbox.EnableHitbox();
         public void DisableHitbox() => weaponHitbox.DisableHitbox();
+        #endregion
 
+        #region Attack Animations
+        public void ApplyAnimations(Weapon instance) => instance.weaponAnimations.ApplyAnimations();
 
         public List<string> GetAttacksForCombatDecision(CombatDecision combatDecision)
         {
@@ -124,5 +154,6 @@ namespace AFV2
                 return weaponAnimations.HeavyAttacks;
             return new();
         }
+        #endregion
     }
 }

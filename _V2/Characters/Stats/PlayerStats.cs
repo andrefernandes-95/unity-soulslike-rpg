@@ -15,7 +15,7 @@ namespace AFV2
                 SetHealth(health);
 
             if (reader.TryRead(STAMINA, out float stamina))
-                SetStamina(stamina);
+                CharacterStamina.SetStamina(stamina);
 
             if (reader.TryRead(MANA, out float mana))
                 SetMana(mana);
@@ -27,7 +27,7 @@ namespace AFV2
         public void SaveData(QuickSaveWriter writer)
         {
             writer.Write(HEALTH, Health);
-            writer.Write(STAMINA, Stamina);
+            writer.Write(STAMINA, CharacterStamina.Stamina);
             writer.Write(MANA, Mana);
             writer.Write(REPUTATION, Reputation);
         }

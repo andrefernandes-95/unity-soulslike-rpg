@@ -11,18 +11,29 @@ namespace AFV2
             get => items;
         }
 
-        public void AddItem(Item item, int amount)
+        public Item AddItem(Item item, int amount)
         {
+            if (item == null)
+            {
+                Debug.LogError("Could not add item because it was null");
+                return null;
+            }
+
+            Item instance = null;
+
             for (int i = 0; i < amount; i++)
             {
-                Item instance = Instantiate(item, transform);
+                instance = Instantiate(item, transform);
                 items.Add(instance);
             }
+
+            return instance;
         }
 
-        public void AddItem(Item item)
-        {
-            AddItem(item, 1);
-        }
+        /// <summary>
+        /// Unity Event
+        /// </summary>
+        /// <param name="item"></param>
+        public void AddItem(Item item) => AddItem(item, 1);
     }
 }

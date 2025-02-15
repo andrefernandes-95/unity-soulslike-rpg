@@ -43,5 +43,8 @@ namespace AFV2
             get => value;
         }
 
+        [Header("World Pickup")]
+        public GameObject worldPickup;
+
     }
 }

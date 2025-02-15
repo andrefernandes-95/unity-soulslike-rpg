@@ -28,7 +28,7 @@ namespace AFV2
                 if (rightHandWeapon != null)
                 {
                     var availableAttacks = rightHandWeapon.GetAttacksForCombatDecision(combatDecision);
-                    var staminaCost = characterCombat.LightAttackStaminaCost;
+                    var staminaCost = rightHandWeapon.lightAttackStaminaCost;
                     return (availableAttacks, staminaCost, combatDecision);
                 }
             }
@@ -37,7 +37,7 @@ namespace AFV2
                 if (leftHandWeapon != null)
                 {
                     var availableAttacks = leftHandWeapon.GetAttacksForCombatDecision(combatDecision);
-                    var staminaCost = characterCombat.LightAttackStaminaCost;
+                    var staminaCost = leftHandWeapon.lightAttackStaminaCost;
                     return (availableAttacks, staminaCost, combatDecision);
                 }
             }
@@ -45,16 +45,18 @@ namespace AFV2
             {
                 List<string> heavyAttacks = new();
 
+                float staminaCost = 0;
                 if (rightHandWeapon != null)
                 {
                     heavyAttacks = rightHandWeapon.GetAttacksForCombatDecision(combatDecision);
+                    staminaCost = rightHandWeapon.heavyAttackStaminaCost;
                 }
                 else if (leftHandWeapon != null)
                 {
                     heavyAttacks = leftHandWeapon.GetAttacksForCombatDecision(combatDecision);
+                    staminaCost = leftHandWeapon.heavyAttackStaminaCost;
                 }
 
-                var staminaCost = characterCombat.HeavyAttackStaminaCost;
                 return (heavyAttacks, staminaCost, combatDecision);
             }
 
@@ -88,12 +90,13 @@ namespace AFV2
             if (!CanRightAttack())
                 return false;
 
-            float normalizedStamina = characterApi.characterStats.GetNormalizedStamina();
+            float normalizedStamina = characterApi.characterStats.CharacterStamina.GetNormalizedStamina();
 
             // More right attacks when stamina is high
             combatDecision = (Random.value <= MathHelpers.PositiveSigmoid(normalizedStamina))
                 ? CombatDecision.RIGHT_LIGHT_ATTACK
                 : CombatDecision.LEFT_LIGHT_ATTACK;
+
             return true;
         }
 
@@ -137,10 +140,12 @@ namespace AFV2
 
         bool ShouldAttemptHeavyAttack()
         {
-            if (!characterApi.characterStats.HasEnoughStamina(characterCombat.HeavyAttackStaminaCost))
-            {
+            characterApi.characterEquipment.characterWeapons.TryGetActiveRightWeapon(out Weapon rightHandWeapon);
+            if (rightHandWeapon == null)
                 return false;
-            }
+
+            if (!characterApi.characterStats.CharacterStamina.HasEnoughStamina(rightHandWeapon.heavyAttackStaminaCost))
+                return false;
 
             // Heavy attacks should occur more often when health is low because the character would be desperate
             return Random.value <= MathHelpers.NegativeSigmoid(characterApi.characterStats.GetNormalizedHealth());
@@ -148,21 +153,21 @@ namespace AFV2
 
         protected virtual bool CanRightAttack()
         {
-            if (!characterApi.characterEquipment.characterWeapons.TryGetActiveRightWeapon(out _))
+            if (!characterApi.characterEquipment.characterWeapons.TryGetActiveRightWeapon(out Weapon rightWeapon))
                 return false;
 
-            return CanLightAttack();
+            return CanLightAttack(rightWeapon);
         }
 
         protected virtual bool CanLeftAttack()
         {
-            if (!characterApi.characterEquipment.characterWeapons.TryGetActiveLeftWeapon(out _))
+            if (!characterApi.characterEquipment.characterWeapons.TryGetActiveLeftWeapon(out Weapon leftWeapon))
                 return false;
 
-            return CanLightAttack();
+            return CanLightAttack(leftWeapon);
         }
 
-        bool CanLightAttack() => characterApi.characterStats.HasEnoughStamina(characterCombat.LightAttackStaminaCost);
+        bool CanLightAttack(Weapon weapon) => characterApi.characterStats.CharacterStamina.HasEnoughStamina(weapon.lightAttackStaminaCost);
 
         #endregion
 
@@ -176,7 +181,7 @@ namespace AFV2
             if (weapon != null)
             {
                 availableAttacks = weapon.GetAttacksForCombatDecision(combatDecision);
-                staminaCost = characterCombat.LightAttackStaminaCost;
+                staminaCost = weapon.lightAttackStaminaCost;
             }
 
             return (availableAttacks, staminaCost);

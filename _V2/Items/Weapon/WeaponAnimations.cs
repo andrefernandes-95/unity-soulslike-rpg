@@ -60,6 +60,11 @@ namespace AFV2
 
         public async void ApplyAnimations()
         {
+            if (characterApi == null)
+            {
+                SetupCharacterApi();
+            }
+
             while (characterApi.animatorManager.IsInTransition())
                 await Task.Yield();
 

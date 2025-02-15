@@ -1,7 +1,6 @@
 namespace AFV2
 {
     using System.Collections.Generic;
-    using System.Threading;
     using System.Threading.Tasks;
     using UnityEngine;
 
@@ -25,7 +24,6 @@ namespace AFV2
             (List<string> availableAttacks, float staminaCost, CombatDecision combatDecision) = characterCombat.CharacterCombatDecision.GetNextAirAttack();
 
             await characterCombat.Attack(availableAttacks, staminaCost, combatDecision);
-
 
             returnState = characterGravity.Grounded ? groundedState : fallState;
         }

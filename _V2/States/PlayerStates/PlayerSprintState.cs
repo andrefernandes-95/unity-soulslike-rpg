@@ -12,7 +12,6 @@ namespace AFV2
         [Header("Components")]
         public CharacterApi characterApi;
         public PlayerController playerController;
-        public CharacterStats characterStats;
 
         [Header("Transition States")]
         public PlayerIdleState idleState;
@@ -30,7 +29,7 @@ namespace AFV2
 
         public override State Tick()
         {
-            if (!CanSprint())
+            if (!playerController.IsSprinting())
                 return runState;
 
             if (!characterApi.characterGravity.Grounded)
@@ -45,10 +44,9 @@ namespace AFV2
             if (playerController.IsLightAttacking())
                 return attackState;
 
+            characterApi.characterStats.CharacterStamina.UseSprint();
             characterApi.characterMovement.Move(sprintSpeed, playerController.GetPlayerRotation());
             return this;
         }
-
-        bool CanSprint() => playerController.IsSprinting() && characterStats.Stamina > 0;
     }
 }

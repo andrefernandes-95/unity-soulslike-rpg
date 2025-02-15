@@ -13,14 +13,6 @@ namespace AFV2
         [SerializeField] CharacterCombatDecision characterCombatDecision => GetComponent<CharacterCombatDecision>();
         public CharacterCombatDecision CharacterCombatDecision => characterCombatDecision;
 
-        [Header("Light Attacks")]
-        [SerializeField] float lightAttackStaminaCost = 10f;
-        public float LightAttackStaminaCost => lightAttackStaminaCost;
-
-        [Header("Heavy Attacks")]
-        [SerializeField] float heavyAttackStaminaCost = 30f;
-        public float HeavyAttackStaminaCost => heavyAttackStaminaCost;
-
         // Callbacks
         [HideInInspector] public UnityEvent onAttackBegin, onAttackEnd, onNoDecisionMade;
 
@@ -43,7 +35,7 @@ namespace AFV2
 
         protected virtual bool CanCombo(float staminaCost, CombatDecision combatDecision)
         {
-            if (!characterApi.characterStats.HasEnoughStamina(staminaCost))
+            if (!characterApi.characterStats.CharacterStamina.HasEnoughStamina(staminaCost))
                 return false;
 
             // If target is close
@@ -56,12 +48,18 @@ namespace AFV2
             List<string> attacks,
             float staminaCost,
             CombatDecision combatDecision
-            )
+        )
         {
             while (CanCombo(staminaCost, combatDecision) && attacks.Count > 0)
             {
                 string nextAttack = attacks[0]; // Get the first attack in the list
                 attacks.RemoveAt(0); // Remove the used attack
+
+                // If the combat decision is an air attack, but the player is grounded, exit
+                if (IsAirCombatDecision(combatDecision) && characterApi.characterGravity.Grounded)
+                {
+                    return Task.CompletedTask;
+                }
 
                 onAttackBegin?.Invoke();
 
@@ -71,14 +69,34 @@ namespace AFV2
                 // Play the attack animation
                 characterApi.animatorManager.BlendTo(nextAttack, 0.05f);
 
-                await characterApi.animatorManager.WaitForAnimationToFinish(nextAttack);
+                // **Wait for animation while checking if the player lands mid-attack**
+                Task animationTask = characterApi.animatorManager.WaitForAnimationToFinish(nextAttack);
+
+                while (!animationTask.IsCompleted)
+                {
+                    await Task.Yield(); // Yield control to avoid blocking
+
+                    // **If player lands mid-air attack, cancel early**
+                    if (IsAirCombatDecision(combatDecision) && characterApi.characterGravity.Grounded)
+                    {
+                        break;
+                    }
+                }
 
                 characterApi.animatorManager.DisableRootMotion();
 
                 onAttackEnd?.Invoke();
+
+                // **If we exited early due to landing, stop the attack chain**
+                if (IsAirCombatDecision(combatDecision) && characterApi.characterGravity.Grounded)
+                {
+                    return Task.CompletedTask;
+                }
             }
 
             return Task.CompletedTask;
         }
+
+        bool IsAirCombatDecision(CombatDecision combatDecision) => combatDecision == CombatDecision.RIGHT_AIR_ATTACK || combatDecision == CombatDecision.LEFT_AIR_ATTACK;
     }
 }

@@ -98,5 +98,20 @@ namespace AFV2
 
         public float GetFallHeight() => fallBegin - characterApi.transform.position.y;
 
+        public float GetHeightFromGround()
+        {
+            // Define a ray starting from the player's position pointing downwards
+            Ray ray = new Ray(characterApi.transform.position, Vector3.down);
+
+            // Perform the raycast to detect the ground
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, GroundLayers, QueryTriggerInteraction.Ignore))
+            {
+                // Return the distance from the player to the ground
+                return hit.distance;
+            }
+
+            // If no ground is detected, return a large value or handle it as needed
+            return Mathf.Infinity;
+        }
     }
 }

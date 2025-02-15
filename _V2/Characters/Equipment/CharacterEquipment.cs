@@ -1,6 +1,5 @@
 namespace AFV2
 {
-    using System.Linq;
     using UnityEngine;
 
     public class CharacterEquipment : MonoBehaviour
@@ -21,38 +20,6 @@ namespace AFV2
         public Boot Boots => boots;
         [SerializeField] private Accessory[] accessories = new Accessory[2];
         public Accessory[] Accessories => accessories;
-
-
-        [Header("Components")]
-        public CharacterInventory characterInventory;
-
-        private void Awake()
-        {
-            SyncInventoryWithEquipment();
-
-            SyncDefaultEquipment();
-        }
-
-        void SyncInventoryWithEquipment()
-        {
-            foreach (Arrow arrow in arrows.Where(item => item != null))
-                characterInventory.AddItem(arrow, 1);
-            foreach (Skill skill in skills.Where(item => item != null))
-                characterInventory.AddItem(skill, 1);
-            foreach (Consumable consumable in consumables.Where(item => item != null))
-                characterInventory.AddItem(consumable, 1);
-
-            if (headgear != null) characterInventory.AddItem(headgear, 1);
-            if (armor != null) characterInventory.AddItem(armor, 1);
-            if (boots != null) characterInventory.AddItem(boots, 1);
-        }
-
-        void SyncDefaultEquipment()
-        {
-            if (headgear != null) headgear.OnEquip.Invoke();
-            if (armor != null) armor.OnEquip.Invoke();
-            if (boots != null) boots.OnEquip.Invoke();
-        }
 
         public void EquipSkill(Skill skill, int slot)
         {
@@ -95,13 +62,13 @@ namespace AFV2
             UnequipHeadgear();
 
             headgear = newHeadgear;
-            headgear.OnEquip.Invoke();
+            headgear.Equip();
         }
 
         public void UnequipHeadgear()
         {
             if (headgear != null)
-                headgear.OnUnequip.Invoke();
+                headgear.Unequip();
 
             headgear = null;
         }
@@ -111,13 +78,13 @@ namespace AFV2
             UnequipArmor();
 
             armor = newArmor;
-            armor.OnEquip.Invoke();
+            armor.Equip();
         }
 
         public void UnequipArmor()
         {
             if (armor != null)
-                armor.OnUnequip.Invoke();
+                armor.Unequip();
 
             armor = null;
         }
@@ -127,13 +94,13 @@ namespace AFV2
             UnequipBoots();
 
             boots = newBoots;
-            boots.OnEquip.Invoke();
+            boots.Equip();
         }
 
         public void UnequipBoots()
         {
             if (boots != null)
-                boots.OnUnequip.Invoke();
+                boots.Unequip();
 
             boots = null;
         }

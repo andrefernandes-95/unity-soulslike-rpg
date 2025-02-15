@@ -1,10 +1,11 @@
 namespace AFV2
 {
+    using System.Collections.Generic;
     using UnityEngine;
 
     public class Boot : ArmorBase
     {
         [Header("Footstep")]
-        public AudioClip footstepOverride;
+        public List<AudioClip> footstepOverrides = new();
     }
 }
