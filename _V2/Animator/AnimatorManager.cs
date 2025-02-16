@@ -30,8 +30,18 @@ namespace AFV2
 
         public void BlendTo(string nextAnimation, float blendTime = 0.2f)
         {
+            if (animator.fireEvents == false)
+                Invoke(nameof(RefireEvents), 0f);
+
             animator.CrossFade(nextAnimation, blendTime);
         }
+
+        void RefireEvents()
+        {
+            animator.fireEvents = true;
+            Debug.Log($"Refirede events at {Time.time}");
+        }
+
         public async Task WaitForAnimationToFinish(string animationName, float end = .9f)
         {
             // Ensure the animator exists
@@ -71,6 +81,20 @@ namespace AFV2
         public void EnableRootMotion() => animator.applyRootMotion = true;
         public void DisableRootMotion() => animator.applyRootMotion = false;
 
+        // Retrieves the progress of the currently playing animation
+        public float GetAnimationProgress(string animationName)
+        {
+            if (animator == null) return 1.0f; // Return 100% if no animator is found
 
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+
+            // If the current animation matches the one we are tracking, return its normalized time
+            if (stateInfo.IsName(animationName))
+            {
+                return stateInfo.normalizedTime % 1.0f; // Normalize it to stay within 0 - 1
+            }
+
+            return 1.0f; // Assume complete if it's not found
+        }
     }
 }

@@ -5,21 +5,8 @@ namespace AFV2
     public class PlayerCombat : CharacterCombat
     {
         [SerializeField] PlayerController playerController;
-        [SerializeField] PlayerCombatDecision playerCombatDecision;
 
-        void Awake()
-        {
-            onAttackBegin.AddListener(ResetCombatFlags);
-            onNoDecisionMade.AddListener(ResetCombatFlags);
-            onAttackEnd.AddListener(characterApi.characterMovement.EnableRotation);
-        }
-
-        void ResetCombatFlags()
-        {
-            playerController.ResetCombatFlags();
-        }
-
-        protected override bool CanCombo(float staminaCost, CombatDecision combatDecision)
+        public override bool CanCombo(float staminaCost, CombatDecision combatDecision)
         {
             if (!characterApi.characterStats.CharacterStamina.HasEnoughStamina(staminaCost))
                 return false;

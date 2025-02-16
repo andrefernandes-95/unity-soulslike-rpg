@@ -20,7 +20,7 @@ namespace AFV2
             returnState = this;
 
             (List<string> availableAttacks, float staminaCost, CombatDecision combatDecision) = characterCombat.CharacterCombatDecision.GetNextAttack();
-            await characterCombat.Attack(availableAttacks, staminaCost, combatDecision);
+            await characterCombat.CharacterAttack.Attack(availableAttacks, staminaCost, combatDecision);
 
             returnState = idleState;
         }

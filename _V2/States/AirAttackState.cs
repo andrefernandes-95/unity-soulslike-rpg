@@ -8,6 +8,7 @@ namespace AFV2
     {
 
         [Header("Components")]
+        [SerializeField] CharacterWeapons characterWeapons;
         public CharacterGravity characterGravity;
         public CharacterCombat characterCombat;
 
@@ -23,14 +24,13 @@ namespace AFV2
 
             (List<string> availableAttacks, float staminaCost, CombatDecision combatDecision) = characterCombat.CharacterCombatDecision.GetNextAirAttack();
 
-            await characterCombat.Attack(availableAttacks, staminaCost, combatDecision);
+            await characterCombat.CharacterAttack.Attack(availableAttacks, staminaCost, combatDecision);
 
             returnState = characterGravity.Grounded ? groundedState : fallState;
         }
 
         public override async Task OnStateExit()
         {
-            return;
         }
 
         public override State Tick()

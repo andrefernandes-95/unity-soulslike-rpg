@@ -6,8 +6,9 @@ namespace AFV2
 
     public class AnimationEventDispatcher : MonoBehaviour
     {
-        [SerializeField]
-        private SerializedDictionary<string, UnityEvent> eventMap = new();
+        [SerializeField] AnimatorManager animatorManager;
+
+        [SerializeField] private SerializedDictionary<string, UnityEvent> eventMap = new();
 
         // Register a new event dynamically
         public void RegisterEvent(string eventName, UnityEvent unityEvent)
@@ -21,13 +22,17 @@ namespace AFV2
         // Method that Unity AnimationEvent will call
         public void TriggerEvent(string eventName)
         {
-            if (eventMap.TryGetValue(eventName, out UnityEvent unityEvent))
+            if (eventMap.TryGetValue(eventName, out UnityEvent animationEvent))
             {
-                unityEvent?.Invoke();
+                animationEvent?.Invoke();
+
+                Debug.Log($"{eventName} triggered at {Time.time}");
             }
         }
 
-        public void ClearAll() => eventMap.Clear();
+        public void ClearAll()
+        {
+            eventMap.Clear();
+        }
     }
-
 }

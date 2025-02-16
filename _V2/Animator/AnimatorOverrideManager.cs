@@ -52,7 +52,7 @@ namespace AFV2
                     {
                         functionName = "TriggerEvent",
                         stringParameter = eventName,
-                        time = actionClipEvent.triggerTime
+                        time = actionClipEvent.triggerTime,
                     };
 
                     clipOverrides[animationName].AddEvent(animationEvent);

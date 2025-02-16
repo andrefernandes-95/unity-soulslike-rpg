@@ -145,6 +145,5 @@ namespace AFV2
             DisableLeftWeaponHitbox();
             DisableRightWeaponHitbox();
         }
-
     }
 }

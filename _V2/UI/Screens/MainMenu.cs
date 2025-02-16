@@ -4,6 +4,9 @@ namespace AFV2
 
     public class MainMenu : MonoBehaviour
     {
+        [Header("Components")]
+        [SerializeField] PlayerHUD playerHud;
+
         [SerializeField] GameObject[] childScreens;
 
         bool isActive = false;
@@ -19,6 +22,8 @@ namespace AFV2
 
             if (childScreens.Length > 0)
                 UIUtils.FadeIn(childScreens[0]);
+
+            DisableOtherUIs();
         }
 
         public void Hide()
@@ -33,6 +38,18 @@ namespace AFV2
             }
 
             this.gameObject.SetActive(false);
+
+            EnableOtherUIs();
+        }
+
+        void DisableOtherUIs()
+        {
+            UIUtils.FadeOut(playerHud.gameObject);
+        }
+
+        void EnableOtherUIs()
+        {
+            UIUtils.FadeIn(playerHud.gameObject);
         }
     }
 }

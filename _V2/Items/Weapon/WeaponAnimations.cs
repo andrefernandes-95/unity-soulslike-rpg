@@ -13,6 +13,10 @@ namespace AFV2
         Dictionary<string, ActionClip> oneHandActionClips = new();
         Dictionary<string, ActionClip> twoHandActionClips = new();
 
+        [Header(("Inherited Action Clips"))]
+        public List<ActionClip> inheritedOneHandActionClips = new();
+        public List<ActionClip> inheritedTwoHandActionClips = new();
+
         [Header("Available Animations")]
         [SerializeField] protected List<string> rightLightAttacks = new() { "Right Attack A", "Right Attack B", "Right Attack C" };
         public List<string> RightLightAttacks => rightLightAttacks.ToList();
@@ -41,6 +45,22 @@ namespace AFV2
 
         void CollectActionClips()
         {
+            if (inheritedOneHandActionClips.Count > 0)
+            {
+                foreach (ActionClip actionClip in inheritedOneHandActionClips)
+                {
+                    oneHandActionClips.Add(actionClip.name, actionClip);
+                }
+            }
+
+            if (inheritedTwoHandActionClips.Count > 0)
+            {
+                foreach (ActionClip actionClip in inheritedTwoHandActionClips)
+                {
+                    twoHandActionClips.Add(actionClip.name, actionClip);
+                }
+            }
+
             foreach (ActionClip commonClip in commonActionClipsContainer.GetComponentsInChildren<ActionClip>())
             {
                 oneHandActionClips.Add(commonClip.name, commonClip);
@@ -72,7 +92,5 @@ namespace AFV2
                 characterApi.characterEquipment.characterWeapons.IsTwoHanding ? twoHandActionClips : oneHandActionClips
             );
         }
-
-
     }
 }

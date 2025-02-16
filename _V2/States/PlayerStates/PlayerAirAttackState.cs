@@ -16,7 +16,7 @@ namespace AFV2
         public override Task OnStateExit()
         {
             playerController.ResetCombatFlags();
-            return Task.CompletedTask;
+            return base.OnStateExit();
         }
 
         public override State Tick()
