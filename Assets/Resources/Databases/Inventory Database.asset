@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6feca677bc8b0c84482bf1ce426ae9d6, type: 3}
+  m_Name: Inventory Database
+  m_EditorClassIdentifier: 
+  ownedItems: []
+  defaultItems:
+  - {fileID: 11400000, guid: 2dd2d1a357b32664bba5b0819210c303, type: 2}
+  - {fileID: 11400000, guid: f31a1b547f0fdc74287638b585b3dc73, type: 2}
+  - {fileID: 11400000, guid: 0312caeac3a98ae4e8e510b7c5a24d81, type: 2}
+  - {fileID: 11400000, guid: 3656b588d86871c49854d614a3b94487, type: 2}
+  defaultArmor: {fileID: 11400000, guid: 2dd2d1a357b32664bba5b0819210c303, type: 2}
+  defaultLegwear: {fileID: 11400000, guid: 0312caeac3a98ae4e8e510b7c5a24d81, type: 2}
+  defaultGauntlets: {fileID: 11400000, guid: f31a1b547f0fdc74287638b585b3dc73, type: 2}
+  defaultWeapon: {fileID: 11400000, guid: 3656b588d86871c49854d614a3b94487, type: 2}
+  defaultShield: {fileID: 11400000, guid: dd6fe522ebb9644e79d8d6a2ea27d9f1, type: 2}
+  defaultBowWeapon: {fileID: 11400000, guid: 31267c9149f0cb74ca68440da6dbd48f, type: 2}
+  defaultStaffWeapon: {fileID: 11400000, guid: e6ff9e3c878c7b54691f6c344e4f4260, type: 2}
+  defaultArrows: {fileID: 11400000, guid: 9881a089ea52e2849bf4a53816eb6e20, type: 2}
+  defaultAmountOfArrows: 15
+  defaultSpell: {fileID: 11400000, guid: dce82c53cdb4fd3498da9c7ceed59e06, type: 2}
+  equipmentDatabase: {fileID: 11400000, guid: a2bf3141e1e696a48952a3479a4a9742, type: 2}

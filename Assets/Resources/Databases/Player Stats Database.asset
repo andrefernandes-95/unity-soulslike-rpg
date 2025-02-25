@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27c2eff28922d264480a9e7d96030c6b, type: 3}
+  m_Name: Player Stats Database
+  m_EditorClassIdentifier: 
+  vitality: 1
+  endurance: 1
+  strength: 1
+  dexterity: 1
+  intelligence: 1
+  playerCombatant: {fileID: 11400000, guid: 7b767c8048c163b49ab7da5486e67f98, type: 2}
+  levelMultiplierForHealth: 1000
+  levelMultiplierForStamina: 800
+  levelMultiplierForMana: 700
+  currentHealth: 300
+  currentStamina: 150
+  currentMana: 100
+  reputation: 1
+  gold: 0
+  lostGold: -1
+  sceneWhereGoldWasLost: 
+  positionWhereGoldWasLost: {x: 0, y: 0, z: 0}
