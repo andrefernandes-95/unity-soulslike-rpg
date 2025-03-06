@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f3573ac0310a84f95f225e5200bb66, type: 3}
+  m_Name: Fists
+  m_EditorClassIdentifier: 
+  englishName: Fists
+  portugueseName: Punhos
+  englishDescription: 
+  portugueseDescription: 
+  sprite: {fileID: 0}
+  value: 1
+  worldPickup: {fileID: 0}
+  weaponType: {fileID: 11400000, guid: a1a6d590953bf874cb19b28082bfafdc, type: 2}
+  strengthScaling: 0
+  dexterityScaling: 0
+  intelligenceScalling: 0
+  lightAttackStaminaCost: 10
+  heavyAttackStaminaCost: 30
+  isFallbackWeapon: 1

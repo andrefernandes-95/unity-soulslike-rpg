@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f3573ac0310a84f95f225e5200bb66, type: 3}
+  m_Name: Sword
+  m_EditorClassIdentifier: 
+  englishName: Sword
+  portugueseName: Espada
+  englishDescription: Common sword
+  portugueseDescription: Espada comum
+  sprite: {fileID: 21300000, guid: f1b5bf913ddc2064f983738929d4988c, type: 3}
+  value: 1
+  worldPickup: {fileID: 0}
+  weaponType: {fileID: 11400000, guid: 5a2e02169ac592146b11b7f670373b2a, type: 2}
+  strengthScaling: 0
+  dexterityScaling: 0
+  intelligenceScalling: 0
+  lightAttackStaminaCost: 10
+  heavyAttackStaminaCost: 30
+  isFallbackWeapon: 0
