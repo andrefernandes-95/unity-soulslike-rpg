@@ -18,6 +18,8 @@ namespace AFV2
         bool hasLeftAttackQueued = false;
         public bool HasLeftAttackQueued => hasLeftAttackQueued;
 
+        bool isAiming = false;
+
         MainMenu cachedMainMenu;
 
         private void Awake()
@@ -36,11 +38,25 @@ namespace AFV2
                 }
             });
 
-            inputListener.onLeftAttack.AddListener(() =>
+            inputListener.onBlockOrAim_Start.AddListener(() =>
             {
                 if (CanControlPlayer())
                 {
-                    hasLeftAttackQueued = true;
+                    if (characterApi.characterWeapons.HasRangeWeapon())
+                    {
+                        isAiming = true;
+                    }
+                    else
+                    {
+                        hasLeftAttackQueued = true;
+                    }
+                }
+            });
+            inputListener.onBlockOrAim_End.AddListener(() =>
+            {
+                if (CanControlPlayer())
+                {
+                    isAiming = false;
                 }
             });
 
@@ -77,9 +93,29 @@ namespace AFV2
         public bool IsSprinting() => IsMoving() && inputListener.Sprint && characterApi.characterStamina.CanSprint();
         public bool IsDodging() => inputListener.Dodge && characterApi.characterStamina.CanDodge();
         public bool IsJumping() => CanControlPlayer() && inputListener.Jump && characterApi.characterGravity.Grounded && characterApi.characterStamina.CanJump();
-        public bool IsLightAttacking() => CanControlPlayer() && (hasLeftAttackQueued || hasRightAttackQueued) && characterApi.characterGravity.Grounded;
+        public bool IsLightAttacking() => CanControlPlayer() && (IsLeftAttackQueueded() || hasRightAttackQueued) && characterApi.characterGravity.Grounded;
+        public bool IsJumpAttacking() => CanControlPlayer() && (IsLeftAttackQueueded() || hasRightAttackQueued) && !characterApi.characterGravity.Grounded;
         public bool IsHeavyAttacking() => CanControlPlayer() && hasHeavyAttackQueued && characterApi.characterGravity.Grounded;
-        public bool IsJumpAttacking() => CanControlPlayer() && (hasLeftAttackQueued || hasRightAttackQueued) && !characterApi.characterGravity.Grounded;
+
+        bool IsLeftAttackQueueded()
+        {
+            if (IsAiming())
+            {
+                return false;
+            }
+
+            return HasLeftAttackQueued;
+        }
+
+        public bool IsAiming()
+        {
+            if (characterApi.characterWeapons.HasRangeWeapon())
+            {
+                return isAiming;
+            }
+
+            return false;
+        }
         #endregion
 
         #region Can Booleans
@@ -124,5 +160,7 @@ namespace AFV2
             hasHeavyAttackQueued = false;
         }
         #endregion
+
+        public Vector3 GetLook() => inputListener.Look;
     }
 }

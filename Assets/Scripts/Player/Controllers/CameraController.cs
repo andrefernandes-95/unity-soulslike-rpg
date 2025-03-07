@@ -95,6 +95,14 @@ namespace AFV2
             Quaternion targetRotation = Quaternion.Slerp(characterApi.transform.rotation, tr, rs * Time.deltaTime);
 
             characterApi.transform.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
+
+
+            // normalise input direction
+            Vector3 inputDirection = new Vector3(
+                inputListener.Move.x, 0.0f, inputListener.Move.y).normalized;
+
+            _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                     Camera.main.transform.eulerAngles.y;
         }
 
         void HandleLockOnRotation()
@@ -156,5 +164,6 @@ namespace AFV2
                     && lockOnManager.isLockedOn*/;
 
         //&& playerManager.dodgeController.isDodging == false;
+
     }
 }

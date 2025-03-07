@@ -14,6 +14,9 @@ namespace AFV2
         [SerializeField] Transform rightFootBone;
         public Transform RightFoot => rightFootBone;
 
+        [SerializeField] Transform torsoBone;
+        public Transform Torso => torsoBone;
+
 
         [Header("Body Parts")]
         [SerializeField] SkinnedMeshRenderer[] defaultEyebrow;

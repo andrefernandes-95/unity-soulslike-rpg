@@ -21,6 +21,7 @@ namespace AFV2
         public JumpState jumpState;
         public AttackState attackState;
         public DodgeState dodgeState;
+        public PlayerAimState aimState;
 
         public override void OnStateEnter()
         {
@@ -51,6 +52,11 @@ namespace AFV2
 
             if (playerController.IsLightAttacking() || playerController.IsHeavyAttacking())
                 return attackState;
+
+            if (playerController.IsAiming())
+            {
+                return aimState;
+            }
 
             characterApi.characterMovement.Move(moveSpeed, playerController.GetPlayerRotation());
             return this;

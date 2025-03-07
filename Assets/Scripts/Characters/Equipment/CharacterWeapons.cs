@@ -16,6 +16,8 @@ namespace AFV2
         public WorldWeapon CurrentLeftFootWeaponInstance;
         public WorldWeapon CurrentRightFootWeaponInstance;
 
+        [Header("Weapon Type Enums")]
+        public WeaponType RangeWeaponType;
 
         [Header("Components")]
         [SerializeField] CharacterApi characterApi;
@@ -139,8 +141,8 @@ namespace AFV2
         {
             isTwoHanding = !isTwoHanding;
 
-            TryGetActiveRightWeapon(out WorldWeapon rightHandWeapon);
-            TryGetActiveLeftWeapon(out WorldWeapon leftHandWeapon);
+            SwitchLeftWeapon(activeLeftWeaponIndex);
+            SwitchRightWeapon(activeRightWeaponIndex);
         }
         #endregion
 
@@ -177,6 +179,21 @@ namespace AFV2
             isTwoHanding == false
             && HasRightAndLeftWeapon()
             && CurrentLeftWeaponInstance == CurrentRightWeaponInstance;
+
+        public bool HasRangeWeapon()
+        {
+            if (CurrentLeftWeaponInstance?.equippedWeapon?.weaponType == RangeWeaponType)
+            {
+                return true;
+            }
+
+            if (CurrentRightWeaponInstance?.equippedWeapon?.weaponType == RangeWeaponType)
+            {
+                return true;
+            }
+
+            return false;
+        }
 
         #region Hitboxes
         public void EnableLeftWeaponHitbox()

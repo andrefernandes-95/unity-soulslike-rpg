@@ -48,6 +48,11 @@ namespace AFV2
             if (playerController.IsDodging())
                 return dodgeState;
 
+            if (playerController.IsAiming())
+            {
+                return runState;
+            }
+
             characterApi.characterStamina.UseSprint();
             characterApi.characterMovement.Move(sprintSpeed, playerController.GetPlayerRotation());
             return this;

@@ -11,6 +11,14 @@ namespace AFV2
         [Header("Components")]
         [SerializeField] InputListener inputListener;
 
+        [Header("Aim Settings")]
+        float cachedDistance;
+        [SerializeField] float aimDistance = 2f;
+        Vector3 cachedShoulderOffset;
+        [SerializeField] Vector3 aimShoulderOffset = Vector3.zero;
+
+        CinemachineThirdPersonFollow cinemachineThirdPersonFollow => GetComponent<CinemachineThirdPersonFollow>();
+
         void Awake()
         {
             AssignListeners();
@@ -34,7 +42,7 @@ namespace AFV2
         {
             if (gameSettings != null)
             {
-                cinemachineVirtualCamera.GetComponent<CinemachineThirdPersonFollow>().CameraDistance = gameSettings.cameraDistance;
+                cinemachineThirdPersonFollow.CameraDistance = gameSettings.cameraDistance;
             }
         }
 
@@ -65,5 +73,23 @@ namespace AFV2
         }
         #endregion
 
+
+        #region Aiming
+
+
+        public void BeginAiming()
+        {
+            cachedDistance = cinemachineThirdPersonFollow.CameraDistance;
+            cinemachineThirdPersonFollow.CameraDistance = aimDistance;
+
+            cachedShoulderOffset = cinemachineThirdPersonFollow.ShoulderOffset;
+            cinemachineThirdPersonFollow.ShoulderOffset = aimShoulderOffset;
+        }
+        public void EndAiming()
+        {
+            cinemachineThirdPersonFollow.CameraDistance = cachedDistance;
+            cinemachineThirdPersonFollow.ShoulderOffset = cachedShoulderOffset;
+        }
+        #endregion
     }
 }

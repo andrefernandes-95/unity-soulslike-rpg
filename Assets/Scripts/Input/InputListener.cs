@@ -45,12 +45,14 @@ namespace AFV2
         public UnityEvent onHeavyAttack;
         public UnityEvent onRightAttack;
         public UnityEvent onLeftAttack;
+        public bool blockOrAim;
+        public UnityEvent onBlockOrAim_Start;
+        public UnityEvent onBlockOrAim_End;
         public UnityEvent onChangeCombatStance;
         public UnityEvent onMenu;
         public UnityEvent onInteract;
         public UnityEvent onQuickSave;
         public UnityEvent onQuickLoad;
-
         public UnityEvent onSwitchRightWeapon;
         public UnityEvent onSwitchLeftWeapon;
         public UnityEvent onSwitchSpell;
@@ -127,8 +129,20 @@ namespace AFV2
 
         public void OnBlock(InputValue value)
         {
-            if (value.isPressed)
-                onLeftAttack.Invoke();
+            bool previousState = blockOrAim;
+            blockOrAim = value.isPressed;
+
+            if (previousState != blockOrAim)
+            {
+                if (blockOrAim)
+                {
+                    onBlockOrAim_Start?.Invoke();
+                }
+                else
+                {
+                    onBlockOrAim_End?.Invoke();
+                }
+            }
         }
 
 

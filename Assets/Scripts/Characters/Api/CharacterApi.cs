@@ -8,6 +8,7 @@ namespace AFV2
         #region Core Components
         public AnimatorManager animatorManager;
         public CharacterController characterController;
+        public CharacterModelManager characterModelManager;
         #endregion
 
         #region AI

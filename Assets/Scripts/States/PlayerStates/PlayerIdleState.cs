@@ -11,6 +11,7 @@ namespace AFV2
         public JumpState jumpState;
         public AttackState attackState;
         public DodgeState dodgeState;
+        public PlayerAimState aimState;
 
         public override State Tick()
         {
@@ -25,6 +26,11 @@ namespace AFV2
 
             if (playerController.IsDodging())
                 return dodgeState;
+
+            if (playerController.IsAiming())
+            {
+                return aimState;
+            }
 
             return this;
         }
