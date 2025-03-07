@@ -7329,6 +7329,10 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0.55626994
       objectReference: {fileID: 0}
+    - target: {fileID: 356286230146508268, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
+      propertyPath: m_DirtyAABB
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 757866723639708885, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.9329374
@@ -7435,6 +7439,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1439670968864420384, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
       propertyPath: m_DirtyAABB
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1686540438773082026, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1794797493657485084, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
@@ -7689,6 +7697,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: "\U0001F484 Character Apperance"
       objectReference: {fileID: 0}
+    - target: {fileID: 4083841566277194025, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
+      propertyPath: m_DirtyAABB
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4121903212743420775, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.82028437
@@ -7739,7 +7751,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4616359132315119897, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
       propertyPath: previewTime
-      value: 0.765
+      value: 0.47
       objectReference: {fileID: 0}
     - target: {fileID: 4624959457501101518, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
       propertyPath: m_DirtyAABB
@@ -7913,6 +7925,10 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0.14197935
       objectReference: {fileID: 0}
+    - target: {fileID: 5877568965150419687, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
+      propertyPath: m_DirtyAABB
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5939876641701716845, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
       propertyPath: m_DirtyAABB
       value: 0
@@ -7968,6 +7984,10 @@ PrefabInstance:
     - target: {fileID: 6325260932910894723, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
       propertyPath: m_LocalRotation.z
       value: -0.13264576
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561794054046505580, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
+      propertyPath: m_DirtyAABB
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6623317251470720572, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
       propertyPath: m_DirtyAABB
@@ -8189,6 +8209,10 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0.10388564
       objectReference: {fileID: 0}
+    - target: {fileID: 8357889096275297454, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
+      propertyPath: m_DirtyAABB
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8448446683564931833, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
       propertyPath: m_LocalRotation.w
       value: -0.7399788
@@ -8204,6 +8228,10 @@ PrefabInstance:
     - target: {fileID: 8448446683564931833, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.16144651
+      objectReference: {fileID: 0}
+    - target: {fileID: 8497354763862823083, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
+      propertyPath: m_DirtyAABB
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8687922851721348719, guid: f97812df3aac30a4fbcb499d005e3825, type: 3}
       propertyPath: m_LocalRotation.w
@@ -9016,7 +9044,7 @@ GameObject:
   - component: {fileID: 1344223904}
   - component: {fileID: 1344223905}
   m_Layer: 0
-  m_Name: Kay Lousberg
+  m_Name: Mixamo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9049,8 +9077,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca9e57bf55a901d4f8385e0b60c08f27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  description: Characters and animations
-  assetURL: https://kaylousberg.itch.io/
+  description: Animations
+  assetURL: https://www.mixamo.com/#/
 --- !u!224 &1367245888 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3978854743772896143, guid: 840ec78f09485aa43ba1832e0a235ffb, type: 3}
