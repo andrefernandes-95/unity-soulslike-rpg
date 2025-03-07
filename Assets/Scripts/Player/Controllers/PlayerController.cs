@@ -1,7 +1,6 @@
 namespace AFV2
 {
     using UnityEngine;
-    using UnityEngine.Events;
 
     public class PlayerController : MonoBehaviour
     {
@@ -12,6 +11,8 @@ namespace AFV2
         [SerializeField] CameraController cameraController;
 
         [Header("Flags")]
+        bool hasHeavyAttackQueued = false;
+        public bool HasHeavyAttackQueued => hasHeavyAttackQueued;
         bool hasRightAttackQueued = false;
         public bool HasRightAttackQueued => hasRightAttackQueued;
         bool hasLeftAttackQueued = false;
@@ -30,21 +31,39 @@ namespace AFV2
             inputListener.onRightAttack.AddListener(() =>
             {
                 if (CanControlPlayer())
+                {
                     hasRightAttackQueued = true;
+                }
             });
+
             inputListener.onLeftAttack.AddListener(() =>
             {
                 if (CanControlPlayer())
+                {
                     hasLeftAttackQueued = true;
+                }
+            });
+
+            inputListener.onHeavyAttack.AddListener(() =>
+            {
+                if (CanControlPlayer())
+                {
+                    hasHeavyAttackQueued = true;
+                }
             });
 
             inputListener.onChangeCombatStance.AddListener(() =>
             {
                 if (CanControlPlayer())
-                    characterApi.characterEquipment.characterWeapons.ToggleTwoHanding();
+                {
+                    characterApi.characterWeapons.ToggleTwoHanding();
+                }
             });
 
             inputListener.onMenu.AddListener(ToggleMenu);
+
+            inputListener.onSwitchRightWeapon.AddListener(characterApi.characterWeapons.SwitchRightWeapon);
+            inputListener.onSwitchLeftWeapon.AddListener(characterApi.characterWeapons.SwitchLeftWeapon);
         }
         #endregion
 
@@ -56,8 +75,10 @@ namespace AFV2
         #region Is Booleans
         public bool IsMoving() => CanControlPlayer() && inputListener.Move != Vector2.zero;
         public bool IsSprinting() => IsMoving() && inputListener.Sprint && characterApi.characterStamina.CanSprint();
-        public bool IsJumping() => CanControlPlayer() && inputListener.Jump && characterApi.characterGravity.Grounded;
+        public bool IsDodging() => inputListener.Dodge && characterApi.characterStamina.CanDodge();
+        public bool IsJumping() => CanControlPlayer() && inputListener.Jump && characterApi.characterGravity.Grounded && characterApi.characterStamina.CanJump();
         public bool IsLightAttacking() => CanControlPlayer() && (hasLeftAttackQueued || hasRightAttackQueued) && characterApi.characterGravity.Grounded;
+        public bool IsHeavyAttacking() => CanControlPlayer() && hasHeavyAttackQueued && characterApi.characterGravity.Grounded;
         public bool IsJumpAttacking() => CanControlPlayer() && (hasLeftAttackQueued || hasRightAttackQueued) && !characterApi.characterGravity.Grounded;
         #endregion
 
@@ -100,6 +121,7 @@ namespace AFV2
         {
             hasRightAttackQueued = false;
             hasLeftAttackQueued = false;
+            hasHeavyAttackQueued = false;
         }
         #endregion
     }

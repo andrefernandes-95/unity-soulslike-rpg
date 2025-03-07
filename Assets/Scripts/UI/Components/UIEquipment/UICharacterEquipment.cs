@@ -7,7 +7,7 @@ namespace AFV2
 
     public class UICharacterEquipment : MonoBehaviour
     {
-        public CharacterEquipment characterEquipment;
+        public CharacterApi characterApi;
 
         [Header("Components")]
         public UICharacterInventory uICharacterInventory;
@@ -34,23 +34,23 @@ namespace AFV2
             EquipmentSlotSetters = new Dictionary<EquipmentSlotType, Action<ItemInstance, int>>
             {
                 { EquipmentSlotType.RIGHT_HAND, (item, slotIndex) =>
-                    characterEquipment.characterWeapons.EquipRightWeapon(item as WeaponInstance, slotIndex) },
+                    characterApi.characterWeapons.EquipRightWeapon(item as WeaponInstance, slotIndex) },
                 { EquipmentSlotType.LEFT_HAND, (item, slotIndex) =>
-                    characterEquipment.characterWeapons.EquipLeftWeapon(item as WeaponInstance, slotIndex) },
+                    characterApi.characterWeapons.EquipLeftWeapon(item as WeaponInstance, slotIndex) },
                 { EquipmentSlotType.SKILL, (item, slotIndex) =>
-                    characterEquipment.characterWeapons.EquipSkill(item as SkillInstance, slotIndex) },
+                    characterApi.characterSkills.EquipSkill(item as SkillInstance, slotIndex) },
                 { EquipmentSlotType.ARROW, (item, slotIndex) =>
-                    characterEquipment.characterWeapons.EquipArrow(item as ArrowInstance, slotIndex) },
+                    characterApi.characterArchery.EquipArrow(item as ArrowInstance, slotIndex) },
                 { EquipmentSlotType.ACCESSORY, (item, slotIndex) =>
-                    characterEquipment.EquipAccessory(item as AccessoryInstance, slotIndex) },
+                    characterApi.characterEquipment.EquipAccessory(item as AccessoryInstance, slotIndex) },
                 { EquipmentSlotType.CONSUMABLE, (item, slotIndex) =>
-                    characterEquipment.EquipConsumable(item as ConsumableInstance, slotIndex) },
+                    characterApi.characterConsumables.EquipConsumable(item as ConsumableInstance, slotIndex) },
                 { EquipmentSlotType.HEADGEAR, (item, slotIndex) =>
-                    characterEquipment.EquipHeadgear(item as HeadgearInstance) },
+                    characterApi.characterEquipment.EquipHeadgear(item as HeadgearInstance) },
                 { EquipmentSlotType.ARMOR, (item, slotIndex) =>
-                    characterEquipment.EquipArmor(item as ArmorInstance) },
+                    characterApi.characterEquipment.EquipArmor(item as ArmorInstance) },
                 { EquipmentSlotType.BOOTS, (item, slotIndex) =>
-                    characterEquipment.EquipBoots(item as BootInstance) }
+                    characterApi.characterEquipment.EquipBoots(item as BootInstance) }
             };
         }
 

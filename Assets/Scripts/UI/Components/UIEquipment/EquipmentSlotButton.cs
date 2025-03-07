@@ -72,7 +72,7 @@ namespace AFV2
 
         bool TryGetSlotItem(out ItemInstance itemInstance)
         {
-            itemInstance = GetEquippedItemSlot(uICharacterEquipment.characterEquipment, slotType, slotIndex);
+            itemInstance = GetEquippedItemSlot(slotType, slotIndex);
             return itemInstance != null;
         }
 
@@ -133,29 +133,28 @@ namespace AFV2
         }
 
 
-        ItemInstance GetEquippedItemSlot(CharacterEquipment characterEquipment, EquipmentSlotType equipmentSlotType, int slotIndex)
+        ItemInstance GetEquippedItemSlot(EquipmentSlotType equipmentSlotType, int slotIndex)
         {
             if (equipmentSlotType == EquipmentSlotType.RIGHT_HAND)
-                return characterEquipment.characterWeapons.rightWeapons[slotIndex];
+                return uICharacterEquipment.characterApi.characterWeapons.rightWeapons[slotIndex];
             if (equipmentSlotType == EquipmentSlotType.LEFT_HAND)
-                return characterEquipment.characterWeapons.leftWeapons[slotIndex];
+                return uICharacterEquipment.characterApi.characterWeapons.leftWeapons[slotIndex];
             if (equipmentSlotType == EquipmentSlotType.ARROW)
-                return characterEquipment.characterWeapons.arrows[slotIndex];
+                return uICharacterEquipment.characterApi.characterArchery.arrows[slotIndex];
             if (equipmentSlotType == EquipmentSlotType.SKILL)
-                return characterEquipment.characterWeapons.skills[slotIndex];
+                return uICharacterEquipment.characterApi.characterSkills.skills[slotIndex];
             if (equipmentSlotType == EquipmentSlotType.ACCESSORY)
-                return characterEquipment.accessories[slotIndex];
+                return uICharacterEquipment.characterApi.characterEquipment.accessories[slotIndex];
             if (equipmentSlotType == EquipmentSlotType.CONSUMABLE)
-                return characterEquipment.consumables[slotIndex];
+                return uICharacterEquipment.characterApi.characterConsumables.consumables[slotIndex];
             if (equipmentSlotType == EquipmentSlotType.HEADGEAR)
-                return characterEquipment.headgear;
+                return uICharacterEquipment.characterApi.characterEquipment.headgear;
             if (equipmentSlotType == EquipmentSlotType.ARMOR)
-                return characterEquipment.armor;
+                return uICharacterEquipment.characterApi.characterEquipment.armor;
             if (equipmentSlotType == EquipmentSlotType.BOOTS)
-                return characterEquipment.boot;
+                return uICharacterEquipment.characterApi.characterEquipment.boot;
 
             return null;
-
         }
     }
 }

@@ -8,7 +8,6 @@ namespace AFV2
         [Header("Transition")]
         [SerializeField] private string HASH_FALL = "Fall";
         [SerializeField] private float fallBlendTime = 0.3f;
-
         [SerializeField] private string HASH_LAND = "Land";
         [SerializeField] private float landBlendTime = 0.15f;
         [SerializeField] private float minimumFallHeightToPlayLandAnimation = 3f;

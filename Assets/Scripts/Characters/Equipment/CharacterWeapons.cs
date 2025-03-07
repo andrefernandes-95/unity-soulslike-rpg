@@ -11,13 +11,11 @@ namespace AFV2
         [SerializeField] int activeLeftWeaponIndex = 0;
         [SerializeField] int activeRightWeaponIndex = 0;
 
-        [Header("🏹 Arrows")]
-        public ArrowInstance[] arrows = new ArrowInstance[2];
-        [SerializeField] int activeArrowIndex = 0;
+        [Header("Feet Weapons")]
 
-        [Header("🔥 Skills")]
-        public SkillInstance[] skills = new SkillInstance[6];
-        [SerializeField] int activeSkillIndex = 0;
+        public WorldWeapon CurrentLeftFootWeaponInstance;
+        public WorldWeapon CurrentRightFootWeaponInstance;
+
 
         [Header("Components")]
         [SerializeField] CharacterApi characterApi;
@@ -33,10 +31,27 @@ namespace AFV2
         // Events
         WorldWeapon[] allWeaponInstances => characterApi.GetComponentsInChildren<WorldWeapon>(true);
 
-        public UnityEvent onRightWeaponSwitched = new();
-        public UnityEvent onLeftWeaponSwitched = new();
-        public UnityEvent onSkillSwitched = new();
-        public UnityEvent onArrowSwitched = new();
+        public UnityEvent<WeaponInstance> onRightWeaponSwitched = new();
+        public UnityEvent<WeaponInstance> onLeftWeaponSwitched = new();
+
+        void Awake()
+        {
+            foreach (WorldWeapon worldWeapon in allWeaponInstances)
+            {
+                onRightWeaponSwitched.AddListener((WeaponInstance weaponInstance) =>
+                {
+                    worldWeapon.OnWeaponSwitched(EquipmentSlotType.RIGHT_HAND, weaponInstance);
+                });
+
+                onLeftWeaponSwitched.AddListener((WeaponInstance weaponInstance) =>
+                {
+                    worldWeapon.OnWeaponSwitched(EquipmentSlotType.LEFT_HAND, weaponInstance);
+                });
+            }
+
+            SwitchRightWeapon(0);
+            SwitchLeftWeapon(0);
+        }
 
         public void EquipRightWeapon(WeaponInstance weaponInstance, int slot)
         {
@@ -68,81 +83,56 @@ namespace AFV2
 
         public void UnequipRightWeapon(int slot)
         {
-            WeaponInstance unarmedWeapon = new WeaponInstance(characterDefaultEquipment.fallbackWeapon);
+            WeaponInstance unarmedWeapon = new(characterDefaultEquipment.fallbackWeapon);
             rightWeapons[slot] = unarmedWeapon;
             SwitchRightWeapon(slot);
         }
 
         public void UnequipLeftWeapon(int slot)
         {
-            WeaponInstance unarmedWeapon = new WeaponInstance(characterDefaultEquipment.fallbackWeapon);
+            WeaponInstance unarmedWeapon = new(characterDefaultEquipment.fallbackWeapon);
             leftWeapons[slot] = unarmedWeapon;
             SwitchLeftWeapon(slot);
+        }
+
+        public void SwitchRightWeapon()
+        {
+            var newIndex = activeRightWeaponIndex + 1;
+
+            if (newIndex >= rightWeapons.Length)
+            {
+                newIndex = 0;
+            }
+
+            SwitchRightWeapon(newIndex);
+        }
+
+        public void SwitchLeftWeapon()
+        {
+            var newIndex = activeLeftWeaponIndex + 1;
+
+            if (newIndex >= leftWeapons.Length)
+            {
+                newIndex = 0;
+            }
+
+            SwitchLeftWeapon(newIndex);
         }
 
         void SwitchRightWeapon(int newIndex)
         {
             this.activeRightWeaponIndex = newIndex;
 
-            foreach (var weaponInstance in allWeaponInstances)
-            {
-                weaponInstance.OnWeaponSwitched(EquipmentSlotType.RIGHT_HAND, rightWeapons[activeRightWeaponIndex]);
-            }
-
-            onRightWeaponSwitched?.Invoke();
+            onRightWeaponSwitched?.Invoke(rightWeapons[activeRightWeaponIndex]);
         }
 
         void SwitchLeftWeapon(int newIndex)
         {
             this.activeLeftWeaponIndex = newIndex;
 
-            foreach (var weaponInstance in allWeaponInstances)
-            {
-                weaponInstance.OnWeaponSwitched(EquipmentSlotType.LEFT_HAND, leftWeapons[activeLeftWeaponIndex]);
-            }
-
-            onLeftWeaponSwitched?.Invoke();
+            onLeftWeaponSwitched?.Invoke(leftWeapons[activeLeftWeaponIndex]);
         }
 
-
-        public void EquipSkill(SkillInstance skillInstance, int slot)
-        {
-            bool shouldUnequip = skills[slot] == skillInstance;
-            UnequipSkill(slot);
-
-            if (shouldUnequip)
-            {
-                return;
-            }
-
-            skills[slot] = skillInstance;
-            onSkillSwitched?.Invoke();
-        }
-
-        public void UnequipSkill(int slot = 0)
-        {
-            skills[slot] = null;
-            onSkillSwitched?.Invoke();
-        }
-
-        public void EquipArrow(ArrowInstance arrowInstance, int slot)
-        {
-            bool shouldUnequip = arrows[slot] == arrowInstance;
-            UnequipArrow(slot);
-            if (shouldUnequip)
-            {
-                return;
-            }
-
-            arrows[slot] = arrowInstance;
-            onArrowSwitched?.Invoke();
-        }
-
-        public void UnequipArrow(int slot)
-        {
-            arrows[slot] = null;
-            onArrowSwitched?.Invoke();
-        }
 
         #region Two-Handing
         public void ToggleTwoHanding()
@@ -209,31 +199,44 @@ namespace AFV2
             if (TryGetActiveRightWeapon(out WorldWeapon weapon)) weapon.DisableHitbox();
         }
 
+        public void EnableLeftFootHitbox()
+        {
+            if (CurrentLeftFootWeaponInstance != null)
+            {
+                CurrentLeftFootWeaponInstance.EnableHitbox();
+            }
+        }
+
+        public void EnableRightFootHitbox()
+        {
+            if (CurrentRightFootWeaponInstance != null)
+            {
+                CurrentRightFootWeaponInstance.EnableHitbox();
+            }
+        }
+
+        void DisableLeftFootHitbox()
+        {
+            if (CurrentLeftFootWeaponInstance != null)
+            {
+                CurrentLeftFootWeaponInstance.DisableHitbox();
+            }
+        }
+        void DisableRightFootHitbox()
+        {
+            if (CurrentRightFootWeaponInstance != null)
+            {
+                CurrentRightFootWeaponInstance.DisableHitbox();
+            }
+        }
+
+
         public void DisableAllHitboxes()
         {
             DisableLeftWeaponHitbox();
             DisableRightWeaponHitbox();
-        }
-        #endregion
-
-        #region Skills
-
-        public bool TryGetSkillInstance(out SkillInstance skillInstance)
-        {
-            skillInstance = skills[activeSkillIndex];
-
-            return skillInstance != null;
-        }
-
-        #endregion
-
-        #region Arrows
-
-        public bool TruyGetArrowInstance(out ArrowInstance arrowInstance)
-        {
-            arrowInstance = arrows[activeArrowIndex];
-
-            return arrowInstance != null;
+            DisableLeftFootHitbox();
+            DisableRightFootHitbox();
         }
         #endregion
 

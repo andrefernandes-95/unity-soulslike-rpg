@@ -8,8 +8,7 @@ namespace AFV2
         [Header("UI")]
         [SerializeField] Image equippedItemIcon;
         [SerializeField] Image unequippedItemIcon;
-        [SerializeField] CharacterEquipment characterEquipment;
-        [SerializeField] CharacterWeapons characterWeapons;
+        [SerializeField] CharacterApi characterApi;
 
         public EquipmentSlotType equipmentSlotType;
 
@@ -23,23 +22,23 @@ namespace AFV2
 
             if (equipmentSlotType == EquipmentSlotType.RIGHT_HAND)
             {
-                characterWeapons.onRightWeaponSwitched.AddListener(OnRightWeaponSwitched);
+                characterApi.characterWeapons.onRightWeaponSwitched.AddListener(OnRightWeaponSwitched);
             }
             else if (equipmentSlotType == EquipmentSlotType.LEFT_HAND)
             {
-                characterWeapons.onLeftWeaponSwitched.AddListener(OnLeftWeaponSwitched);
+                characterApi.characterWeapons.onLeftWeaponSwitched.AddListener(OnLeftWeaponSwitched);
             }
             else if (equipmentSlotType == EquipmentSlotType.SKILL)
             {
-                characterWeapons.onArrowSwitched.AddListener(OnArrowSwitched);
-                characterWeapons.onSkillSwitched.AddListener(OnSkillSwitched);
+                characterApi.characterArchery.onArrowSwitched.AddListener(OnArrowSwitched);
+                characterApi.characterSkills.onSkillSwitched.AddListener(OnSkillSwitched);
             }
 
         }
 
-        void OnRightWeaponSwitched()
+        void OnRightWeaponSwitched(WeaponInstance weaponInstance)
         {
-            if (characterWeapons.TryGetRightWeaponInstance(out WeaponInstance weaponInstance) && weaponInstance.item is Weapon weapon && weapon.isFallbackWeapon == false)
+            if (weaponInstance.item is Weapon weapon && weapon.isFallbackWeapon == false)
             {
                 UpdateIcon(weaponInstance);
             }
@@ -49,9 +48,9 @@ namespace AFV2
             }
         }
 
-        void OnLeftWeaponSwitched()
+        void OnLeftWeaponSwitched(WeaponInstance weaponInstance)
         {
-            if (characterWeapons.TryGetLeftWeaponInstance(out WeaponInstance weaponInstance) && weaponInstance.item is Weapon weapon && weapon.isFallbackWeapon == false)
+            if (weaponInstance.item is Weapon weapon && weapon.isFallbackWeapon == false)
             {
                 UpdateIcon(weaponInstance);
             }
@@ -63,7 +62,7 @@ namespace AFV2
 
         void OnSkillSwitched()
         {
-            if (characterWeapons.TryGetSkillInstance(out SkillInstance skillInstance))
+            if (characterApi.characterSkills.TryGetSkillInstance(out SkillInstance skillInstance))
             {
                 UpdateIcon(skillInstance);
             }
@@ -75,7 +74,7 @@ namespace AFV2
 
         void OnArrowSwitched()
         {
-            if (characterWeapons.TruyGetArrowInstance(out ArrowInstance arrowInstance))
+            if (characterApi.characterArchery.TryGetArrowInstance(out ArrowInstance arrowInstance))
             {
                 UpdateIcon(arrowInstance);
             }

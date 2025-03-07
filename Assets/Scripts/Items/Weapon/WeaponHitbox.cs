@@ -6,7 +6,7 @@ namespace AFV2
     [RequireComponent(typeof(AudioSource))]
     public class WeaponHitbox : MonoBehaviour
     {
-        new Collider collider => GetComponent<Collider>();
+        public Collider collider;
         AudioSource audiSource => GetComponent<AudioSource>();
 
         [Header("Trail Renderer")]

@@ -22,9 +22,7 @@ namespace AFV2
         [SerializeField] int defaultArrowNumber = 15;
 
         [Header("Components")]
-        [SerializeField] CharacterWeapons characterWeapons;
-        [SerializeField] CharacterEquipment characterEquipment;
-        [SerializeField] CharacterInventory characterInventory;
+        [SerializeField] CharacterApi characterApi;
 
         private void Awake()
         {
@@ -33,13 +31,13 @@ namespace AFV2
 
         void SyncInventoryWithEquipment()
         {
-            EquipWeapons(characterWeapons.leftWeapons, defaultLeftWeapon, (weapon, index) =>
+            EquipWeapons(characterApi.characterWeapons.leftWeapons, defaultLeftWeapon, (weapon, index) =>
             {
-                characterWeapons.EquipLeftWeapon(weapon, index);
+                characterApi.characterWeapons.EquipLeftWeapon(weapon, index);
             });
-            EquipWeapons(characterWeapons.rightWeapons, defaultRightWeapon, (weapon, index) =>
+            EquipWeapons(characterApi.characterWeapons.rightWeapons, defaultRightWeapon, (weapon, index) =>
             {
-                characterWeapons.EquipRightWeapon(weapon, index);
+                characterApi.characterWeapons.EquipRightWeapon(weapon, index);
             });
 
             for (int i = 0; i < defaultArrows.Count; i++)
@@ -48,8 +46,8 @@ namespace AFV2
                 {
                     for (int j = 0; j < defaultArrowNumber; j++)
                     {
-                        ArrowInstance arrowInstance = characterInventory.AddItem(defaultArrows[i]) as ArrowInstance;
-                        characterEquipment.characterWeapons.EquipArrow(arrowInstance, i);
+                        ArrowInstance arrowInstance = characterApi.characterInventory.AddItem(defaultArrows[i]) as ArrowInstance;
+                        characterApi.characterArchery.EquipArrow(arrowInstance, i);
                     }
                 }
             }
@@ -58,8 +56,8 @@ namespace AFV2
             {
                 if (defaultSkills[i] != null)
                 {
-                    SkillInstance skillInstance = characterInventory.AddItem(defaultSkills[i]) as SkillInstance;
-                    characterEquipment.characterWeapons.EquipSkill(skillInstance, i);
+                    SkillInstance skillInstance = characterApi.characterInventory.AddItem(defaultSkills[i]) as SkillInstance;
+                    characterApi.characterSkills.EquipSkill(skillInstance, i);
                 }
             }
 
@@ -67,8 +65,8 @@ namespace AFV2
             {
                 if (defaultAccessories[i] != null)
                 {
-                    AccessoryInstance accessoryInstance = characterInventory.AddItem(defaultAccessories[i]) as AccessoryInstance;
-                    characterEquipment.EquipAccessory(accessoryInstance, i);
+                    AccessoryInstance accessoryInstance = characterApi.characterInventory.AddItem(defaultAccessories[i]) as AccessoryInstance;
+                    characterApi.characterEquipment.EquipAccessory(accessoryInstance, i);
                 }
             }
 
@@ -76,27 +74,27 @@ namespace AFV2
             {
                 if (defaultConsumables[i] != null)
                 {
-                    ConsumableInstance consumableInstance = characterInventory.AddItem(defaultConsumables[i]) as ConsumableInstance;
-                    characterEquipment.EquipConsumable(consumableInstance, i);
+                    ConsumableInstance consumableInstance = characterApi.characterInventory.AddItem(defaultConsumables[i]) as ConsumableInstance;
+                    characterApi.characterConsumables.EquipConsumable(consumableInstance, i);
                 }
             }
 
             if (defaultHeadgear != null)
             {
-                HeadgearInstance headgearInstance = characterInventory.AddItem(defaultHeadgear) as HeadgearInstance;
-                characterEquipment.EquipHeadgear(headgearInstance);
+                HeadgearInstance headgearInstance = characterApi.characterInventory.AddItem(defaultHeadgear) as HeadgearInstance;
+                characterApi.characterEquipment.EquipHeadgear(headgearInstance);
             }
 
             if (defaultArmor != null)
             {
-                ArmorInstance armorInstance = characterInventory.AddItem(defaultArmor) as ArmorInstance;
-                characterEquipment.EquipArmor(armorInstance);
+                ArmorInstance armorInstance = characterApi.characterInventory.AddItem(defaultArmor) as ArmorInstance;
+                characterApi.characterEquipment.EquipArmor(armorInstance);
             }
 
             if (defaultBoots != null)
             {
-                BootInstance bootInstance = characterInventory.AddItem(defaultBoots) as BootInstance;
-                characterEquipment.EquipBoots(bootInstance);
+                BootInstance bootInstance = characterApi.characterInventory.AddItem(defaultBoots) as BootInstance;
+                characterApi.characterEquipment.EquipBoots(bootInstance);
             }
         }
 
@@ -112,7 +110,7 @@ namespace AFV2
 
                 if (weaponToEquip != null && !weaponToEquip.isFallbackWeapon)
                 {
-                    weaponInstance = characterInventory.AddItem(weaponToEquip) as WeaponInstance;
+                    weaponInstance = characterApi.characterInventory.AddItem(weaponToEquip) as WeaponInstance;
                 }
 
                 equipAction.Invoke(weaponInstance, i);

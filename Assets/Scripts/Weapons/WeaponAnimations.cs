@@ -5,10 +5,12 @@ namespace AFV2
     using System.Threading.Tasks;
     using UnityEngine;
 
-    public class RightWeaponAnimations : MonoBehaviour
+    public class WeaponAnimations : MonoBehaviour
     {
 
         [Header("Animation Clips")]
+        public Transform commonActionsContainer;
+        List<ActionClip> inheritedActionClips = new();
         public ActionClip[] animationClips => GetComponentsInChildren<ActionClip>();
         private Dictionary<string, ActionClip> animationClipLookup = new();
 
@@ -33,6 +35,19 @@ namespace AFV2
         {
             if (animationClipLookup.Count <= 0)
             {
+                if (inheritedActionClips.Count <= 0 && commonActionsContainer != null)
+                {
+                    inheritedActionClips = commonActionsContainer.GetComponentsInChildren<ActionClip>(true).ToList();
+                }
+
+                foreach (var clip in inheritedActionClips)
+                {
+                    if (!animationClipLookup.ContainsKey(clip.name))
+                    {
+                        animationClipLookup.Add(clip.name, clip);
+                    }
+                }
+
                 foreach (var clip in animationClips)
                 {
                     if (!animationClipLookup.ContainsKey(clip.name))
@@ -41,13 +56,14 @@ namespace AFV2
                     }
                     else
                     {
-                        Debug.LogWarning($"Duplicate animation clip name found: {clip.name}");
+                        // Override inherited clip
+                        animationClipLookup[clip.name] = clip;
                     }
                 }
             }
         }
 
-        public async void ApplyAnimations()
+        public async void ApplyAnimations(bool isLeftHand)
         {
             while (characterApi.animatorManager.IsInTransition())
             {
@@ -56,7 +72,14 @@ namespace AFV2
 
             InitializeAnimationClipLookup();
 
-            characterApi.animatorManager.animatorOverrideManager.UpdateCommonClips(animationClipLookup);
+            if (isLeftHand)
+            {
+                characterApi.animatorManager.animatorOverrideManager.UpdateLeftHandClips(animationClipLookup);
+            }
+            else
+            {
+                characterApi.animatorManager.animatorOverrideManager.UpdateCommonClips(animationClipLookup);
+            }
         }
     }
 }

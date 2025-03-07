@@ -30,7 +30,11 @@ namespace AFV2
         #endregion
 
         #region Inventory
+        public CharacterWeapons characterWeapons;
+        public CharacterArchery characterArchery;
+        public CharacterSkills characterSkills;
         public CharacterEquipment characterEquipment;
+        public CharacterConsumables characterConsumables;
         public CharacterInventory characterInventory;
         #endregion
 

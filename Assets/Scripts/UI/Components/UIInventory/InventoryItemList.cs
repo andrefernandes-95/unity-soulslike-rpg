@@ -10,8 +10,7 @@ namespace AFV2
 
     public class InventoryItemList : MonoBehaviour
     {
-        [SerializeField] CharacterEquipment characterEquipment;
-        [SerializeField] CharacterInventory characterInventory;
+        [SerializeField] CharacterApi characterApi;
 
         [Header("Inventory UI Components")]
         [SerializeField] UICharacterInventory uICharacterInventory;
@@ -43,23 +42,23 @@ namespace AFV2
             EquipmentSlotGetters = new Dictionary<EquipmentSlotType, Func<EquipmentSlotType, int, ItemInstance>>
             {
                 { EquipmentSlotType.RIGHT_HAND, (slotType, index) => {
-                    return characterEquipment.characterWeapons.rightWeapons[index]; } },
+                    return characterApi.characterWeapons.rightWeapons[index]; } },
                 { EquipmentSlotType.LEFT_HAND, (slotType, index) => {
-                    return characterEquipment.characterWeapons.leftWeapons[index]; } },
+                    return characterApi.characterWeapons.leftWeapons[index]; } },
                 { EquipmentSlotType.SKILL, (slotType, index) => {
-                    return characterEquipment.characterWeapons.skills[index]; } },
+                    return characterApi.characterSkills.skills[index]; } },
                 { EquipmentSlotType.ARROW, (slotType, index) => {
-                    return characterEquipment.characterWeapons.arrows[index]; } },
+                    return characterApi.characterArchery.arrows[index]; } },
                 { EquipmentSlotType.ACCESSORY, (slotType, index) => {
-                    return characterEquipment.accessories[index]; } },
+                    return characterApi.characterEquipment.accessories[index]; } },
                 { EquipmentSlotType.CONSUMABLE, (slotType, index) => {
-                    return characterEquipment.consumables[index]; } },
+                    return characterApi.characterConsumables.consumables[index]; } },
                 { EquipmentSlotType.HEADGEAR, (slotType, index) => {
-                    return characterEquipment.headgear; } },
+                    return characterApi.characterEquipment.headgear; } },
                 { EquipmentSlotType.ARMOR, (slotType, index) => {
-                    return characterEquipment.armor; } },
+                    return characterApi.characterEquipment.armor; } },
                 { EquipmentSlotType.BOOTS, (slotType, index) => {
-                    return characterEquipment.boot; } }
+                    return characterApi.characterEquipment.boot; } }
             };
         }
 
@@ -114,8 +113,8 @@ namespace AFV2
                 return false;
             }
 
-            int leftSlotIndex = Array.IndexOf(characterEquipment.characterWeapons.leftWeapons, weaponInstance);
-            int rightSlotIndex = Array.IndexOf(characterEquipment.characterWeapons.rightWeapons, weaponInstance);
+            int leftSlotIndex = Array.IndexOf(characterApi.characterWeapons.leftWeapons, weaponInstance);
+            int rightSlotIndex = Array.IndexOf(characterApi.characterWeapons.rightWeapons, weaponInstance);
 
             bool isRightHandFilter = inventoryFilter.Filter == EquipmentSlotType.RIGHT_HAND;
             bool isLeftHandFilter = inventoryFilter.Filter == EquipmentSlotType.LEFT_HAND;
@@ -156,7 +155,7 @@ namespace AFV2
                 return;
             }
 
-            List<ItemInstance> weapons = characterInventory.GetItems<Weapon>()
+            List<ItemInstance> weapons = characterApi.characterInventory.GetItems<Weapon>()
                 .Where(itemInstance =>
             {
                 if (itemInstance.item is not Weapon weapon)
@@ -186,12 +185,12 @@ namespace AFV2
                 return;
             }
 
-            List<ItemInstance> skills = characterInventory.GetItems<Skill>()
+            List<ItemInstance> skills = characterApi.characterInventory.GetItems<Skill>()
                 .Where(item =>
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterEquipment.characterWeapons.skills.Cast<Item>().ToList(), item.item))
+                    if (IsItemAvailable(characterApi.characterSkills.skills.Cast<Item>().ToList(), item.item))
                     {
                         return false;
                     }
@@ -210,12 +209,12 @@ namespace AFV2
                 return;
             }
 
-            List<ItemInstance> arrows = characterInventory.GetItems<Arrow>()
+            List<ItemInstance> arrows = characterApi.characterInventory.GetItems<Arrow>()
                 .Where(item =>
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterEquipment.characterWeapons.arrows.Cast<Item>().ToList(), item.item))
+                    if (IsItemAvailable(characterApi.characterArchery.arrows.Cast<Item>().ToList(), item.item))
                     {
                         return false;
                     }
@@ -234,12 +233,12 @@ namespace AFV2
                 return;
             }
 
-            List<ItemInstance> accessories = characterInventory.GetItems<Accessory>()
+            List<ItemInstance> accessories = characterApi.characterInventory.GetItems<Accessory>()
                 .Where(item =>
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterEquipment.accessories.Cast<Item>().ToList(), item.item))
+                    if (IsItemAvailable(characterApi.characterEquipment.accessories.Cast<Item>().ToList(), item.item))
                     {
                         return false;
                     }
@@ -258,12 +257,12 @@ namespace AFV2
                 return;
             }
 
-            List<ItemInstance> consumables = characterInventory.GetItems<Consumable>()
+            List<ItemInstance> consumables = characterApi.characterInventory.GetItems<Consumable>()
                 .Where(item =>
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterEquipment.consumables.Cast<Item>().ToList(), item.item))
+                    if (IsItemAvailable(characterApi.characterConsumables.consumables.Cast<Item>().ToList(), item.item))
                     {
                         return false;
                     }
@@ -282,7 +281,7 @@ namespace AFV2
                 return;
             }
 
-            List<ItemInstance> headgears = characterInventory.GetItems<Headgear>().ToList();
+            List<ItemInstance> headgears = characterApi.characterInventory.GetItems<Headgear>().ToList();
 
             RenderItems(GetItemsToDisplay(headgears));
         }
@@ -294,7 +293,7 @@ namespace AFV2
                 return;
             }
 
-            List<ItemInstance> armors = characterInventory.GetItems<Armor>().ToList();
+            List<ItemInstance> armors = characterApi.characterInventory.GetItems<Armor>().ToList();
 
             RenderItems(GetItemsToDisplay(armors));
         }
@@ -306,7 +305,7 @@ namespace AFV2
                 return;
             }
 
-            List<ItemInstance> boots = characterInventory.GetItems<Boot>().ToList();
+            List<ItemInstance> boots = characterApi.characterInventory.GetItems<Boot>().ToList();
             RenderItems(GetItemsToDisplay(boots));
         }
 
@@ -317,7 +316,7 @@ namespace AFV2
                 return;
             }
 
-            RenderItems(GetItemsToDisplay(characterInventory.GetItems<Item>().ToList()));
+            RenderItems(GetItemsToDisplay(characterApi.characterInventory.GetItems<Item>().ToList()));
         }
         #endregion
 

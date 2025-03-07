@@ -13,7 +13,7 @@ namespace AFV2
 
             if (characterApi != null)
             {
-                characterApi.characterEquipment.characterWeapons.DisableAllHitboxes();
+                characterApi.characterWeapons.DisableAllHitboxes();
 
                 characterApi.characterMovement.EnableRotation();
             }

@@ -13,8 +13,8 @@ namespace AFV2
         [HideInInspector] public UnityEvent onHealthChange, onStaminaChange, onManaChange;
 
         [Header("Stamina Regeneration")]
-        [SerializeField] private float regenRate = 5f; // Stamina per second
-        [SerializeField] private float regenDelay = 2f; // Delay before regen starts
+        [SerializeField] private float regenRate = 15f; // Stamina per second
+        [SerializeField] private float regenDelay = 1f; // Delay before regen starts
 
         private Coroutine regenCoroutine;
         private float lastStaminaUseTime;
@@ -25,8 +25,11 @@ namespace AFV2
         }
 
         [Header("Action Costs")]
-        [SerializeField] float jumpCost = 5f;
-        [SerializeField] float sprintCost = .5f;
+        [SerializeField] float jumpCost = 15f;
+        [SerializeField]
+        float sprintCost = 15f;
+
+        [SerializeField] float dodgeCost = 40f;
 
         [Header("Components")]
         [SerializeField] CharacterApi characterApi;
@@ -66,13 +69,30 @@ namespace AFV2
         {
             return Stamina > sprintCost;
         }
-
+        public bool CanDodge()
+        {
+            return Stamina > dodgeCost;
+        }
+        public bool CanJump()
+        {
+            return Stamina > jumpCost;
+        }
         #endregion
 
         #region Use Actions
         public void UseSprint()
         {
             DecreaseStamina(sprintCost * Time.deltaTime);
+        }
+
+        public void UseDodge()
+        {
+            DecreaseStamina(dodgeCost);
+        }
+
+        public void UseJump()
+        {
+            DecreaseStamina(jumpCost);
         }
         #endregion
 

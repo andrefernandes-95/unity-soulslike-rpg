@@ -16,7 +16,7 @@ namespace AFV2
         protected void FinishCombo()
         {
             characterApi.characterMovement.EnableRotation();
-            characterApi.characterEquipment.characterWeapons.DisableAllHitboxes();
+            characterApi.characterWeapons.DisableAllHitboxes();
             characterApi.animatorManager.DisableRootMotion();
         }
 
@@ -47,6 +47,8 @@ namespace AFV2
             while (shouldExitEarly == false && characterCombat.CanCombo(staminaCost, combatDecision) && attacks.Count > 0)
             {
                 FinishAttack();
+
+                characterApi.characterStamina.DecreaseStamina(staminaCost);
 
                 string nextAttack = attacks[0];
                 attacks.RemoveAt(0);

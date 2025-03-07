@@ -12,8 +12,6 @@ namespace AFV2
 
         public Transform RightFoot => activeCharacterModel?.RightFoot;
         public Transform LeftFoot => activeCharacterModel?.LeftFoot;
-        public Transform RightHand => activeCharacterModel?.RightHand;
-        public Transform LeftHand => activeCharacterModel?.LeftHand;
 
         void Start()
         {

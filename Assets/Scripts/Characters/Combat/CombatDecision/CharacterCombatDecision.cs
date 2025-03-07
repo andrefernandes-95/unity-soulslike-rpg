@@ -11,8 +11,8 @@ namespace AFV2
 
         private (WorldWeapon rightHandWeapon, WorldWeapon leftHandWeapon) GetActiveWeapons()
         {
-            characterApi.characterEquipment.characterWeapons.TryGetActiveRightWeapon(out WorldWeapon rightHandWeapon);
-            characterApi.characterEquipment.characterWeapons.TryGetActiveLeftWeapon(out WorldWeapon leftHandWeapon);
+            characterApi.characterWeapons.TryGetActiveRightWeapon(out WorldWeapon rightHandWeapon);
+            characterApi.characterWeapons.TryGetActiveLeftWeapon(out WorldWeapon leftHandWeapon);
             return (rightHandWeapon, leftHandWeapon);
         }
 
@@ -138,9 +138,9 @@ namespace AFV2
             return false;
         }
 
-        bool ShouldAttemptHeavyAttack()
+        protected virtual bool ShouldAttemptHeavyAttack()
         {
-            characterApi.characterEquipment.characterWeapons.TryGetActiveRightWeapon(out WorldWeapon rightHandWeapon);
+            characterApi.characterWeapons.TryGetActiveRightWeapon(out WorldWeapon rightHandWeapon);
             if (rightHandWeapon == null)
                 return false;
 
@@ -153,7 +153,7 @@ namespace AFV2
 
         protected virtual bool CanRightAttack()
         {
-            if (!characterApi.characterEquipment.characterWeapons.TryGetActiveRightWeapon(out WorldWeapon rightWeapon))
+            if (!characterApi.characterWeapons.TryGetActiveRightWeapon(out WorldWeapon rightWeapon))
                 return false;
 
             return CanLightAttack(rightWeapon);
@@ -161,7 +161,7 @@ namespace AFV2
 
         protected virtual bool CanLeftAttack()
         {
-            if (!characterApi.characterEquipment.characterWeapons.TryGetActiveLeftWeapon(out WorldWeapon leftWeapon))
+            if (!characterApi.characterWeapons.TryGetActiveLeftWeapon(out WorldWeapon leftWeapon))
                 return false;
 
             return CanLightAttack(leftWeapon);

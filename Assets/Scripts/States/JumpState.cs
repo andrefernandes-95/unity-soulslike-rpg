@@ -17,6 +17,7 @@ namespace AFV2
 
         public override void OnStateEnter()
         {
+            characterApi.characterStamina.UseJump();
             characterApi.animatorManager.BlendTo(HASH_JUMP, jumpBlend);
             characterApi.characterGravity.Jump();
         }

@@ -29,6 +29,12 @@ namespace AFV2
             get { return sprint; }
         }
 
+        bool dodge;
+        public bool Dodge
+        {
+            get { return dodge; }
+        }
+
         bool jump;
         public bool Jump
         {
@@ -36,6 +42,7 @@ namespace AFV2
         }
 
         [Header("Events")]
+        public UnityEvent onHeavyAttack;
         public UnityEvent onRightAttack;
         public UnityEvent onLeftAttack;
         public UnityEvent onChangeCombatStance;
@@ -43,6 +50,11 @@ namespace AFV2
         public UnityEvent onInteract;
         public UnityEvent onQuickSave;
         public UnityEvent onQuickLoad;
+
+        public UnityEvent onSwitchRightWeapon;
+        public UnityEvent onSwitchLeftWeapon;
+        public UnityEvent onSwitchSpell;
+        public UnityEvent onSwitchConsumable;
 
         public UnityAction<float> onZoomIn;
         public UnityAction<float> onZoomOut;
@@ -107,6 +119,12 @@ namespace AFV2
                 onRightAttack.Invoke();
         }
 
+        public void OnHeavyAttack(InputValue value)
+        {
+            if (value.isPressed)
+                onHeavyAttack.Invoke();
+        }
+
         public void OnBlock(InputValue value)
         {
             if (value.isPressed)
@@ -132,6 +150,7 @@ namespace AFV2
             if (value.isPressed)
             {
                 onNavigate?.Invoke();
+                onSwitchSpell?.Invoke();
             }
         }
 
@@ -140,6 +159,7 @@ namespace AFV2
             if (value.isPressed)
             {
                 onNavigate?.Invoke();
+                onSwitchConsumable?.Invoke();
             }
         }
 
@@ -148,6 +168,7 @@ namespace AFV2
             if (value.isPressed)
             {
                 onNavigate?.Invoke();
+                onSwitchRightWeapon?.Invoke();
             }
         }
 
@@ -156,6 +177,7 @@ namespace AFV2
             if (value.isPressed)
             {
                 onNavigate?.Invoke();
+                onSwitchLeftWeapon?.Invoke();
             }
         }
 
@@ -182,6 +204,17 @@ namespace AFV2
                 onQuickLoad?.Invoke();
             }
         }
+
+        public void OnDodge(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                dodge = true;
+                CancelInvoke(nameof(ResetDodge)); // Cancel previous invoke if any
+                Invoke(nameof(ResetDodge), Time.deltaTime); // Schedule reset
+            }
+        }
+        void ResetDodge() => dodge = false;
 
     }
 }

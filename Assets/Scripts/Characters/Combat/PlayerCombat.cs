@@ -12,10 +12,19 @@ namespace AFV2
                 return false;
 
             if (combatDecision == CombatDecision.RIGHT_LIGHT_ATTACK || combatDecision == CombatDecision.RIGHT_AIR_ATTACK)
+            {
                 return playerController.HasRightAttackQueued;
+            }
 
             if (combatDecision == CombatDecision.LEFT_LIGHT_ATTACK || combatDecision == CombatDecision.LEFT_AIR_ATTACK)
+            {
                 return playerController.HasLeftAttackQueued;
+            }
+
+            if (combatDecision == CombatDecision.HEAVY_ATTACK)
+            {
+                return playerController.HasHeavyAttackQueued;
+            }
 
             return false;
         }

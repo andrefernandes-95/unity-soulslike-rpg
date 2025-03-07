@@ -23,6 +23,7 @@ namespace AFV2
         #endregion
 
         #region Damage
+        [Header("💥 Damage")]
         public Damage damage;
         #endregion
 

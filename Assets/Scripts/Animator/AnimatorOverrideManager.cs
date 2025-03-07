@@ -76,7 +76,7 @@ namespace AFV2
 
                 foreach (var actionClipEvent in actionClip.Events)
                 {
-                    UnityEngine.AnimationEvent animationEvent = animationEventDispatcher.RegisterEvent(animationName, actionClipEvent, eventList);
+                    UnityEngine.AnimationEvent animationEvent = animationEventDispatcher.RegisterEvent(animationName, actionClipEvent, eventList, actionClip.animationClip.length);
                     overrides[kvp.Key].AddEvent(animationEvent);
                 }
             }

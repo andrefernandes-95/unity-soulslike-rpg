@@ -9,10 +9,17 @@ namespace AFV2
         public Weapon equippedWeapon;
         [SerializeField] CharacterApi characterApi;
 
+        [Header("Settings")]
+        public bool isFeetWeapon = false;
+
         [Header("Components")]
         public WeaponHitbox weaponHitbox;
-        public RightWeaponAnimations rightWeaponAnimations;
-        public LeftWeaponAnimations leftWeaponAnimations;
+
+        [Header("Applicable to Right Hand")]
+        public WeaponAnimations rightWeaponAnimations;
+        public WeaponAnimations twoHandWeaponAnimations;
+        [Header("Applicable to Left Hand")]
+        public WeaponAnimations leftWeaponAnimations;
 
         public void OnWeaponSwitched(EquipmentSlotType slotType, WeaponInstance weaponInstance)
         {
@@ -21,18 +28,32 @@ namespace AFV2
                 weaponHitbox.DisableHitbox();
             }
 
+            if (isFeetWeapon)
+            {
+                return;
+            }
+
             if (weaponInstance != null && weaponInstance.item == equippedWeapon)
             {
                 if (slotType == EquipmentSlotType.RIGHT_HAND && IsRightHandWeapon())
                 {
-                    characterApi.characterEquipment.characterWeapons.CurrentRightWeaponInstance = this;
-                    rightWeaponAnimations.ApplyAnimations();
+                    characterApi.characterWeapons.CurrentRightWeaponInstance = this;
+
+                    if (characterApi.characterWeapons.IsTwoHanding)
+                    {
+                        twoHandWeaponAnimations.ApplyAnimations(false);
+                    }
+                    else
+                    {
+                        rightWeaponAnimations.ApplyAnimations(false);
+                    }
+
                     this.gameObject.SetActive(true);
                 }
-                else if (slotType == EquipmentSlotType.LEFT_HAND && IsLeftHandWeapon())
+                else if (slotType == EquipmentSlotType.LEFT_HAND && IsLeftHandWeapon() && !characterApi.characterWeapons.IsTwoHanding)
                 {
-                    characterApi.characterEquipment.characterWeapons.CurrentLeftWeaponInstance = this;
-                    leftWeaponAnimations.ApplyAnimations();
+                    characterApi.characterWeapons.CurrentLeftWeaponInstance = this;
+                    leftWeaponAnimations.ApplyAnimations(true);
                     this.gameObject.SetActive(true);
                 }
             }

@@ -12,7 +12,7 @@ namespace AFV2
         public Dictionary<string, UnityEvent> leftHandActions = new();
         public Dictionary<string, UnityEvent> rightHandActions = new();
 
-        public UnityEngine.AnimationEvent RegisterEvent(string animationName, AFV2.AnimationEvent animationEvent, Dictionary<string, UnityEvent> targetDictionary)
+        public UnityEngine.AnimationEvent RegisterEvent(string animationName, AFV2.AnimationEvent animationEvent, Dictionary<string, UnityEvent> targetDictionary, float animationLength)
         {
             string eventName = $"{animationName}_{animationEvent.triggerTime}";
 
@@ -26,7 +26,7 @@ namespace AFV2
             {
                 functionName = "TriggerEvent",
                 stringParameter = eventName,
-                time = animationEvent.triggerTime,
+                time = animationEvent.triggerTime * animationLength,
             };
 
             return createdAnimationEvent;

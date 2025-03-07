@@ -10,6 +10,7 @@ namespace AFV2
         public PlayerRunState runState;
         public JumpState jumpState;
         public AttackState attackState;
+        public DodgeState dodgeState;
 
         public override State Tick()
         {
@@ -19,8 +20,11 @@ namespace AFV2
             if (playerController.IsJumping())
                 return jumpState;
 
-            if (playerController.IsLightAttacking())
+            if (playerController.IsLightAttacking() || playerController.IsHeavyAttacking())
                 return attackState;
+
+            if (playerController.IsDodging())
+                return dodgeState;
 
             return this;
         }

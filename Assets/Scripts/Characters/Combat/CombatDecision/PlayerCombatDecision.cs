@@ -6,6 +6,13 @@ namespace AFV2
     {
         [SerializeField] PlayerController playerController;
 
+        protected override bool ShouldAttemptHeavyAttack()
+        {
+            characterApi.characterWeapons.TryGetActiveRightWeapon(out WorldWeapon weapon);
+
+            return playerController.HasHeavyAttackQueued && characterApi.characterStamina.HasEnoughStamina(weapon.equippedWeapon.heavyAttackStaminaCost);
+        }
+
         protected override bool CanRightAttack() =>
             playerController.HasRightAttackQueued && base.CanRightAttack();
 

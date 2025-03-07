@@ -13,14 +13,6 @@ namespace AFV2
     }
 
     [System.Serializable]
-    public enum DamageType
-    {
-        NORMAL,
-        COUNTER_ATTACK,
-        ENRAGED,
-    }
-
-    [System.Serializable]
     public class Damage
     {
         public int physical;
@@ -34,13 +26,10 @@ namespace AFV2
         public int poiseDamage;
         public float pushForce = 0;
 
-        // public WeaponAttackType weaponAttackType;
-
         public StatusEffectEntry[] statusEffects;
 
         public bool ignoreBlocking = false;
         public bool canNotBeParried = false;
-        public DamageType damageType = DamageType.NORMAL;
 
         public Damage()
         {
@@ -233,7 +222,6 @@ namespace AFV2
                 darkness = this.darkness,
                 water = this.water,
                 canNotBeParried = this.canNotBeParried,
-                damageType = this.damageType,
                 ignoreBlocking = this.ignoreBlocking,
                 poiseDamage = this.poiseDamage,
                 postureDamage = this.postureDamage,
@@ -273,7 +261,6 @@ namespace AFV2
                 darkness = this.darkness + damageToCombine.darkness,
                 water = this.water + damageToCombine.water,
                 canNotBeParried = damageToCombine.canNotBeParried,
-                damageType = damageToCombine.damageType,
                 ignoreBlocking = damageToCombine.ignoreBlocking,
                 poiseDamage = this.poiseDamage + damageToCombine.poiseDamage,
                 postureDamage = this.postureDamage + damageToCombine.postureDamage,
@@ -308,7 +295,6 @@ namespace AFV2
                 darkness = (int)(this.darkness * multiplier),
                 water = (int)(this.water * multiplier),
                 canNotBeParried = this.canNotBeParried,
-                damageType = this.damageType,
                 ignoreBlocking = this.ignoreBlocking,
                 poiseDamage = (int)(this.poiseDamage * multiplier),
                 postureDamage = (int)(this.postureDamage * multiplier),

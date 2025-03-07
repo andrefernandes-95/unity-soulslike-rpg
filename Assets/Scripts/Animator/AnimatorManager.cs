@@ -30,16 +30,7 @@ namespace AFV2
 
         public void BlendTo(string nextAnimation, float blendTime = 0.2f)
         {
-            if (animator.fireEvents == false)
-                Invoke(nameof(RefireEvents), 0f);
-
             animator.CrossFade(nextAnimation, blendTime);
-        }
-
-        void RefireEvents()
-        {
-            animator.fireEvents = true;
-            Debug.Log($"Refirede events at {Time.time}");
         }
 
         public async Task WaitForAnimationToFinish(string animationName, float end = .9f)
