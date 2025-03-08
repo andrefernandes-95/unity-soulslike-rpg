@@ -17,6 +17,10 @@ namespace AFV2
             {
                 createdItem = new WeaponInstance(item);
             }
+            else if (item is Arrow)
+            {
+                createdItem = new ArrowInstance(item);
+            }
 
             if (ownedItems.ContainsKey(item))
             {

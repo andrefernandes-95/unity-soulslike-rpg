@@ -140,7 +140,7 @@ namespace AFV2
             if (equipmentSlotType == EquipmentSlotType.LEFT_HAND)
                 return uICharacterEquipment.characterApi.characterWeapons.leftWeapons[slotIndex];
             if (equipmentSlotType == EquipmentSlotType.ARROW)
-                return uICharacterEquipment.characterApi.characterArchery.arrows[slotIndex];
+                return new ArrowInstance(uICharacterEquipment.characterApi.characterArchery.arrows[slotIndex]);
             if (equipmentSlotType == EquipmentSlotType.SKILL)
                 return uICharacterEquipment.characterApi.characterSkills.skills[slotIndex];
             if (equipmentSlotType == EquipmentSlotType.ACCESSORY)

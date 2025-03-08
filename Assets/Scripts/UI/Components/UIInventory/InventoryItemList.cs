@@ -48,7 +48,7 @@ namespace AFV2
                 { EquipmentSlotType.SKILL, (slotType, index) => {
                     return characterApi.characterSkills.skills[index]; } },
                 { EquipmentSlotType.ARROW, (slotType, index) => {
-                    return characterApi.characterArchery.arrows[index]; } },
+                    return new ArrowInstance(characterApi.characterArchery.arrows[index]); } },
                 { EquipmentSlotType.ACCESSORY, (slotType, index) => {
                     return characterApi.characterEquipment.accessories[index]; } },
                 { EquipmentSlotType.CONSUMABLE, (slotType, index) => {
@@ -140,9 +140,9 @@ namespace AFV2
             return false;
         }
 
-        bool IsItemAvailable(List<Item> equippedItems, Item itemToEquip)
+        bool IsItemAvailable(List<ItemInstance> equippedItems, ItemInstance itemToEquip)
         {
-            int equippedIndex = equippedItems.FindIndex(equippedItem => equippedItem == itemToEquip);
+            int equippedIndex = equippedItems.FindIndex(equippedItem => equippedItem?.ID == itemToEquip?.ID);
 
             // Unavailable is item is equipped on another slot
             return equippedIndex != -1 && equippedIndex != inventoryFilter.SlotFilter;
@@ -190,7 +190,7 @@ namespace AFV2
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterApi.characterSkills.skills.Cast<Item>().ToList(), item.item))
+                    if (IsItemAvailable(characterApi.characterSkills.skills.Cast<ItemInstance>().ToList(), item))
                     {
                         return false;
                     }
@@ -214,7 +214,7 @@ namespace AFV2
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterApi.characterArchery.arrows.Cast<Item>().ToList(), item.item))
+                    if (IsItemAvailable(characterApi.characterArchery.arrows.Cast<ItemInstance>().ToList(), item))
                     {
                         return false;
                     }
@@ -238,7 +238,7 @@ namespace AFV2
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterApi.characterEquipment.accessories.Cast<Item>().ToList(), item.item))
+                    if (IsItemAvailable(characterApi.characterEquipment.accessories.Cast<ItemInstance>().ToList(), item))
                     {
                         return false;
                     }
@@ -262,7 +262,7 @@ namespace AFV2
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterApi.characterConsumables.consumables.Cast<Item>().ToList(), item.item))
+                    if (IsItemAvailable(characterApi.characterConsumables.consumables.Cast<ItemInstance>().ToList(), item))
                     {
                         return false;
                     }

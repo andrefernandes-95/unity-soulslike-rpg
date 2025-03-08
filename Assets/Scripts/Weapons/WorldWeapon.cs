@@ -117,11 +117,11 @@ namespace AFV2
 
         public void EnableHitbox()
         {
-            weaponHitbox.EnableHitbox();
+            weaponHitbox?.EnableHitbox();
         }
         public void DisableHitbox()
         {
-            weaponHitbox.DisableHitbox();
+            weaponHitbox?.DisableHitbox();
         }
 
         bool IsRightHandWeapon() => rightWeaponAnimations != null;

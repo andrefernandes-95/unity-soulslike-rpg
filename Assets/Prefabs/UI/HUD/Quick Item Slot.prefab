@@ -167,8 +167,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   equippedItemIcon: {fileID: 2404493577540044881}
   unequippedItemIcon: {fileID: 2010526064282206976}
-  characterEquipment: {fileID: 0}
+  characterApi: {fileID: 0}
   equipmentSlotType: 0
+  unequippedSkillIcon: {fileID: 21300000, guid: 9a3c9b2af0dbd7a44b973c1301c9664b, type: 3}
+  unequippedArrowIcon: {fileID: 21300000, guid: b0512abe637a2e747ad145a40bad10db, type: 3}
 --- !u!1 &8804813796646681736
 GameObject:
   m_ObjectHideFlags: 0

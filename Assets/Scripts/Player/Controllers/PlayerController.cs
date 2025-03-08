@@ -80,6 +80,7 @@ namespace AFV2
 
             inputListener.onSwitchRightWeapon.AddListener(characterApi.characterWeapons.SwitchRightWeapon);
             inputListener.onSwitchLeftWeapon.AddListener(characterApi.characterWeapons.SwitchLeftWeapon);
+            inputListener.onSwitchSpell.AddListener(characterApi.characterArchery.SwitchArrow);
         }
         #endregion
 

@@ -1,41 +1,136 @@
 namespace AFV2
 {
+    using System.Collections.Generic;
     using UnityEngine;
+    using UnityEngine.Animations;
     using UnityEngine.Events;
 
     public class CharacterArchery : MonoBehaviour
     {
 
         [Header("🏹 Arrows")]
-        public ArrowInstance[] arrows = new ArrowInstance[2];
+        public Arrow[] arrows = new Arrow[2];
         [SerializeField] int activeArrowIndex = 0;
 
-        public UnityEvent onArrowSwitched = new();
+        public UnityEvent<Arrow> onArrowSwitched = new();
+
+        [Header("Components")]
+        [SerializeField] CharacterApi characterApi;
+
+        [Header("Look At Constraints")]
+        [SerializeField] LookAtConstraint lookAtConstraint;
+
+
+        [Header("Flags")]
+        public bool _canShoot = true;
+        public bool CanShoot => _canShoot;
+
+        // Events
+        ArrowWorld[] allArrowWorldInstances => characterApi.GetComponentsInChildren<ArrowWorld>(true);
+        Dictionary<Arrow, ArrowWorld> arrowWorldDictionary = new();
+
+        void Awake()
+        {
+            foreach (ArrowWorld arrowWorld in allArrowWorldInstances)
+            {
+                onArrowSwitched.AddListener((Arrow arrow) =>
+                {
+                    arrowWorld.OnArrowSwitched(arrow);
+                });
+
+                if (!arrowWorldDictionary.ContainsKey(arrowWorld.arrow))
+                {
+                    arrowWorldDictionary.Add(arrowWorld.arrow, arrowWorld);
+                }
+            }
+
+            SwitchArrow(activeArrowIndex);
+        }
 
         public void EquipArrow(ArrowInstance arrowInstance, int slot)
         {
-            bool shouldUnequip = arrows[slot] == arrowInstance;
+            bool shouldUnequip = arrows[slot] == arrowInstance.item;
             UnequipArrow(slot);
+
             if (shouldUnequip)
             {
                 return;
             }
 
-            arrows[slot] = arrowInstance;
-            onArrowSwitched?.Invoke();
+            arrows[slot] = arrowInstance.item as Arrow;
+
+            SwitchArrow(activeArrowIndex);
         }
 
         public void UnequipArrow(int slot)
         {
             arrows[slot] = null;
-            onArrowSwitched?.Invoke();
+
+            SwitchArrow(activeArrowIndex);
         }
 
-        public bool TryGetArrowInstance(out ArrowInstance arrowInstance)
+        public void SwitchArrow()
         {
-            arrowInstance = arrows[activeArrowIndex];
+            var newIndex = activeArrowIndex + 1;
 
-            return arrowInstance != null;
+            if (newIndex >= arrows.Length)
+            {
+                newIndex = 0;
+            }
+
+            SwitchArrow(newIndex);
+        }
+
+        void SwitchArrow(int index)
+        {
+            this.activeArrowIndex = index;
+            onArrowSwitched?.Invoke(arrows[activeArrowIndex]);
+        }
+
+        public void OnCanShoot(bool value)
+        {
+            this._canShoot = value;
+        }
+
+        public void Shoot()
+        {
+            Arrow currentArrow = arrows[activeArrowIndex];
+
+            if (!arrowWorldDictionary.ContainsKey(currentArrow))
+            {
+                return;
+            }
+
+            if (!characterApi.characterWeapons.HasRangeWeapon())
+            {
+                return;
+            }
+
+            OnCanShoot(false);
+
+            WorldWeapon bowWeapon = characterApi.characterWeapons.CurrentRightWeaponInstance;
+            arrowWorldDictionary[currentArrow].Shoot(bowWeapon.transform.position, lookAtConstraint.GetSource(0).sourceTransform.transform.rotation);
+        }
+
+        void HandleArrowWorld(bool show)
+        {
+            Arrow currentArrow = arrows[activeArrowIndex];
+
+            if (!arrowWorldDictionary.ContainsKey(currentArrow))
+            {
+                return;
+            }
+            arrowWorldDictionary[currentArrow].gameObject.SetActive(show);
+
+        }
+
+        public void ShowArrowWorld()
+        {
+            HandleArrowWorld(true);
+        }
+        public void HideArrowWorld()
+        {
+            HandleArrowWorld(false);
         }
     }
 }

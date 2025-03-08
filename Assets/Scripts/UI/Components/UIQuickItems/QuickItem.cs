@@ -12,6 +12,11 @@ namespace AFV2
 
         public EquipmentSlotType equipmentSlotType;
 
+        [Header("Skill / Arrow Slots")]
+        [SerializeField] Sprite unequippedSkillIcon;
+        [SerializeField] Sprite unequippedArrowIcon;
+
+
         void OnEnable()
         {
         }
@@ -34,13 +39,31 @@ namespace AFV2
                 characterApi.characterSkills.onSkillSwitched.AddListener(OnSkillSwitched);
             }
 
+            characterApi.characterWeapons.onEquipmentChange.AddListener(CheckForSkillOrArrowMode);
+            characterApi.characterWeapons.onLeftWeaponSwitched.AddListener((_) => CheckForSkillOrArrowMode());
+            characterApi.characterWeapons.onRightWeaponSwitched.AddListener((_) => CheckForSkillOrArrowMode());
+        }
+
+        void CheckForSkillOrArrowMode()
+        {
+            if (equipmentSlotType == EquipmentSlotType.SKILL)
+            {
+                if (characterApi.characterWeapons.HasRangeWeapon())
+                {
+                    unequippedItemIcon.sprite = unequippedArrowIcon;
+                }
+                else
+                {
+                    unequippedItemIcon.sprite = unequippedSkillIcon;
+                }
+            }
         }
 
         void OnRightWeaponSwitched(WeaponInstance weaponInstance)
         {
             if (weaponInstance.item is Weapon weapon && weapon.isFallbackWeapon == false)
             {
-                UpdateIcon(weaponInstance);
+                UpdateIcon(weaponInstance.item.Sprite);
             }
             else
             {
@@ -52,7 +75,7 @@ namespace AFV2
         {
             if (weaponInstance.item is Weapon weapon && weapon.isFallbackWeapon == false)
             {
-                UpdateIcon(weaponInstance);
+                UpdateIcon(weaponInstance.item.Sprite);
             }
             else
             {
@@ -64,7 +87,7 @@ namespace AFV2
         {
             if (characterApi.characterSkills.TryGetSkillInstance(out SkillInstance skillInstance))
             {
-                UpdateIcon(skillInstance);
+                UpdateIcon(skillInstance.item.Sprite);
             }
             else
             {
@@ -72,11 +95,11 @@ namespace AFV2
             }
         }
 
-        void OnArrowSwitched()
+        void OnArrowSwitched(Arrow arrow)
         {
-            if (characterApi.characterArchery.TryGetArrowInstance(out ArrowInstance arrowInstance))
+            if (arrow != null)
             {
-                UpdateIcon(arrowInstance);
+                UpdateIcon(arrow.Sprite);
             }
             else
             {
@@ -84,9 +107,9 @@ namespace AFV2
             }
         }
 
-        void UpdateIcon(ItemInstance equippedItem)
+        void UpdateIcon(Sprite equippedItemSprite)
         {
-            equippedItemIcon.sprite = equippedItem.item.Sprite;
+            equippedItemIcon.sprite = equippedItemSprite;
             equippedItemIcon.gameObject.SetActive(true);
             unequippedItemIcon.gameObject.SetActive(false);
         }
