@@ -13,8 +13,7 @@ namespace AFV2
 
             if (characterApi != null)
             {
-                characterApi.characterArchery.OnCanShoot(true);
-                characterApi.characterArchery.ShowArrowWorld();
+                characterApi.characterArchery.onShotFinished?.Invoke();
             }
         }
     }

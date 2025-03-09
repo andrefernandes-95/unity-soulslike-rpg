@@ -20,14 +20,12 @@ namespace AFV2
         [Header("Look At Constraints")]
         [SerializeField] LookAtConstraint lookAtConstraint;
 
-
-        [Header("Flags")]
-        public bool _canShoot = true;
-        public bool CanShoot => _canShoot;
-
         // Events
         ArrowWorld[] allArrowWorldInstances => characterApi.GetComponentsInChildren<ArrowWorld>(true);
         Dictionary<Arrow, ArrowWorld> arrowWorldDictionary = new();
+
+        [Header("Events")]
+        public UnityEvent onShotFinished;
 
         void Awake()
         {
@@ -87,11 +85,6 @@ namespace AFV2
             onArrowSwitched?.Invoke(arrows[activeArrowIndex]);
         }
 
-        public void OnCanShoot(bool value)
-        {
-            this._canShoot = value;
-        }
-
         public void Shoot()
         {
             Arrow currentArrow = arrows[activeArrowIndex];
@@ -105,8 +98,6 @@ namespace AFV2
             {
                 return;
             }
-
-            OnCanShoot(false);
 
             WorldWeapon bowWeapon = characterApi.characterWeapons.CurrentRightWeaponInstance;
             arrowWorldDictionary[currentArrow].Shoot(bowWeapon.transform.position, lookAtConstraint.GetSource(0).sourceTransform.transform.rotation);

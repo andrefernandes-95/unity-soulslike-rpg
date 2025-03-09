@@ -13,6 +13,8 @@ This is an open-source Unity project for a Soulslike RPG, inspired by what I've 
   - Stamina-based attacks, dodges, and blocks
   - Light and heavy attacks with various weapon types
   - Parry and riposte mechanics
+  - Archery system
+    ![Thumb](archery.gif)
 
 - **RPG Elements**
 

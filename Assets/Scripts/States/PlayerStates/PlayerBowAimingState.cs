@@ -11,6 +11,13 @@ namespace AFV2
         [Header("Archery Settings")]
         [SerializeField] float aimWalkSpeed = 2f;
 
+        bool isShooting = false;
+
+        void Awake()
+        {
+            characterApi.characterArchery.onShotFinished.AddListener(ResetState);
+        }
+
         public override string GetHashAimIdle()
         {
             return HASH_AIM_IDLE;
@@ -33,7 +40,7 @@ namespace AFV2
 
         public override void OnLightAttackInput()
         {
-            if (!characterApi.characterArchery.CanShoot)
+            if (isShooting)
             {
                 return;
             }
@@ -42,17 +49,42 @@ namespace AFV2
 
             characterApi.characterArchery.HideArrowWorld();
 
-            HandleShotAnimation();
+            characterApi.animatorManager.BlendTo(GetHashAimShot(), 0.05f);
+
+            isShooting = true;
         }
 
         public override void OnEnter()
         {
             characterApi.characterArchery.ShowArrowWorld();
+            isShooting = false;
         }
 
         public override void OnExit()
         {
             characterApi.characterArchery.HideArrowWorld();
+        }
+
+        void ResetState()
+        {
+            if (playerController.IsAiming())
+            {
+                OnEnter();
+
+                isMoving = false;
+                HandleAimMovement();
+            }
+        }
+
+        protected override void HandleAimMovement()
+        {
+            // If shooting, ignore aim idle / aim walk transitions 
+            if (isShooting)
+            {
+                return;
+            }
+
+            base.HandleAimMovement();
         }
     }
 }

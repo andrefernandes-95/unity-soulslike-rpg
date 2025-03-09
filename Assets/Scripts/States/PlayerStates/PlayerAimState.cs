@@ -10,7 +10,7 @@ namespace AFV2
 
         [Header("Components")]
         [SerializeField] protected CharacterApi characterApi;
-        [SerializeField] PlayerController playerController;
+        [SerializeField] protected PlayerController playerController;
         [SerializeField] CameraController cameraController;
         [SerializeField] PlayerCamera playerCamera;
 
@@ -21,6 +21,7 @@ namespace AFV2
         public IdleState idleState;
 
         protected bool isMoving = false;
+
 
         public override void OnStateEnter()
         {
@@ -49,9 +50,10 @@ namespace AFV2
         {
             HandleAimMovement();
 
-            if (isMoving)
+            if (playerController.IsLightAttacking())
             {
-                characterApi.characterMovement.Move(GetMoveSpeed(), playerController.GetPlayerRotation());
+                playerController.ResetCombatFlags();
+                OnLightAttackInput();
             }
 
             if (!playerController.IsAiming())
@@ -59,28 +61,10 @@ namespace AFV2
                 return idleState;
             }
 
-            if (playerController.IsLightAttacking())
-            {
-                playerController.ResetCombatFlags();
-
-                OnLightAttackInput();
-            }
-
             return this;
         }
 
-        protected async void HandleShotAnimation()
-        {
-            characterApi.animatorManager.BlendTo(GetHashAimShot(), 0.05f);
-            await characterApi.animatorManager.WaitForAnimationToFinish(GetHashAimShot());
-
-            characterApi.animatorManager.BlendTo(GetHashAimIdle());
-            isMoving = false;
-
-            HandleAimMovement();
-        }
-
-        protected void HandleAimMovement()
+        protected virtual void HandleAimMovement()
         {
             if (playerController.IsMoving() && !isMoving)
             {
@@ -91,6 +75,11 @@ namespace AFV2
             {
                 characterApi.animatorManager.BlendTo(GetHashAimIdle(), blendBetweenActions);
                 isMoving = false;
+            }
+
+            if (isMoving)
+            {
+                characterApi.characterMovement.Move(GetMoveSpeed(), playerController.GetPlayerRotation());
             }
         }
 
