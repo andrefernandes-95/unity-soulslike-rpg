@@ -16,7 +16,7 @@ MonoBehaviour:
   portugueseName: Espada
   englishDescription: Common sword
   portugueseDescription: Espada comum
-  sprite: {fileID: 21300000, guid: f1b5bf913ddc2064f983738929d4988c, type: 3}
+  sprite: {fileID: 21300000, guid: 28b3ae80c1de8ba4f81870b1a4651816, type: 3}
   value: 1
   worldPickup: {fileID: 0}
   weaponType: {fileID: 11400000, guid: 5a2e02169ac592146b11b7f670373b2a, type: 2}
@@ -39,5 +39,4 @@ MonoBehaviour:
     statusEffects: []
     ignoreBlocking: 0
     canNotBeParried: 0
-    damageType: 0
   isFallbackWeapon: 0

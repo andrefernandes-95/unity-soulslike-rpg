@@ -106,6 +106,10 @@ namespace AFV2
         void HandleArrowWorld(bool show)
         {
             Arrow currentArrow = arrows[activeArrowIndex];
+            if (currentArrow == null)
+            {
+                return;
+            }
 
             if (!arrowWorldDictionary.ContainsKey(currentArrow))
             {

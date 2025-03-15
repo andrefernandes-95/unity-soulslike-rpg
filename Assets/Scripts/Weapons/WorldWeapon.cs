@@ -20,6 +20,21 @@ namespace AFV2
         public WeaponAnimations twoHandWeaponAnimations;
         [Header("Applicable to Left Hand")]
         public WeaponAnimations leftWeaponAnimations;
+
+
+
+        void Awake()
+        {
+            if (IsLeftHandWeapon())
+            {
+                transform.parent = characterApi.characterModel.LeftHand.transform;
+            }
+            else
+            {
+                transform.parent = characterApi.characterModel.RightHand.transform;
+            }
+        }
+
         public void OnWeaponSwitched(EquipmentSlotType slotType, WeaponInstance weaponInstance)
         {
             // Disable the weapon hitbox if it exists

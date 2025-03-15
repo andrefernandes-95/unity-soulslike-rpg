@@ -16,7 +16,7 @@ MonoBehaviour:
   portugueseName: Flecha de Ferro
   englishDescription: Common iron arrow
   portugueseDescription: Flecha de ferro comum
-  sprite: {fileID: 21300000, guid: 432e0ffcded6f2f4eb3a9e50930c9591, type: 3}
+  sprite: {fileID: 21300000, guid: 11fb7e1c2ae70b845909d1625a798307, type: 3}
   value: 1
   worldPickup: {fileID: 0}
   shootForce: 50

@@ -4,18 +4,12 @@ namespace AFV2
 
     public class CharacterModel : MonoBehaviour
     {
-        [Header("Animations")]
-        public Avatar avatar;
-
         [Header("Transform References")]
-        [SerializeField] Transform leftFootBone;
-        public Transform LeftFoot => leftFootBone;
-
-        [SerializeField] Transform rightFootBone;
-        public Transform RightFoot => rightFootBone;
-
-        [SerializeField] Transform torsoBone;
-        public Transform Torso => torsoBone;
+        public Transform LeftHand;
+        public Transform RightHand;
+        public Transform LeftFoot;
+        public Transform RightFoot;
+        public Transform Torso;
 
 
         [Header("Body Parts")]
@@ -30,9 +24,49 @@ namespace AFV2
         [SerializeField] SkinnedMeshRenderer[] defaultHands;
         [SerializeField] SkinnedMeshRenderer[] defaultLegs;
 
+        [Header("Bone Names")]
+        public string leftHandBoneName = "Left_Hand";
+        public string rightHandBoneName = "Right_Hand";
+        public string leftFootBoneName = "Left_Foot";
+        public string rightFootBoneName = "Right_Foot";
+        public string torsoBoneName = "Hips";
+
+
+        private void OnTransformChildrenChanged()
+        {
+            Debug.Log("Child objects changed! Reassigning bones...");
+            AssignBoneReferences();
+        }
+
+        public void AssignBoneReferences()
+        {
+            LeftHand = FindBone(leftHandBoneName);
+            RightHand = FindBone(rightHandBoneName);
+            LeftFoot = FindBone(leftFootBoneName);
+            RightFoot = FindBone(rightFootBoneName);
+            Torso = FindBone(torsoBoneName);
+
+            Debug.Log("Bone reassignment complete.");
+        }
+
+        private Transform FindBone(string boneName)
+        {
+            Transform foundBone = transform.Find(boneName);
+            if (foundBone == null)
+            {
+                foreach (Transform child in GetComponentsInChildren<Transform>())
+                {
+                    if (child.name.Contains(boneName))
+                    {
+                        return child;
+                    }
+                }
+            }
+            return foundBone;
+        }
+
         public void EnableCharacterModel()
         {
-            GetComponentInParent<Animator>().avatar = avatar;
             gameObject.SetActive(true);
         }
 

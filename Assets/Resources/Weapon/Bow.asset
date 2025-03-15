@@ -16,7 +16,7 @@ MonoBehaviour:
   portugueseName: Arco
   englishDescription: Common bow
   portugueseDescription: Arco comum
-  sprite: {fileID: 21300000, guid: 432e0ffcded6f2f4eb3a9e50930c9591, type: 3}
+  sprite: {fileID: 21300000, guid: 15a5487e66380734f844fdf9cdfbe9e8, type: 3}
   value: 1
   worldPickup: {fileID: 0}
   weaponType: {fileID: 11400000, guid: 9b7a6fbe175422446bd8fcd30f5b0ccc, type: 2}
