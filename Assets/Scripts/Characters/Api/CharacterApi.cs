@@ -50,5 +50,6 @@ namespace AFV2
         [Header("💾 Save")]
         public bool isSaveable = true;
         #endregion
+
     }
 }

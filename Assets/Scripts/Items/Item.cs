@@ -52,6 +52,6 @@ namespace AFV2
         }
 
         [Header("World Pickup")]
-        public GameObject worldPickup;
+        public WorldItemPickup worldPickup;
     }
 }

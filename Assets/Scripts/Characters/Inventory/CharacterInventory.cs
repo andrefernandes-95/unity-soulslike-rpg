@@ -1,11 +1,15 @@
 namespace AFV2
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using UnityEngine;
+    using UnityEngine.AI;
 
     public class CharacterInventory : MonoBehaviour
     {
+        [SerializeField] CharacterApi characterApi;
+
         [SerializeField] private Dictionary<Item, List<ItemInstance>> ownedItems = new();
         public IReadOnlyDictionary<Item, List<ItemInstance>> OwnedItems => ownedItems;
 
@@ -34,6 +38,19 @@ namespace AFV2
             return createdItem;
         }
 
+        public void DropItem(ItemInstance itemInstance)
+        {
+            WorldItemPickup worldItemInstance = Instantiate(itemInstance.item.worldPickup);
+
+            worldItemInstance.SetWorldItem(itemInstance.item, 1);
+            worldItemInstance.transform.parent = null;
+
+            NavMesh.SamplePosition(transform.position, out var hit, 1.0f, NavMesh.AllAreas);
+            worldItemInstance.transform.position = hit.position;
+
+            RemoveItem(itemInstance);
+        }
+
         public void RemoveItem(ItemInstance itemInstance)
         {
             if (itemInstance == null)
@@ -53,12 +70,39 @@ namespace AFV2
                 return;
             }
 
+            UnequipItemInstance(itemInstance);
+
             itemList.RemoveAt(itemIndexForRemoval);
 
             if (itemList.Count == 0)
             {
                 ownedItems.Remove(itemInstance.item);
             }
+        }
+
+        void UnequipItemInstance(ItemInstance itemInstance)
+        {
+            if (itemInstance is WeaponInstance weaponInstance)
+            {
+                int rightWeaponIdx = Array.FindIndex(characterApi.characterWeapons.rightWeapons, x => x?.ID == weaponInstance.ID);
+                if (rightWeaponIdx != -1)
+                {
+                    characterApi.characterWeapons.UnequipRightWeapon(rightWeaponIdx);
+                    return;
+                }
+
+                int leftWeaponIdx = Array.FindIndex(characterApi.characterWeapons.leftWeapons, x => x?.ID == weaponInstance.ID);
+                if (leftWeaponIdx != -1)
+                {
+                    characterApi.characterWeapons.UnequipLeftWeapon(leftWeaponIdx);
+                }
+            }
+            else if (itemInstance is ArrowInstance arrowInstance)
+            {
+                int arrowIdx = Array.FindIndex(characterApi.characterArchery.arrows, x => x == arrowInstance.item);
+                characterApi.characterArchery.UnequipArrow(arrowIdx);
+            }
+
         }
 
         public bool HasItem(Item item) => ownedItems.ContainsKey(item);

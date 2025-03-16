@@ -18,5 +18,6 @@ MonoBehaviour:
   portugueseDescription: Flecha de ferro comum
   sprite: {fileID: 21300000, guid: 11fb7e1c2ae70b845909d1625a798307, type: 3}
   value: 1
-  worldPickup: {fileID: 0}
+  weight: 1
+  worldPickup: {fileID: 7492898717814760397, guid: 7f7efa8959f667146b204f46347ed0fe, type: 3}
   shootForce: 50

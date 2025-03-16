@@ -1,5 +1,6 @@
 namespace AFV2
 {
+    using System;
     using TMPro;
     using UnityEngine;
     using UnityEngine.Events;
@@ -14,7 +15,6 @@ namespace AFV2
         [Header("Events")]
         public UnityEvent onPickup;
 
-
         [Header("UI")]
         [SerializeField] Canvas pickupCanvas;
         [SerializeField] Image itemImage;
@@ -25,6 +25,7 @@ namespace AFV2
 
         [Header("Components")]
         InputListener inputListener;
+        PlayerController _playerController;
         CharacterApi pickupReceiver;
 
         bool CanPickup = true;
@@ -41,7 +42,6 @@ namespace AFV2
             }
         }
 
-
         void OnTriggerEnter(Collider other)
         {
             if (!CanPickup)
@@ -55,10 +55,6 @@ namespace AFV2
 
                 ShowPickupCanvas();
             }
-        }
-
-        void OnTriggerStay(Collider other)
-        {
         }
 
         void OnTriggerExit(Collider other)
@@ -97,9 +93,14 @@ namespace AFV2
 
         void HandleItemPickupOnInput()
         {
-            if (pickupReceiver != null && pickupReceiver.gameObject.CompareTag("Player"))
+            if (
+                CanPickup
+                && pickupReceiver != null
+                && pickupReceiver.gameObject.CompareTag("Player")
+                && TryGetPlayerController(out PlayerController playerController)
+                && playerController.CanControlPlayer()
+            )
             {
-
                 for (int i = 0; i < amount; i++)
                 {
                     pickupReceiver.characterInventory.AddItem(itemToPickup);
@@ -109,6 +110,24 @@ namespace AFV2
                 CanPickup = false;
                 HidePickupCanvas();
             }
+        }
+
+        public void SetWorldItem(Item item, int amount)
+        {
+            this.itemToPickup = item;
+            this.amount = amount;
+        }
+
+        bool TryGetPlayerController(out PlayerController playerController)
+        {
+            if (_playerController == null)
+            {
+                _playerController = FindFirstObjectByType<PlayerController>(FindObjectsInactive.Include);
+            }
+
+            playerController = _playerController;
+
+            return playerController != null;
         }
     }
 }

@@ -16,7 +16,9 @@ namespace AFV2
         public virtual bool CanCombo(float staminaCost, CombatDecision combatDecision)
         {
             if (!characterApi.characterStamina.HasEnoughStamina(staminaCost))
+            {
                 return false;
+            }
 
             // If target is close
 

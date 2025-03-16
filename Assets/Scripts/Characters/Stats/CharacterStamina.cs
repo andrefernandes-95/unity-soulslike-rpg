@@ -34,6 +34,9 @@ namespace AFV2
         [Header("Components")]
         [SerializeField] CharacterApi characterApi;
 
+        [Header("Optional")]
+        [SerializeField] AlertManager alertManager;
+
         void Start()
         {
             SetStamina(maxStamina);
@@ -50,8 +53,6 @@ namespace AFV2
             }
         }
 
-        public bool HasEnoughStamina(float amount) => Stamina >= amount;
-
         public void DecreaseStamina(float value)
         {
             SetStamina(Stamina - value);
@@ -65,17 +66,37 @@ namespace AFV2
         public float GetNormalizedStamina() => Stamina / maxStamina;
 
         #region Can Do Actions
-        public bool CanSprint()
+        public bool HasEnoughStamina(float cost)
         {
-            return Stamina > sprintCost;
+
+            bool result = Stamina > cost;
+
+            if (!result && alertManager != null)
+            {
+                DisplayInsufficientStaminaAlert();
+            }
+
+            return result;
         }
-        public bool CanDodge()
+
+        public bool CanSprint() => HasEnoughStamina(sprintCost);
+
+        public bool CanDodge() => HasEnoughStamina(dodgeCost);
+
+        public bool CanJump() => HasEnoughStamina(jumpCost);
+        #endregion
+
+        #region Alerts
+        public void DisplayInsufficientStaminaAlert()
         {
-            return Stamina > dodgeCost;
-        }
-        public bool CanJump()
-        {
-            return Stamina > jumpCost;
+            string message = "! Insufficent Stamina !";
+
+            if (Glossary.IsPortuguese())
+            {
+                message = "! Stamina Insuficiente !";
+            }
+
+            alertManager.DisplayAlert(message);
         }
         #endregion
 

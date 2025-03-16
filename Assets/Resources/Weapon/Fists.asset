@@ -18,7 +18,8 @@ MonoBehaviour:
   portugueseDescription: 
   sprite: {fileID: 0}
   value: 1
-  worldPickup: {fileID: 0}
+  weight: 1
+  worldPickup: {fileID: 7492898717814760397, guid: 7f7efa8959f667146b204f46347ed0fe, type: 3}
   weaponType: {fileID: 11400000, guid: a1a6d590953bf874cb19b28082bfafdc, type: 2}
   strengthScaling: 0
   dexterityScaling: 0

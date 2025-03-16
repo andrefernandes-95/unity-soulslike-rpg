@@ -19,7 +19,7 @@ namespace AFV2
 
         [SerializeField] ScrollRect itemsScrollRect;
         [SerializeField] InventorySlotButton inventorySlotButtonPrefab;
-
+        [SerializeField] InventoryItemActions inventoryItemActions;
 
         Dictionary<EquipmentSlotType, Func<EquipmentSlotType, int, ItemInstance>> EquipmentSlotGetters = new();
 
@@ -73,11 +73,14 @@ namespace AFV2
         public void PreviewItem(ItemInstance itemInstance)
         {
             itemTooltip.Show(itemInstance);
+            inventoryItemActions.DisplayActionsForItem(itemInstance);
+
         }
 
         void ClearPreviewItem()
         {
             itemTooltip.Hide();
+            inventoryItemActions.HideActions();
         }
         #endregion
 
