@@ -1,6 +1,7 @@
 namespace AFV2
 {
     using UnityEngine;
+    using UnityEngine.Events;
 
     public class CharacterEquipment : MonoBehaviour
     {
@@ -8,6 +9,7 @@ namespace AFV2
         public ArmorInstance armor;
         public BootInstance boot;
         public AccessoryInstance[] accessories = new AccessoryInstance[4];
+        public UnityEvent onEquipmentChange = new();
 
         public void EquipHeadgear(HeadgearInstance headgearInstance)
         {

@@ -34,6 +34,33 @@ namespace AFV2
             return createdItem;
         }
 
+        public void RemoveItem(ItemInstance itemInstance)
+        {
+            if (itemInstance == null)
+            {
+                return;
+            }
+
+            if (!ownedItems.TryGetValue(itemInstance.item, out var itemList))
+            {
+                return;
+            }
+
+            int itemIndexForRemoval = itemList.FindIndex(_item => _item.ID == itemInstance.ID);
+
+            if (itemIndexForRemoval == -1)
+            {
+                return;
+            }
+
+            itemList.RemoveAt(itemIndexForRemoval);
+
+            if (itemList.Count == 0)
+            {
+                ownedItems.Remove(itemInstance.item);
+            }
+        }
+
         public bool HasItem(Item item) => ownedItems.ContainsKey(item);
 
         public int GetItemCount(Item item)

@@ -33,7 +33,6 @@ namespace AFV2
         // Events
         WorldWeapon[] allWeaponInstances => characterApi.GetComponentsInChildren<WorldWeapon>(true);
 
-        public UnityEvent onEquipmentChange = new();
         public UnityEvent<WeaponInstance> onRightWeaponSwitched = new();
         public UnityEvent<WeaponInstance> onLeftWeaponSwitched = new();
 
@@ -68,7 +67,7 @@ namespace AFV2
 
             rightWeapons[slot] = weaponInstance;
             SwitchRightWeapon(slot);
-            onEquipmentChange?.Invoke();
+            characterApi.characterEquipment.onEquipmentChange?.Invoke();
         }
 
         public void EquipLeftWeapon(WeaponInstance weaponInstance, int slot)
@@ -83,7 +82,7 @@ namespace AFV2
 
             leftWeapons[slot] = weaponInstance;
             SwitchLeftWeapon(slot);
-            onEquipmentChange?.Invoke();
+            characterApi.characterEquipment.onEquipmentChange?.Invoke();
         }
 
         public void UnequipRightWeapon(int slot)
@@ -91,7 +90,7 @@ namespace AFV2
             WeaponInstance unarmedWeapon = new(characterDefaultEquipment.fallbackWeapon);
             rightWeapons[slot] = unarmedWeapon;
             SwitchRightWeapon(slot);
-            onEquipmentChange?.Invoke();
+            characterApi.characterEquipment.onEquipmentChange?.Invoke();
         }
 
         public void UnequipLeftWeapon(int slot)
@@ -99,7 +98,7 @@ namespace AFV2
             WeaponInstance unarmedWeapon = new(characterDefaultEquipment.fallbackWeapon);
             leftWeapons[slot] = unarmedWeapon;
             SwitchLeftWeapon(slot);
-            onEquipmentChange?.Invoke();
+            characterApi.characterEquipment.onEquipmentChange?.Invoke();
         }
 
         public void SwitchRightWeapon()

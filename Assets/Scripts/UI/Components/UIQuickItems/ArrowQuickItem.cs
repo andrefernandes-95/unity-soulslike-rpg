@@ -11,7 +11,8 @@ namespace AFV2
             base.Awake();
 
             characterApi.characterArchery.onArrowSwitched.AddListener(OnArrowSwitched);
-            characterApi.characterWeapons.onEquipmentChange.AddListener(HandleEquipmentChange);
+            characterApi.characterEquipment.onEquipmentChange.AddListener(HandleEquipmentChange);
+            characterApi.characterArchery.onArrowRemoved.AddListener(HandleEquipmentChange);
         }
 
         void HandleEquipmentChange()

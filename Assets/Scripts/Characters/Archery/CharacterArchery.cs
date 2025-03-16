@@ -1,6 +1,7 @@
 namespace AFV2
 {
     using System.Collections.Generic;
+    using System.Linq;
     using UnityEngine;
     using UnityEngine.Animations;
     using UnityEngine.Events;
@@ -13,6 +14,7 @@ namespace AFV2
         [SerializeField] int activeArrowIndex = 0;
 
         public UnityEvent<Arrow> onArrowSwitched = new();
+        public UnityEvent onArrowRemoved = new();
 
         [Header("Components")]
         [SerializeField] CharacterApi characterApi;
@@ -58,6 +60,8 @@ namespace AFV2
             arrows[slot] = arrowInstance.item as Arrow;
 
             SwitchArrow(activeArrowIndex);
+
+            characterApi.characterEquipment.onEquipmentChange?.Invoke();
         }
 
         public void UnequipArrow(int slot)
@@ -65,6 +69,8 @@ namespace AFV2
             arrows[slot] = null;
 
             SwitchArrow(activeArrowIndex);
+
+            characterApi.characterEquipment.onEquipmentChange?.Invoke();
         }
 
         public void SwitchArrow()
@@ -101,6 +107,31 @@ namespace AFV2
 
             WorldWeapon bowWeapon = characterApi.characterWeapons.CurrentRightWeaponInstance;
             arrowWorldDictionary[currentArrow].Shoot(bowWeapon.transform.position, lookAtConstraint.GetSource(0).sourceTransform.transform.rotation);
+
+            RemoveArrowFromInventory(currentArrow);
+            onArrowRemoved?.Invoke();
+        }
+
+        void RemoveArrowFromInventory(Arrow arrow)
+        {
+            if (!characterApi.characterInventory.OwnedItems.ContainsKey(arrow))
+            {
+                UnequipArrow(activeArrowIndex);
+
+                return;
+            }
+
+            List<ItemInstance> arrowInstances = characterApi.characterInventory.OwnedItems[arrow];
+
+            if (arrowInstances.Count > 0)
+            {
+                characterApi.characterInventory.RemoveItem(arrowInstances[0]);
+            }
+
+            if (arrowInstances.Count == 0)
+            {
+                UnequipArrow(activeArrowIndex);
+            }
         }
 
         void HandleArrowWorld(bool show)
