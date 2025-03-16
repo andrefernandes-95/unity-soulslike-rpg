@@ -14,11 +14,9 @@ namespace AFV2
         [SerializeField] TextMeshProUGUI keyboardLabel;
 
         [Header("PS4")]
-        [SerializeField] GameObject ps4Container;
         [SerializeField] Image ps4Icon;
 
         [Header("Xbox")]
-        [SerializeField] GameObject xboxContainer;
         [SerializeField] Image xboxIcon;
 
         [Header("Desired Input")]
@@ -53,8 +51,8 @@ namespace AFV2
         void DisableAll()
         {
             keyboardContainer.SetActive(false);
-            xboxContainer.SetActive(false);
-            ps4Container.SetActive(false);
+            xboxIcon.gameObject.SetActive(false);
+            ps4Icon.gameObject.SetActive(false);
         }
 
         void EnableKeyboard()
@@ -68,14 +66,14 @@ namespace AFV2
         {
             ps4Icon.sprite = desiredInputAction.ps4Icon;
 
-            ps4Container.SetActive(true);
+            ps4Icon.gameObject.SetActive(true);
         }
 
         void EnableXbox()
         {
             xboxIcon.sprite = desiredInputAction.xboxIcon;
 
-            xboxContainer.SetActive(true);
+            xboxIcon.gameObject.SetActive(true);
         }
     }
 }

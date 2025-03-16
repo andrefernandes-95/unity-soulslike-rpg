@@ -42,6 +42,8 @@ namespace AFV2
         #region  ID
         UniqueID uniqueID => GetComponent<UniqueID>();
         public string GetCharacterId() => uniqueID.ID;
+
+        public bool IsCharacter(CharacterApi target) => target?.GetCharacterId() == GetCharacterId();
         #endregion
 
         #region Save System

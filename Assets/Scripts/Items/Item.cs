@@ -44,6 +44,13 @@ namespace AFV2
             get => value;
         }
 
+        [Header("⚖️ Weight")]
+        [SerializeField] private int weight = 1;
+        public int Weight
+        {
+            get => weight;
+        }
+
         [Header("World Pickup")]
         public GameObject worldPickup;
     }

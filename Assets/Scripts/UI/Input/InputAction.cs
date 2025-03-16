@@ -1,24 +1,26 @@
 namespace AFV2
 {
-    using System.Linq;
     using UnityEngine;
     using UnityEngine.InputSystem;
 
-    public class InputAction : MonoBehaviour
+    [CreateAssetMenu(fileName = "Input Action", menuName = "AFV2 / Data / New Input Action", order = 0)]
+    public class InputAction : ScriptableObject
     {
+        [Tooltip("Must match the action name in StarterAssetsInput")]
+        public string actionName;
         public Sprite ps4Icon;
         public Sprite xboxIcon;
 
         public string GetCurrentKeyBinding(PlayerInput playerInput)
         {
-            if (playerInput.actions[name] == null)
+            if (playerInput.actions[actionName] == null)
             {
-                Debug.LogError($"{name} not found in playerInput.actions");
+                Debug.LogError($"{actionName} not found in playerInput.actions");
                 return "";
             }
 
-            var action = playerInput.actions[name];
-            return action.bindings[0].effectivePath.Replace("<Keyboard>/", "").ToUpper() + ")";
+            var action = playerInput.actions[actionName];
+            return action.bindings[0].effectivePath.Replace("<Keyboard>/", "").ToUpper();
         }
     }
 }

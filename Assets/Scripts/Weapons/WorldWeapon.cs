@@ -21,8 +21,6 @@ namespace AFV2
         [Header("Applicable to Left Hand")]
         public WeaponAnimations leftWeaponAnimations;
 
-
-
         void Awake()
         {
             if (IsLeftHandWeapon())
