@@ -1,5 +1,6 @@
 namespace AFV2
 {
+    using TMPro;
     using UnityEngine;
     using UnityEngine.Events;
     using UnityEngine.EventSystems;
@@ -19,6 +20,7 @@ namespace AFV2
         [Header("UI")]
         [SerializeField] Image backgroundIcon;
         [SerializeField] GameObject equippedIndicator;
+        [SerializeField] TextMeshProUGUI itemCounter;
 
         // Events
         public UnityAction onSelect, onDeselect, onPointerEnter, onPointerExit;
@@ -26,10 +28,22 @@ namespace AFV2
         public void ShowEquippedIcon() => equippedIndicator.SetActive(true);
         public void HideEquippedIcon() => equippedIndicator.SetActive(false);
 
+        public void ShowCount(int count)
+        {
+            itemCounter.gameObject.SetActive(true);
+            itemCounter.text = count.ToString();
+        }
+
+        public void HideCount()
+        {
+            itemCounter.gameObject.SetActive(false);
+        }
+
         void Awake()
         {
             AssignEventListeners();
             HideEquippedIcon();
+            HideCount();
         }
 
         void AssignEventListeners()

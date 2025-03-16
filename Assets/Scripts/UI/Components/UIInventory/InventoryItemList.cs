@@ -101,11 +101,6 @@ namespace AFV2
         #endregion
 
         #region Filter and select items to display in the scroll rect
-        List<ItemInstance> GetItemsToDisplay(List<ItemInstance> items)
-        {
-            return items;
-        }
-
         bool IsWeaponAvailable(WeaponInstance weaponInstance)
         {
             if (weaponInstance.item is Weapon weapon && weapon.isFallbackWeapon)
@@ -140,9 +135,17 @@ namespace AFV2
             return false;
         }
 
-        bool IsItemAvailable(List<ItemInstance> equippedItems, ItemInstance itemToEquip)
+        bool IsItemInstanceAvailable(List<ItemInstance> equippedItems, ItemInstance itemToEquip)
         {
             int equippedIndex = equippedItems.FindIndex(equippedItem => equippedItem?.ID == itemToEquip?.ID);
+
+            // Unavailable is item is equipped on another slot
+            return equippedIndex != -1 && equippedIndex != inventoryFilter.SlotFilter;
+        }
+
+        bool IsItemAvailable(List<Item> equippedItems, Item itemToEquip)
+        {
+            int equippedIndex = equippedItems.FindIndex(equippedItem => equippedItem == itemToEquip);
 
             // Unavailable is item is equipped on another slot
             return equippedIndex != -1 && equippedIndex != inventoryFilter.SlotFilter;
@@ -175,7 +178,7 @@ namespace AFV2
                 return true;
             }).Cast<ItemInstance>().ToList();
 
-            RenderItems(GetItemsToDisplay(weapons));
+            RenderItems(weapons);
         }
 
         void ShowSkills()
@@ -190,7 +193,7 @@ namespace AFV2
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterApi.characterSkills.skills.Cast<ItemInstance>().ToList(), item))
+                    if (IsItemInstanceAvailable(characterApi.characterSkills.skills.Cast<ItemInstance>().ToList(), item))
                     {
                         return false;
                     }
@@ -199,7 +202,7 @@ namespace AFV2
                 return true;
             }).ToList();
 
-            RenderItems(GetItemsToDisplay(skills));
+            RenderItems(skills);
         }
 
         void ShowArrows()
@@ -210,11 +213,11 @@ namespace AFV2
             }
 
             List<ItemInstance> arrows = characterApi.characterInventory.GetItems<Arrow>()
-                .Where(item =>
+                .Where(itemInstance =>
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterApi.characterArchery.arrows.Cast<ItemInstance>().ToList(), item))
+                    if (IsItemAvailable(characterApi.characterArchery.arrows.Cast<Item>().ToList(), itemInstance.item))
                     {
                         return false;
                     }
@@ -223,7 +226,21 @@ namespace AFV2
                 return true;
             }).ToList<ItemInstance>();
 
-            RenderItems(GetItemsToDisplay(arrows));
+            Dictionary<Item, List<ItemInstance>> stackableArrows = new();
+
+            foreach (ItemInstance itemInstance in arrows)
+            {
+                if (stackableArrows.ContainsKey(itemInstance.item))
+                {
+                    stackableArrows[itemInstance.item].Add(itemInstance);
+                }
+                else
+                {
+                    stackableArrows.Add(itemInstance.item, new() { itemInstance });
+                }
+            }
+
+            RenderStackableItems(stackableArrows);
         }
 
         void ShowAccessories()
@@ -238,7 +255,7 @@ namespace AFV2
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterApi.characterEquipment.accessories.Cast<ItemInstance>().ToList(), item))
+                    if (IsItemInstanceAvailable(characterApi.characterEquipment.accessories.Cast<ItemInstance>().ToList(), item))
                     {
                         return false;
                     }
@@ -247,7 +264,7 @@ namespace AFV2
                 return true;
             }).ToList();
 
-            RenderItems(GetItemsToDisplay(accessories));
+            RenderItems(accessories);
         }
 
         void ShowConsumables()
@@ -262,7 +279,7 @@ namespace AFV2
             {
                 if (inventoryFilter.SlotFilter != -1)
                 {
-                    if (IsItemAvailable(characterApi.characterConsumables.consumables.Cast<ItemInstance>().ToList(), item))
+                    if (IsItemInstanceAvailable(characterApi.characterConsumables.consumables.Cast<ItemInstance>().ToList(), item))
                     {
                         return false;
                     }
@@ -271,7 +288,7 @@ namespace AFV2
                 return true;
             }).ToList();
 
-            RenderItems(GetItemsToDisplay(consumables));
+            RenderItems(consumables);
         }
 
         void ShowHeadgears()
@@ -283,7 +300,7 @@ namespace AFV2
 
             List<ItemInstance> headgears = characterApi.characterInventory.GetItems<Headgear>().ToList();
 
-            RenderItems(GetItemsToDisplay(headgears));
+            RenderItems(headgears);
         }
 
         void ShowArmors()
@@ -295,7 +312,7 @@ namespace AFV2
 
             List<ItemInstance> armors = characterApi.characterInventory.GetItems<Armor>().ToList();
 
-            RenderItems(GetItemsToDisplay(armors));
+            RenderItems(armors);
         }
 
         void ShowBoots()
@@ -306,7 +323,7 @@ namespace AFV2
             }
 
             List<ItemInstance> boots = characterApi.characterInventory.GetItems<Boot>().ToList();
-            RenderItems(GetItemsToDisplay(boots));
+            RenderItems(boots);
         }
 
         void ShowAll()
@@ -316,7 +333,7 @@ namespace AFV2
                 return;
             }
 
-            RenderItems(GetItemsToDisplay(characterApi.characterInventory.GetItems<Item>().ToList()));
+            RenderItems(characterApi.characterInventory.GetItems<Item>().ToList());
         }
         #endregion
 
@@ -325,15 +342,34 @@ namespace AFV2
         {
             foreach (ItemInstance itemInstance in items)
             {
-                Item item = itemInstance.item;
-
-                InventorySlotButton slotButton = RenderItem(itemInstance);
-                slotButton.onSelect += () => PreviewItem(itemInstance);
-                slotButton.onDeselect += ClearPreviewItem;
-                slotButton.onPointerEnter += () => PreviewItem(itemInstance);
-                slotButton.onPointerExit += ClearPreviewItem;
-                HandleIcons(itemInstance, slotButton);
+                HandleItemRendering(itemInstance);
             }
+        }
+
+        void RenderStackableItems(Dictionary<Item, List<ItemInstance>> stackableItems)
+        {
+            foreach (var itemInstance in stackableItems)
+            {
+                if (itemInstance.Value.Count > 0)
+                {
+                    InventorySlotButton slotButton = HandleItemRendering(itemInstance.Value.ElementAt(0));
+                    slotButton.ShowCount(itemInstance.Value.Count);
+                }
+            }
+        }
+
+        InventorySlotButton HandleItemRendering(ItemInstance itemInstance)
+        {
+            Item item = itemInstance.item;
+
+            InventorySlotButton slotButton = RenderItem(itemInstance);
+            slotButton.onSelect += () => PreviewItem(itemInstance);
+            slotButton.onDeselect += ClearPreviewItem;
+            slotButton.onPointerEnter += () => PreviewItem(itemInstance);
+            slotButton.onPointerExit += ClearPreviewItem;
+            HandleIcons(itemInstance, slotButton);
+
+            return slotButton;
         }
 
         InventorySlotButton RenderItem(ItemInstance itemInstance)

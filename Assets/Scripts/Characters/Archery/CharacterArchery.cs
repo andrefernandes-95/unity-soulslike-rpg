@@ -127,5 +127,10 @@ namespace AFV2
         {
             HandleArrowWorld(false);
         }
+
+        public Arrow GetCurrentArrow()
+        {
+            return arrows[activeArrowIndex];
+        }
     }
 }

@@ -36,6 +36,15 @@ namespace AFV2
 
         public bool HasItem(Item item) => ownedItems.ContainsKey(item);
 
+        public int GetItemCount(Item item)
+        {
+            if (OwnedItems.TryGetValue(item, out var itemInstances))
+            {
+                return itemInstances.Count;
+            }
+            return 0;
+        }
+
         public IEnumerable<ItemInstance> GetItems<T>() where T : Item
         {
             var filteredList = OwnedItems
